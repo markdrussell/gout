@@ -1,4 +1,4 @@
-# gout
+# Gout
 
 [View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fmarkdrussell%252Fgout)
 
