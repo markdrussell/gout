@@ -169,10 +169,10 @@
       "sha": "a1ce4e8cce8a6bf5925c02b8855a3520cd5c7cbc"
     },
     "user-markdrussell-gout-flaresattacks.csv": {
-      "id": "user/markdrussell/gout-flaresattacks/28cf9284",
-      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gout-flaresattacks/28cf9284/",
-      "downloaded_at": "2022-12-05 10:26:13.295267Z",
-      "sha": "cc192118b04499bead7d5afe1d08eb452397eb39"
+      "id": "user/markdrussell/gout-flaresattacks/5334de55",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gout-flaresattacks/5334de55/",
+      "downloaded_at": "2023-01-03 15:28:06.246022Z",
+      "sha": "fc7c0ac5839c7bc2076187bdbe1087016f74a1ab"
     }
   }
 }

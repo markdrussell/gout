@@ -26,4 +26,4 @@ user/markdrussell/gouty-tophi/41df05b9/
 nhsd/oral-steroid-drugs-pra-dmd/44292c02
 pincer/nsaid/23edd06e
 user/markdrussell/colchicine/76b0ac19/
-user/markdrussell/gout-flaresattacks/28cf9284/
+user/markdrussell/gout-flaresattacks/5334de55/

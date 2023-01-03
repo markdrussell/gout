@@ -33,7 +33,7 @@ def first_comorbidity_in_period(dx_codelist):
         },
     )
 
-# Get dates of recurrent clinical events (up to 1 year after diagnosis)
+# Get dates of recurrent clinical events (up to 6m after diagnosis)
 def with_these_clinical_events_date_X(name, codelist, index_date, n, return_expectations):
 
     def var_signature(name, codelist, on_or_after, return_expectations):
@@ -41,7 +41,7 @@ def with_these_clinical_events_date_X(name, codelist, index_date, n, return_expe
             name: patients.with_these_clinical_events(
                     codelist,
                     returning="date",
-                    between=[on_or_after, "gout_code_date + 1 year"],
+                    between=[on_or_after, "gout_code_date + 6 months"],
                     date_format="YYYY-MM-DD",
                     find_first_match_in_period=True,
                     return_expectations=return_expectations
@@ -52,7 +52,7 @@ def with_these_clinical_events_date_X(name, codelist, index_date, n, return_expe
         variables.update(var_signature(f"{name}_{i}", codelist, f"{name}_{i-1} + 1 day", return_expectations))
     return variables
 
-# Get dates of recurrent medication events (up to 1 year after diagnosis)
+# Get dates of recurrent medication events (up to 6 months after diagnosis)
 def with_these_medication_events_date_X(name, codelist, index_date, n, return_expectations):
 
     def var_signature(name, codelist, on_or_after, return_expectations):
@@ -60,7 +60,7 @@ def with_these_medication_events_date_X(name, codelist, index_date, n, return_ex
             name: patients.with_these_medications(
                     codelist,
                     returning="date",
-                    between=[on_or_after, "gout_code_date + 1 year"],
+                    between=[on_or_after, "gout_code_date + 6 months"],
                     date_format="YYYY-MM-DD",
                     find_first_match_in_period=True,
                     return_expectations=return_expectations
@@ -71,7 +71,7 @@ def with_these_medication_events_date_X(name, codelist, index_date, n, return_ex
         variables.update(var_signature(f"{name}_{i}", codelist, f"{name}_{i-1} + 1 day", return_expectations))
     return variables
 
-# Get dates of recurrent blood tests (up to 1 year after diagnosis)
+# Get dates of recurrent blood tests (up to 2 years after diagnosis)
 def with_these_bloods_date_X(name, codelist, index_date, n, return_expectations):
 
     def var_signature(name, codelist, on_or_after, return_expectations):
@@ -256,7 +256,7 @@ study = StudyDefinition(
     ),
 
     # Medications
-    ## Date of first ult prescription on record
+    ## Date of first ULT prescription on record
     first_ult_date=patients.with_these_medications(
         ult_codes,
         between = ["1900-01-01", end_date],
@@ -269,7 +269,7 @@ study = StudyDefinition(
         },
     ),
 
-    ## First ult drug code and date (should match with above - if so, remove) - Nb. code will provide tablet strength
+    ## First ULT drug code and date (should match with above - if so, remove) - Nb. code will provide tablet strength, but not quantity or duration
     first_ult_code=patients.with_these_medications(
         ult_codes,
         between = ["1900-01-01", end_date],
@@ -614,7 +614,7 @@ study = StudyDefinition(
     **with_these_emerg_events_date_X(
         name="gout_emerg",
         codelist=gout_codes,
-        index_date="gout_code_date + 14 days",
+        index_date="gout_code_date - 1 month",
         n=9,
         return_expectations={
             "date": {"earliest": "2014-03-01", "latest": end_date},
@@ -658,7 +658,7 @@ study = StudyDefinition(
         },
     ),
 
-    ## Flares (define as the number of codes that could define a flare in the 6 months after index diagnosis (excluding first 2 weeks of diagnosis) + prescription of a flare treatment (NSAID, colchicine, corticosteroid) within a week of the code)
+    ## Flare codes
     gout_flare_count=patients.with_these_clinical_events(
         gout_flare,
         between = ["gout_code_date + 14 days", "gout_code_date + 6 months"],
@@ -685,6 +685,17 @@ study = StudyDefinition(
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
             "incidence": 0.4,
+        },
+    ),
+
+    **with_these_clinical_events_date_X(
+        name="gout_code_any",
+        codelist=gout_codes,
+        index_date="gout_code_date + 14 days",
+        n=9,
+        return_expectations={
+            "date": {"earliest": "2014-04-01", "latest": end_date},
+            "incidence": 0.5,
         },
     ),
 

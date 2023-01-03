@@ -14,8 +14,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -120,7 +120,7 @@ twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incid
 /*
 twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) || connected incidence_ra_diag_round mo_year_diagn, color(sky) || connected incidence_psa_diag_round mo_year_diagn, color(red) || connected incidence_axspa_diag_round mo_year_diagn, color(green) || connected incidence_undiff_diag_round mo_year_diagn, color(gold) xline(722) yscale(range(0(0.1)0.6)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6", nogrid labsize(vsmall)) xtitle("Date of diagnosis", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022" 753 "Oct 2022", nogrid labsize(vsmall)) title("", size(small)) name(incidence_twoway, replace) legend(region(fcolor(white%0)) order(1 "Total IA diagnoses" 2 "RA" 3 "PsA" 4 "axSpA" 5 "Undifferentiated IA")) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in)replace
-*/	
+
 	
 restore	
 
@@ -219,6 +219,7 @@ gen incidence_imd_5=((imd_5_diag_round/3360490)*10000)
 export delimited using "$projectdir/output/tables/diag_count_byyear_imd.csv", replace
 
 restore
+*/	
 
 /*Baseline tables=====================================================================================*/
 
@@ -257,6 +258,8 @@ tab chronic_liver_disease, missing
 tab chronic_card_disease, missing
 tab diuretic, missing
 tab tophus, missing
+tab multiple_flares, missing
+tabstat flare_count, stats (n mean p50 p25 p75)
 
 *Baseline table overall
 table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
@@ -273,7 +276,7 @@ table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
 		 cancer bin %5.1f \ ///
 		 chronic_resp_disease bin  %5.1f \ ///
 		 chronic_liver_disease bin %5.1f \ ///
-		 ckd cat %5.1f \ ///
+		 ckd bin %5.1f \ ///
 		 diuretic bin %5.1f \ ///
 		 tophus bin %5.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_bydiagnosis.xls", replace)
@@ -293,11 +296,10 @@ table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle("
 		 cancer bin %5.1f \ ///
 		 chronic_resp_disease bin  %5.1f \ ///
 		 chronic_liver_disease bin %5.1f \ ///
-		 ckd cat %5.1f \ ///
+		 ckd bin %5.1f \ ///
 		 diuretic bin %5.1f \ ///
 		 tophus bin %5.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_byyear.xls", replace)
-		 
 
 *Follow-up=======================================================================================================*/
 
@@ -310,6 +312,14 @@ tab mo_year_diagn has_12m_follow_up
 **Proportion of patients with at least 6/12 months of registration and follow-up time after diagnosis
 tab has_6m_post_diag, missing 
 tab has_12m_post_diag, missing 
+
+*Baseline urate==================================================================================================*/
+
+tabstat baseline_urate, stats(n mean p50 p25 p75)
+tab baseline_urate_below360, missing
+tab baseline_urate_below360
+tab baseline_urate_below300, missing
+tab baseline_urate_below300		 
 
 *ULT prescriptions===============================================================================================*/
 
@@ -332,25 +342,34 @@ tab allo_12m, missing
 tab allo_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
 **Proportion with a prescription for febuxostat within 6m of diagnosis
-tab febu_6m, missing
-tab febu_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
-tab febu_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
+tab febux_6m, missing
+tab febux_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
+tab febux_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
 **Proportion with a prescription for febuxostat within 12m of diagnosis
-tab febu_12m, missing
-tab febu_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
+tab febux_12m, missing
+tab febux_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
-*Baseline urate==================================================================================================*/
+*ULT prescriptions in context of additional risk factors=============================================================*/
 
-tabstat baseline_urate, stats(n mean p50 p25 p75)
-tab baseline_urate_below360, missing
-tab baseline_urate_below360
-tab baseline_urate_below300, missing
-tab baseline_urate_below300		 
+**CKD
+foreach var of varlist tophi ckd diuretic multiple_flares high_risk {
+**ULT within 6m 
+bys `var': tab ult_6m, missing
+**ULT within 6m for those with at least 6m of available follow-up
+bys `var': tab ult_6m if has_6m_post_diag==1, missing 
+**ULT within 12m 
+bys `var': tab ult_12m, missing
+**ULT within 12m for those with at least 12m of available follow-up
+bys `var': tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
+}
 
 ***Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 12m of diagnosis //should this be 6m or 12m
 tab has_6m_post_ult, missing
 tab has_12m_post_ult, missing 
+
+
+
  
 
 **Referral standards, by eia diagnosis

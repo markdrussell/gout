@@ -17,8 +17,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -73,6 +73,7 @@ foreach var of varlist   died_date_ons						///
 						 esrf								///
 						 organ_transplant					///
 						 gout_flare_?						///
+						 gout_code_any_?					///
 						 flare_treatment_?					///
 						 gout_admission_?					///	
 						 gout_emerg_?						///
@@ -119,6 +120,7 @@ foreach var of varlist 	 gout_code_date						///
 						 gout_emerg_pre_date				///
 						 tophi_date							///
 						 gout_flare_?_date					///
+						 gout_code_any_?_date				///
 						 flare_treatment_?_date				///
 						 urate_test_?_date					///
 						 {		
@@ -151,6 +153,7 @@ forval i = 1/9 	{
 					order urate_test_`i', after(urate_date_`i')
 					rename urate_test_`i'_val urate_val_`i'
 					rename gout_flare_`i'_date gout_flare_date_`i'
+					rename gout_code_any_`i'_date gout_code_any_date_`i'
 					rename flare_treatment_`i'_date flare_treatment_date_`i'
 					rename gout_emerg_`i'_date gout_emerg_date_`i'
 					rename gout_admission_`i'_date  gout_admission_date_`i'
@@ -521,11 +524,6 @@ lab define tophus 0 "No" 1 "Yes", modify
 lab val tophus tophus
 lab var tophus "Tophaceous gout"
 
-*Define flare==============================================================================*/
-
-*Define flare as presence of a non-index gout code in GP record/ED attendance/admission AND prescription for a flare treatment within 7 days of that code 
-reshape long gout_flare_ gout_flare_date_ gout_emerg_ gout_emerg_date_ gout_admission_ gout_admission_date_, i(patient_id) j(flare_order)
-
 *Ensure everyone has gout code=============================================================*/
 
 tab gout_code, missing
@@ -551,21 +549,21 @@ tab gout_admission_pre //admissions for gout that were more than 30 days before 
 drop if gout_admission_pre==1 //drop those with gout admissions that were more than 30 days before GP gout code 
 
 tab gout_admission_1 //admissions for gout that were from 30 days before gout code and onwards
-tab gout_admission_1 if gout_code_date!=. & gout_admission_1_date!=. & gout_admission_1_date<gout_code_date
-tab gout_admission_1 if gout_code_date!=. & gout_admission_1_date!=. & (gout_admission_1_date+30)<gout_code_date //30 days before - should be accounted for by study definition
+tab gout_admission_1 if gout_code_date!=. & gout_admission_date_1!=. & gout_admission_date_1<gout_code_date
+tab gout_admission_1 if gout_code_date!=. & gout_admission_date_1!=. & (gout_admission_date_1+30)<gout_code_date //30 days before - should be accounted for by study definition
 
 *Recode index diagnosis date as gout admission date if gout admission date less than 30 days before index gout code date
-replace gout_code_date=gout_admission_1_date if gout_code_date!=. & first_ult_code_date!=. & (gout_admission_1_date<gout_code_date)
+replace gout_code_date=gout_admission_date_1 if gout_code_date!=. & first_ult_code_date!=. & (gout_admission_date_1<gout_code_date)
 
 tab gout_emerg_pre //ED attendances for gout that were more than 30 days before gout code
 drop if gout_emerg_pre==1 //drop those with gout ED attendances that were more than 30 days before GP gout code 
 
 tab gout_emerg_1 //ED attendances for gout that were from 30 days before gout code and onwards
-tab gout_emerg_1 if gout_code_date!=. & gout_emerg_1_date!=. & gout_emerg_1_date<gout_code_date
-tab gout_emerg_1 if gout_code_date!=. & gout_emerg_1_date!=. & (gout_emerg_1_date+30)<gout_code_date 
+tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & gout_emerg_date_1<gout_code_date
+tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & (gout_emerg_date_1+30)<gout_code_date 
 
 *Recode index diagnosis date as gout emerg date if gout emerg date less than 30 days before index gout code date
-replace gout_code_date=gout_emerg_1_date if gout_code_date!=. & first_ult_code_date!=. & (gout_emerg_1_date<gout_code_date)
+replace gout_code_date=gout_emerg_date_1 if gout_code_date!=. & first_ult_code_date!=. & (gout_emerg_date_1<gout_code_date)
 
 *Generate diagnosis date===============================================================*/
 
@@ -661,20 +659,20 @@ tab allo_12m, missing
 tab allo_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up 
 
 **Generate variable for time to first febuxostat prescription
-gen time_to_febu = first_febu_date-gout_code_date if first_febu_date!=. & gout_code_date!=.
+gen time_to_febux = first_febux_date-gout_code_date if first_febux_date!=. & gout_code_date!=.
 
 **Generate variable for those who had febuxostat prescription within 6m of diagnosis 
-gen febu_6m = 1 if time_to_febu<=180 & time_to_febu!=.
-recode febu_6m .=0
-tab febu_6m, missing
-tab febu_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
-tab febu_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
+gen febux_6m = 1 if time_to_febux<=180 & time_to_febux!=.
+recode febux_6m .=0
+tab febux_6m, missing
+tab febux_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
+tab febux_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
 **Generate variable for those who had febuxostat prescription within 12m of diagnosis 
-gen febu_12m = 1 if time_to_febu<=365 & time_to_febu!=.
-recode febu_12m .=0
-tab febu_12m, missing
-tab febu_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up 
+gen febux_12m = 1 if time_to_febux<=365 & time_to_febux!=.
+recode febux_12m .=0
+tab febux_12m, missing
+tab febux_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up 
 
 //Nb. can't tell dose - e.g. if allopurinol 100mg tablets issued, don't know dose prescribed
 
@@ -734,14 +732,113 @@ lab var has_12m_post_ult ">12m follow-up after ULT"
 lab define has_12m_post_ult 0 "No" 1 "Yes", modify
 lab val has_12m_post_ult has_12m_post_ult
 tab has_12m_post_ult, missing 
-			
-*Define follow-up======================================*/
 
-**Proportion of patients with at least 6 or 12 months of GP registration after diagnosis date
-tab has_6m_follow_up
-tab has_12m_follow_up 
-tab mo_year_diagn has_6m_follow_up
-tab mo_year_diagn has_12m_follow_up
+*Define flare==============================================================================*/
+
+*Define flare (adapted from https://jamanetwork.com/journals/jama/fullarticle/2794763): 1) presence of a non-index diagnostic code for gout exacerbation; 2) non-index admission with primary gout diagnostic code; 3) non-index ED attendance with primary gout diagnostic code; 4) any non-index gout diagnostic code AND prescription for a flare treatment on same day as that code; all within 6m of index diagnostic code. Exclude events that occur within 14 days of one another
+
+**Non-index admission with primary gout diagnostic code
+reshape long gout_admission_date_ gout_admission_, i(patient_id) j(admission_order)
+preserve
+gen flare_overall_date=gout_admission_date_ if ((gout_admission_date_<(gout_code_date+180)) & (gout_admission_date_>(gout_code_date+14))) & gout_admission_date_!=. //save a list of admission dates within 6m of diagnosis, but not within first 14 days of diagnosis
+format %td flare_overall_date
+keep patient_id admission_order flare_overall_date
+save "$projectdir/output/data/admission_dates_long.dta", replace
+restore
+bys patient_id (gout_admission_date_): gen n=_n
+replace gout_admission_=0 if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=. //remove admissions within 14 days of one another
+replace gout_admission_date_=. if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=.
+drop n
+reshape wide gout_admission_date_ gout_admission_, i(patient_id) j(admission_order)
+
+**Non-index ED attendance with primary gout diagnostic code
+reshape long gout_emerg_date_ gout_emerg_, i(patient_id) j(emerg_order)
+preserve
+gen flare_overall_date=gout_emerg_date_ if ((gout_emerg_date_<(gout_code_date+180)) & (gout_emerg_date_>(gout_code_date+14))) & gout_emerg_date_!=. //save a list of ED dates within 6m of diagnosis, but not within first 14 days of diagnosis
+format %td flare_overall_date
+keep patient_id emerg_order flare_overall_date
+save "$projectdir/output/data/emerg_dates_long.dta", replace
+restore
+bys patient_id (gout_emerg_date_): gen n=_n
+replace gout_emerg_=0 if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=. //remove emergs within 14 days of one another
+replace gout_emerg_date_=. if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=.
+drop n
+reshape wide gout_emerg_date_ gout_emerg_, i(patient_id) j(emerg_order)
+
+**Any non-index gout diagnostic code AND prescription for a flare treatment on same day as that code;
+reshape long gout_code_any_ gout_code_any_date_, i(patient_id) j(code_order)
+gen code_and_tx_date_=.
+format %td code_and_tx_date_
+forval i = 1/9 	{
+replace code_and_tx_date_=gout_code_any_date_ if gout_code_any_date_==flare_treatment_date_`i' & gout_code_any_date_!=. & flare_treatment_date_`i'!=.
+}
+preserve
+gen flare_overall_date=code_and_tx_date_ if ((code_and_tx_date_<(gout_code_date+180)) & (code_and_tx_date_>(gout_code_date+14))) & code_and_tx_date_!=. //save a list of code/Tx dates within 6m of diagnosis
+format %td flare_overall_date
+keep patient_id code_order flare_overall_date
+save "$projectdir/output/data/code_tx_dates_long.dta", replace
+restore
+bys patient_id (code_and_tx_date_): gen n=_n
+replace code_and_tx_date_=. if (code_and_tx_date_-14<code_and_tx_date_[_n-1]) & code_and_tx_date_!=. & code_and_tx_date_[_n-1]!=. //remove flares within 14 days of one another
+drop n
+reshape wide gout_code_any_ gout_code_any_date_ code_and_tx_date_, i(patient_id) j(code_order)
+
+**Presence of a non-index diagnostic code for gout exacerbation
+reshape long gout_flare_date_ gout_flare_, i(patient_id) j(flare_order)
+preserve
+gen flare_overall_date=gout_flare_date_ if ((gout_flare_date_<(gout_code_date+180)) & (gout_flare_date_>(gout_code_date+14))) & gout_flare_date_!=. //save a list of code/Tx dates within 6m of diagnosis, but not within first 14 days of diagnosis
+format %td flare_overall_date
+keep patient_id flare_order flare_overall_date
+save "$projectdir/output/data/flare_dates_long.dta", replace
+append using "$projectdir/output/data/code_tx_dates_long.dta" //append all other flares/admissions/ED
+append using "$projectdir/output/data/emerg_dates_long.dta"
+append using "$projectdir/output/data/admission_dates_long.dta"
+bys patient_id (flare_overall_date): gen n=_n 
+replace flare_overall_date=. if (flare_overall_date-14<flare_overall_date[_n-1]) & flare_overall_date!=. & flare_overall_date[_n-1]!=. //remove flares within 14 days of one another
+drop n
+bys patient_id (flare_overall_date): gen n=_n 
+replace flare_overall_date=. if (flare_overall_date-14<flare_overall_date[_n-1]) & flare_overall_date!=. & flare_overall_date[_n-1]!=. //remove flares within 14 days of one another (repeat this)
+drop n
+bys patient_id (flare_overall_date): gen n=_n 
+replace flare_overall_date=. if (flare_overall_date-14<flare_overall_date[_n-1]) & flare_overall_date!=. & flare_overall_date[_n-1]!=. //remove flares within 14 days of one another (repeat this)
+drop n
+bys patient_id (flare_overall_date): gen n=_n 
+replace flare_overall_date=. if (flare_overall_date-14<flare_overall_date[_n-1]) & flare_overall_date!=. & flare_overall_date[_n-1]!=. //remove flares within 14 days of one another (repeat this)
+drop n
+bys patient_id (flare_overall_date): gen n=_n if flare_overall_date!=.
+by patient_id: egen flare_count=max(n) //count of flares/admissions/ED within 6 months 
+drop n
+bys patient_id (flare_overall_date): gen n=_n 
+keep if n==1
+keep patient_id flare_count
+save "$projectdir/output/data/flare_count.dta", replace
+restore
+bys patient_id (gout_flare_date_): gen n=_n
+replace gout_flare_=0 if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=. //remove flares within 14 days of one another
+replace gout_flare_date_=. if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=.
+drop n
+reshape wide gout_flare_date_ gout_flare_, i(patient_id) j(flare_order)
+
+**Now merge flare count in with original dataset
+merge 1:1 patient_id using "$projectdir/output/data/flare_count.dta"
+drop _merge
+recode flare_count .=0
+tabstat flare_count, stats (n mean p50 p25 p75)
+gen multiple_flares = 1 if flare_count>=1 & flare_count!=. //define multiple flares as one or more additional flare within first 6 months of diagnosis
+recode multiple_flares .=0
+tab multiple_flares	
+
+*Define high-risk patients for ULT===========================================================*/
+gen high_risk = 1 if tophi==1 | ckd==1 | diuretic==1 | multiple_flares==1
+recode high_risk .=0	
+
+
+
+
+
+
+
+
 
 *Time to rheum referral (see notes above)=============================================*/
 
