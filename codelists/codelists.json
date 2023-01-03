@@ -1,3 +1,178 @@
 {
-  "files": {}
+  "files": {
+    "user-markdrussell-gout.csv": {
+      "id": "user/markdrussell/gout/7a2a1f9e",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gout/7a2a1f9e/",
+      "downloaded_at": "2022-11-28 16:03:53.927128Z",
+      "sha": "116946aa5033c47c5f35c1ea1f83b5294c627c80"
+    },
+    "user-markdrussell-serum-urate.csv": {
+      "id": "user/markdrussell/serum-urate/15ec52ca",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/serum-urate/15ec52ca/",
+      "downloaded_at": "2022-11-28 16:03:54.145058Z",
+      "sha": "12e183799ce73c0974e1106a1f69698d539426da"
+    },
+    "user-markdrussell-serum-urateuric-acid-ctv3.csv": {
+      "id": "user/markdrussell/serum-urateuric-acid-ctv3/04f51f77",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/serum-urateuric-acid-ctv3/04f51f77/",
+      "downloaded_at": "2022-11-29 11:56:57.718929Z",
+      "sha": "3337528f94b80a1837b3b9a425055f7bca3b11bc"
+    },
+    "user-markdrussell-allopurinol.csv": {
+      "id": "user/markdrussell/allopurinol/7cdcdf94",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/allopurinol/7cdcdf94/",
+      "downloaded_at": "2022-11-28 16:03:54.381239Z",
+      "sha": "8d2f92ce16680df3c4a71297cfa2de4f11eb1f41"
+    },
+    "user-markdrussell-febuxostat.csv": {
+      "id": "user/markdrussell/febuxostat/4abdf92a",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/febuxostat/4abdf92a/",
+      "downloaded_at": "2022-11-28 16:03:54.618857Z",
+      "sha": "d228f963aa27773ffdd5812ff8eeeaa4bec479a7"
+    },
+    "user-markdrussell-gout-admissions.csv": {
+      "id": "user/markdrussell/gout-admissions/07a7df6d",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gout-admissions/07a7df6d/",
+      "downloaded_at": "2022-11-29 15:13:00.270647Z",
+      "sha": "b4f8a262fc4324281ddc145e05a93a4bb7f2197c"
+    },
+    "opensafely-cancer-excluding-lung-and-haematological.csv": {
+      "id": "opensafely/cancer-excluding-lung-and-haematological/2020-04-15",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/cancer-excluding-lung-and-haematological/2020-04-15/",
+      "downloaded_at": "2021-02-09 09:24:26.798213Z",
+      "sha": "8fa1164b587028c4bd5903289e0948642d399e56"
+    },
+    "opensafely-chronic-cardiac-disease.csv": {
+      "id": "opensafely/chronic-cardiac-disease/2020-04-08",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/chronic-cardiac-disease/2020-04-08/",
+      "downloaded_at": "2021-02-09 09:24:26.888988Z",
+      "sha": "2267f6fada9c77a2bbf62ce7a1c07ddf48348d61"
+    },
+    "opensafely-chronic-liver-disease.csv": {
+      "id": "opensafely/chronic-liver-disease/2020-06-02",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/chronic-liver-disease/2020-06-02/",
+      "downloaded_at": "2021-02-09 09:24:27.018564Z",
+      "sha": "d31d212d23c5f0e15f63236d2106282fb070bd7c"
+    },
+    "opensafely-chronic-kidney-disease.csv": {
+      "id": "opensafely/chronic-kidney-disease/2020-04-14",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/chronic-kidney-disease/2020-04-14/",
+      "downloaded_at": "2021-02-09 09:24:26.958078Z",
+      "sha": "08e003f1222fe26781288b2eeff22db99780f202"
+    },
+    "opensafely-chronic-respiratory-disease.csv": {
+      "id": "opensafely/chronic-respiratory-disease/2020-04-10",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/chronic-respiratory-disease/2020-04-10/",
+      "downloaded_at": "2021-02-09 09:24:27.104578Z",
+      "sha": "77946d9b844f348daf5c8c9e81346b9776d13998"
+    },
+    "opensafely-crohns-disease.csv": {
+      "id": "opensafely/crohns-disease/223a39f5",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/crohns-disease/223a39f5/",
+      "downloaded_at": "2021-03-23 10:46:43.454469Z",
+      "sha": "63230a0cc37cc199ffd4920cfcbe6d3188c602bf"
+    },
+    "opensafely-current-copd.csv": {
+      "id": "opensafely/current-copd/2020-05-06",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/current-copd/2020-05-06/",
+      "downloaded_at": "2021-02-09 09:24:27.178226Z",
+      "sha": "bab838b50e256ceef8b9d2f6ca1132491e522bda"
+    },
+    "opensafely-diabetes.csv": {
+      "id": "opensafely/diabetes/2020-04-15",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/diabetes/2020-04-15/",
+      "downloaded_at": "2022-04-04 10:01:38.581139Z",
+      "sha": "f2781f0c9a0617b30996d681a798eedd152a09af"
+    },
+    "opensafely-ethnicity.csv": {
+      "id": "opensafely/ethnicity/2020-04-27",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/ethnicity/2020-04-27/",
+      "downloaded_at": "2021-02-09 09:24:27.622608Z",
+      "sha": "3d2f3998b71863a80b24d60f6f4282e14191ae13"
+    },
+    "opensafely-haematological-cancer.csv": {
+      "id": "opensafely/haematological-cancer/2020-04-15",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/haematological-cancer/2020-04-15/",
+      "downloaded_at": "2021-02-09 09:24:27.702866Z",
+      "sha": "59d65c613a7b984ba46eca8a74eedcc6320609fe"
+    },
+    "opensafely-hypertension.csv": {
+      "id": "opensafely/hypertension/2020-04-28",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/hypertension/2020-04-28/",
+      "downloaded_at": "2021-02-09 09:24:27.897409Z",
+      "sha": "b0d7bbf6ea767366db458bc6f6d37955ae331cc7"
+    },
+    "opensafely-lung-cancer.csv": {
+      "id": "opensafely/lung-cancer/2020-04-15",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/lung-cancer/2020-04-15/",
+      "downloaded_at": "2021-02-09 09:24:27.971404Z",
+      "sha": "645584a20f81c4d76187a2c305c904e8b8c63dbb"
+    },
+    "opensafely-smoking-clear.csv": {
+      "id": "opensafely/smoking-clear/2020-04-29",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/smoking-clear/2020-04-29/",
+      "downloaded_at": "2021-02-09 09:24:28.208160Z",
+      "sha": "0b5f3afe1db96dcce5141220e893a42ba2e5a8f7"
+    },
+    "opensafely-smoking-unclear.csv": {
+      "id": "opensafely/smoking-unclear/2020-04-29",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/smoking-unclear/2020-04-29/",
+      "downloaded_at": "2021-02-09 09:24:28.275164Z",
+      "sha": "d9dad3e9d9491f765863b2617114c521957b6db1"
+    },
+    "opensafely-solid-organ-transplantation.csv": {
+      "id": "opensafely/solid-organ-transplantation/2020-04-10",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/solid-organ-transplantation/2020-04-10/",
+      "downloaded_at": "2021-02-09 09:24:28.343153Z",
+      "sha": "94178a9e19770b9c43c08fe42df6ab5ed0d9ec49"
+    },
+    "opensafely-stroke-updated.csv": {
+      "id": "opensafely/stroke-updated/2020-06-02",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/stroke-updated/2020-06-02/",
+      "downloaded_at": "2021-02-09 09:24:28.403150Z",
+      "sha": "e62a8af49698022220de1e1e438d6b6c611e666e"
+    },
+    "pincer-diur.csv": {
+      "id": "pincer/diur/213b1078",
+      "url": "https://codelists.opensafely.org/codelist/pincer/diur/213b1078/",
+      "downloaded_at": "2022-12-02 16:24:05.631905Z",
+      "sha": "9cf891203e1c05f8663306823bea56ca31389e41"
+    },
+    "opensafely-thiazide-type-diuretic-medication.csv": {
+      "id": "opensafely/thiazide-type-diuretic-medication/2020-05-19",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/thiazide-type-diuretic-medication/2020-05-19/",
+      "downloaded_at": "2022-12-02 16:24:06.020175Z",
+      "sha": "9bb1c197e0733d2e53a5dece516caf75e458be2c"
+    },
+    "user-markdrussell-gouty-tophi.csv": {
+      "id": "user/markdrussell/gouty-tophi/41df05b9",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gouty-tophi/41df05b9/",
+      "downloaded_at": "2022-12-05 10:26:12.405403Z",
+      "sha": "86a5f63ea9ddf2a49a036109610ea051c20124f5"
+    },
+    "nhsd-oral-steroid-drugs-pra-dmd.csv": {
+      "id": "nhsd/oral-steroid-drugs-pra-dmd/44292c02",
+      "url": "https://codelists.opensafely.org/codelist/nhsd/oral-steroid-drugs-pra-dmd/44292c02/",
+      "downloaded_at": "2022-12-05 10:26:12.671034Z",
+      "sha": "bc844f5bf1d376fdfff43458233e09cc2a0978de"
+    },
+    "pincer-nsaid.csv": {
+      "id": "pincer/nsaid/23edd06e",
+      "url": "https://codelists.opensafely.org/codelist/pincer/nsaid/23edd06e/",
+      "downloaded_at": "2022-12-05 10:28:43.616312Z",
+      "sha": "36655feddbfcbf9ec475d6c31e87bf19230a0236"
+    },
+    "user-markdrussell-colchicine.csv": {
+      "id": "user/markdrussell/colchicine/76b0ac19",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/colchicine/76b0ac19/",
+      "downloaded_at": "2022-12-05 10:26:13.110194Z",
+      "sha": "a1ce4e8cce8a6bf5925c02b8855a3520cd5c7cbc"
+    },
+    "user-markdrussell-gout-flaresattacks.csv": {
+      "id": "user/markdrussell/gout-flaresattacks/28cf9284",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/gout-flaresattacks/28cf9284/",
+      "downloaded_at": "2022-12-05 10:26:13.295267Z",
+      "sha": "cc192118b04499bead7d5afe1d08eb452397eb39"
+    }
+  }
 }

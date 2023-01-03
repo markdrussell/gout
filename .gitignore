@@ -1,5 +1,6 @@
 *~
-model.log
+*.log
+*.smcl
 */input.csv
 __pycache__
 .python-version
@@ -9,3 +10,4 @@ venv/
 .DS_Store
 .Rhistory
 .Rproj.user/
+
