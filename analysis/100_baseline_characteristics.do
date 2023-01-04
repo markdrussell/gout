@@ -14,8 +14,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -260,6 +260,7 @@ tab diuretic, missing
 tab tophus, missing
 tab multiple_flares, missing
 tabstat flare_count, stats (n mean p50 p25 p75)
+tab high_risk, missing
 
 *Baseline table overall
 table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
@@ -279,6 +280,8 @@ table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
 		 ckd bin %5.1f \ ///
 		 diuretic bin %5.1f \ ///
 		 tophus bin %5.1f \ ///
+		 multiple_flares bin %5.1f \ ///
+		 high_risk %5.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_bydiagnosis.xls", replace)
 
 *Baseline table by year of diagnosis
@@ -299,6 +302,8 @@ table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle("
 		 ckd bin %5.1f \ ///
 		 diuretic bin %5.1f \ ///
 		 tophus bin %5.1f \ ///
+		 multiple_flares bin %5.1f \ ///
+		 high_risk %5.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_byyear.xls", replace)
 
 *Follow-up=======================================================================================================*/
@@ -312,14 +317,6 @@ tab mo_year_diagn has_12m_follow_up
 **Proportion of patients with at least 6/12 months of registration and follow-up time after diagnosis
 tab has_6m_post_diag, missing 
 tab has_12m_post_diag, missing 
-
-*Baseline urate==================================================================================================*/
-
-tabstat baseline_urate, stats(n mean p50 p25 p75)
-tab baseline_urate_below360, missing
-tab baseline_urate_below360
-tab baseline_urate_below300, missing
-tab baseline_urate_below300		 
 
 *ULT prescriptions===============================================================================================*/
 
@@ -364,13 +361,56 @@ bys `var': tab ult_12m, missing
 bys `var': tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 }
 
-***Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 12m of diagnosis //should this be 6m or 12m
+***Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
 tab has_6m_post_ult, missing
+tab has_6m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
 tab has_12m_post_ult, missing 
+tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m 
 
+*Baseline urate==================================================================================================*/
 
+**Define baseline serum urate level as urate level closest to index diagnosis date (must be within 6m before/after diagnosis and before ULT commencement)
+tab baseline_urate, missing //proportion who had a baseline urate level performed
+tabstat baseline_urate, stats(n mean p50 p25 p75)
+tab baseline_urate_below360, missing
+tab baseline_urate_below360 if baseline_urate!=., missing //of those who had a baseline urate performed
 
+*Urate target attainment=========================================================================================*/
+
+**6 months
+tab ult_6m, missing //those who received ULT within 6m of diagnosis
+tab has_6m_post_ult if if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 6m of registration and follow-up after first ULT prescription
+tab had_test_ult_6m if has_6m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 6m
+tabstat lowest_urate_ult_6m, stats(n mean p50 p25 p75) //lowest urate value within 6m of ULT
+tab urate_below360_ult_6m if has_6m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >6m of follow-up
+tab urate_below360_ult_6m if has_6m_post_ult==1 & had_test_ult_6m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >6m of follow-up, and had a test performed within 6m of ULT
+
+**12 months 
+tab ult_6m, missing //those who received ULT within 6m of diagnosis
+tab has_12m_post_ult if if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 12m of registration and follow-up after first ULT prescription
+tab had_test_ult_12m if has_12m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 12m
+tabstat lowest_urate_ult_12m, stats(n mean p50 p25 p75) //lowest urate value within 12m of ULT
+tab urate_below360_ult_12m if has_12m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >12m of follow-up
+tab urate_below360_ult_12m if has_12m_post_ult==1 & had_test_ult_12m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >12m of follow-up, and had a test performed within 12m of ULT
  
+*Number of urate levels perfomred within 6m/12m of ULT initiation=========================================================*/
+
+**6 months
+tabstat count_urate_ult_6m if has_6m_post_ult==1, stats(n mean p50 p25 p75) //number of tests performed within 6m of ULT initiation
+tab two_urate_ult_6m if has_6m_post_ult==1, missing //two or more urate tests performed within 6m of ULT initiation
+
+**12 months
+tabstat count_urate_ult_12m if has_12m_post_ult==1, stats(n mean p50 p25 p75) //number of tests performed within 12m of ULT initiation
+tab two_urate_ult_12m if has_12m_post_ult==1, missing //two or more urate tests performed within 12m of ULT initiation
+
+
+
+
+
+
+
+
+/*
 
 **Referral standards, by eia diagnosis
 table1_mc, by(eia_diagnosis) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
@@ -397,7 +437,7 @@ table1_mc if nuts_region!=., by(nuts_region) total(before) onecol nospacelowperc
 		 gp_appt_cat_21 cat %3.1f \ ///
 		 ) saving("$projectdir/output/tables/referral_byregion_nomiss.xls", replace)
 
-*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================*/
+*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================
 
 *As above, all patients must have 1) rheum appt and GP appt 2) 6m follow-up after rheum appt 3) 6m of registration after appt
 **Note: in final redacted tables, axSpA patients are excluded (due to potential for small counts)
@@ -741,7 +781,7 @@ table1_mc if undiff_code==1, by(appt_year) total(before) onecol nospacelowpercen
 		 lef_time cat %3.1f \ ///
 		 biologic_time cat %3.1f \ ///
 		 ) saving("$projectdir/output/tables/biol_byyear_undiff_miss.xls", replace)
-*/		 
+ 
 
 *Output tables as CSVs		 
 import excel "$projectdir/output/tables/baseline_bydiagnosis.xls", clear
@@ -779,5 +819,7 @@ outsheet * using "$projectdir/output/tables/drug_byyearanddisease.csv" , comma n
 
 import excel "$projectdir/output/tables/drug_byyearandregion.xls", clear
 outsheet * using "$projectdir/output/tables/drug_byyearandregion.csv" , comma nonames replace	
+
+*/
 
 log close

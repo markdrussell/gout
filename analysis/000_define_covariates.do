@@ -17,8 +17,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -535,13 +535,13 @@ keep if gout_code==1
 codebook first_ult_date
 codebook first_ult_code_date //should be same as above; if so, delete above and study definition and below
 
-tab first_ult if gout_code_date!=. & first_ult_code_date!=. & first_ult_code_date<gout_code_date
-tab first_ult if gout_code_date!=. & first_ult_code_date!=. & (first_ult_code_date+30)<gout_code_date //30 days before
-tab first_ult if gout_code_date!=. & first_ult_code_date!=. & (first_ult_code_date+60)<gout_code_date //60 days before
-drop if gout_code_date!=. & first_ult_code_date!=. & (first_ult_code_date+30)<gout_code_date //drop if first ULT script more than 30 days before first gout code
+tab first_ult if gout_code_date!=. & first_ult_date!=. & first_ult_date<gout_code_date
+tab first_ult if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //30 days before
+tab first_ult if gout_code_date!=. & first_ult_date!=. & (first_ult_date+60)<gout_code_date //60 days before
+drop if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //drop if first ULT script more than 30 days before first gout code
 
 *Recode index diagnosis date as first ULT date if first ULT date <30 days before index gout code date
-replace gout_code_date=first_ult_code_date if gout_code_date!=. & first_ult_code_date!=. & (first_ult_code_date<gout_code_date)
+replace gout_code_date=first_ult_date if gout_code_date!=. & first_ult_date!=. & (first_ult_date<gout_code_date)
 
 *Check if first gout admission/emergency attendance was before index diagnosis code=====================================================*/
 
@@ -550,20 +550,20 @@ drop if gout_admission_pre==1 //drop those with gout admissions that were more t
 
 tab gout_admission_1 //admissions for gout that were from 30 days before gout code and onwards
 tab gout_admission_1 if gout_code_date!=. & gout_admission_date_1!=. & gout_admission_date_1<gout_code_date
-tab gout_admission_1 if gout_code_date!=. & gout_admission_date_1!=. & (gout_admission_date_1+30)<gout_code_date //30 days before - should be accounted for by study definition
+tab gout_admission_1 if gout_code_date!=. & gout_admission_date_1!=. & (gout_admission_date_1+30)<gout_code_date //30 days before - should be accounted for by study definition - check
 
 *Recode index diagnosis date as gout admission date if gout admission date less than 30 days before index gout code date
-replace gout_code_date=gout_admission_date_1 if gout_code_date!=. & first_ult_code_date!=. & (gout_admission_date_1<gout_code_date)
+replace gout_code_date=gout_admission_date_1 if gout_code_date!=. & first_ult_date!=. & (gout_admission_date_1<gout_code_date)
 
 tab gout_emerg_pre //ED attendances for gout that were more than 30 days before gout code
 drop if gout_emerg_pre==1 //drop those with gout ED attendances that were more than 30 days before GP gout code 
 
 tab gout_emerg_1 //ED attendances for gout that were from 30 days before gout code and onwards
 tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & gout_emerg_date_1<gout_code_date
-tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & (gout_emerg_date_1+30)<gout_code_date 
+tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & (gout_emerg_date_1+30)<gout_code_date //check
 
 *Recode index diagnosis date as gout emerg date if gout emerg date less than 30 days before index gout code date
-replace gout_code_date=gout_emerg_date_1 if gout_code_date!=. & first_ult_code_date!=. & (gout_emerg_date_1<gout_code_date)
+replace gout_code_date=gout_emerg_date_1 if gout_code_date!=. & first_ult_date!=. & (gout_emerg_date_1<gout_code_date)
 
 *Generate diagnosis date===============================================================*/
 
@@ -632,6 +632,9 @@ gen time_to_ult = first_ult_date-gout_code_date if first_ult_date!=. & gout_code
 **Generate variable for those who had ULT prescription within 6m of diagnosis 
 gen ult_6m = 1 if time_to_ult<=180 & time_to_ult!=.
 recode ult_6m .=0
+lab var ult_6m "ULT within 6 months of diagnosis"
+lab define ult_6m 0 "No" 1 "Yes", modify
+lab val ult_6m ult_6m
 tab ult_6m, missing
 tab ult_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
 tab ult_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
@@ -639,6 +642,9 @@ tab ult_6m if has_12m_post_diag==1, missing //for those with at least 12m of ava
 **Generate variable for those who had ULT prescription within 12m of diagnosis 
 gen ult_12m = 1 if time_to_ult<=365 & time_to_ult!=.
 recode ult_12m .=0
+lab var ult_12m "ULT within 12 months of diagnosis"
+lab define ult_12m 0 "No" 1 "Yes", modify
+lab val ult_12m ult_12m
 tab ult_12m, missing
 tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
@@ -648,6 +654,9 @@ gen time_to_allo = first_allo_date-gout_code_date if first_allo_date!=. & gout_c
 **Generate variable for those who had allopurinol prescription within 6m of diagnosis 
 gen allo_6m = 1 if time_to_allo<=180 & time_to_allo!=.
 recode allo_6m .=0
+lab var allo_6m "Allopurinol within 6 months of diagnosis"
+lab define allo_6m 0 "No" 1 "Yes", modify
+lab val allo_6m allo_6m
 tab allo_6m, missing
 tab allo_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
 tab allo_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
@@ -655,6 +664,9 @@ tab allo_6m if has_12m_post_diag==1, missing //for those with at least 12m of av
 **Generate variable for those who had allopurinol prescription within 12m of diagnosis 
 gen allo_12m = 1 if time_to_allo<=365 & time_to_allo!=.
 recode allo_12m .=0
+lab var allo_12m "Allopurinol within 12 months of diagnosis"
+lab define allo_12m 0 "No" 1 "Yes", modify
+lab val allo_12m allo_12m
 tab allo_12m, missing
 tab allo_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up 
 
@@ -664,6 +676,9 @@ gen time_to_febux = first_febux_date-gout_code_date if first_febux_date!=. & gou
 **Generate variable for those who had febuxostat prescription within 6m of diagnosis 
 gen febux_6m = 1 if time_to_febux<=180 & time_to_febux!=.
 recode febux_6m .=0
+lab var febux_6m "Febuxostat within 6 months of diagnosis"
+lab define febux_6m 0 "No" 1 "Yes", modify
+lab val febux_6m febux_6m
 tab febux_6m, missing
 tab febux_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
 tab febux_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
@@ -671,10 +686,28 @@ tab febux_6m if has_12m_post_diag==1, missing //for those with at least 12m of a
 **Generate variable for those who had febuxostat prescription within 12m of diagnosis 
 gen febux_12m = 1 if time_to_febux<=365 & time_to_febux!=.
 recode febux_12m .=0
+lab var febux_12m "Febuxostat within 12 months of diagnosis"
+lab define febux_12m 0 "No" 1 "Yes", modify
+lab val febux_12m febux_12m
 tab febux_12m, missing
 tab febux_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up 
 
 //Nb. can't tell dose - e.g. if allopurinol 100mg tablets issued, don't know dose prescribed
+
+*Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
+gen has_6m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-180) & has_6m_follow_up_ult==1 & ult_6m==1
+recode has_6m_post_ult .=0
+lab var has_6m_post_ult ">6m follow-up after ULT commenced"
+lab define has_6m_post_ult 0 "No" 1 "Yes", modify
+lab val has_6m_post_ult has_6m_post_ult
+tab has_6m_post_ult, missing 
+
+gen has_12m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-365) & has_12m_follow_up_ult==1 & ult_6m==1
+recode has_12m_post_ult .=0
+lab var has_12m_post_ult ">12m follow-up after ULT commenced"
+lab define has_12m_post_ult 0 "No" 1 "Yes", modify
+lab val has_12m_post_ult has_12m_post_ult
+tab has_12m_post_ult, missing 
 
 *Serum urate measurements==================================================*/
 
@@ -691,14 +724,13 @@ forval i = 1/9 	{
 reshape long urate_val_ urate_date_ urate_test_, i(patient_id) j(urate_order)
 
 *Define baseline serum urate level as urate level closest to index diagnosis date (must be within 6m before/after diagnosis and before ULT commencement)
-sort patient_id urate_date_
-gen time_to_test = urate_date_-gout_code_date if urate_date_!=. & gout_code_date!=. //time to urate test from diagnosis date
-gen test_after_ult=1 if urate_date_>first_ult_date & urate_date_!=. & first_ult_date!=.
-replace test_after_ult=0 if urate_date_<=first_ult_date & urate_date_!=.
-
 bys patient_id urate_date_ (urate_val_): gen n=_n //keeps only single urate test from same day (i.e. delete duplicates), priotising ones !=.
 drop if n>1 
 drop n
+
+gen test_after_ult=1 if urate_date_>first_ult_date & urate_date_!=. & first_ult_date!=.
+replace test_after_ult=0 if urate_date_<=first_ult_date & urate_date_!=.
+gen time_to_test = urate_date_-gout_code_date if urate_date_!=. & gout_code_date!=. //time to urate test from diagnosis date
 
 gen abs_time_to_test = abs(time_to_test) if time_to_test!=. & time_to_test<=180 & time_to_test>=-180 & test_after_ult!=1 & urate_val_!=.
 bys patient_id (abs_time_to_test): gen n=_n 
@@ -707,33 +739,102 @@ lab var baseline_urate "Serum urate at baseline"
 drop n
 by patient_id: replace baseline_urate = baseline_urate[_n-1] if missing(baseline_urate)
 gen baseline_urate_below360=1 if baseline_urate<=360 & baseline_urate!=.
+lab var baseline_urate_below360 "Baseline serum urate <360 micromol/L"
+lab define baseline_urate_below360 0 "No" 1 "Yes", modify
+lab val baseline_urate_below360 baseline_urate_below360
 replace baseline_urate_below360=0 if baseline_urate>360 & baseline_urate!=.
-gen baseline_urate_below300=1 if baseline_urate<=300 & baseline_urate!=.
-replace baseline_urate_below300=0 if baseline_urate>300 & baseline_urate!=.
 drop abs_time_to_test
+drop time_to_test
 
-drop test_after_ult time_to_test		
+*Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement (assuming they had at least 6 months of follow-up available)
+gen time_to_test_ult_6m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1 & has_6m_post_ult==1
+gen had_test_ult_6m = 1 if time_to_test_ult_6m<=180 & time_to_test_ult_6m!=. & urate_val_!=. //any test done within 6 months of ULT
+bys patient_id (had_test_ult_6m): gen n=_n if had_test_ult_6m!=.
+by patient_id: egen count_urate_ult_6m = max(n) //number of tests within 6m of ULT
+recode count_urate_ult_6m .=0 //includes those who didn't receive ULT
+lab var count_urate_ult_6m "Number of urate levels within 6m of ULT initiation"
+drop n
+sort patient_id had_test_ult_6m
+by patient_id: replace had_test_ult_6m = had_test_ult_6m[_n-1] if missing(had_test_ult_6m) //any test done within 6 months of ULT
+recode had_test_ult_6m .=0 //includes those who didn't receive ULT
+lab var had_test_ult_6m "Urate test performed within 6 months of ULT"
+lab def had_test_ult_6m 0 "No" 1 "Yes", modify
+lab val had_test_ult_6m had_test_ult_6m
+gen value_test_ult_6m = urate_val_ if time_to_test_ult_6m<=180 & time_to_test_ult_6m!=. & urate_val_!=. //test values within 6 months of ULT
+bys patient_id (value_test_ult_6m): gen n=_n if value_test_ult_6m!=.
+gen lowest_urate_ult_6m = value_test_ult_6m if n==1 //lowest urate value within 6m of ULT
+lab var lowest_urate_ult_6m "Lowest urate value within 6m of ULT initiation"
+sort patient_id (lowest_urate_ult_6m)
+by patient_id: replace lowest_urate_ult_6m = lowest_urate_ult_6m[_n-1] if missing(lowest_urate_ult_6m)
+drop n value_test_ult_6m
+gen urate_below360_ult_6m = 1 if lowest_urate_ult_6m<=360 & lowest_urate_ult_6m!=.
+lab var urate_below360_ult_6m  "Urate <360 micromol/L within 6m of ULT initiation"
+lab def urate_below360_ult_6m 0 "No" 1 "Yes", modify
+lab val urate_below360_ult_6m urate_below360_ult_6m
+recode urate_below360_ult_6m .=0 //includes those who didn't receive ULT or didn't have a test within 6m
+drop time_to_test_ult_6m
+
+*Define proportion of patients commenced on ULT within 6 months (important) of diagnosis who attained serum urate <360 within 12 months of ULT commencement (assuming they had at least 12 months of follow-up available)
+gen time_to_test_ult_12m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1 & has_12m_post_ult==1
+gen had_test_ult_12m = 1 if time_to_test_ult_12m<=365 & time_to_test_ult_12m!=. & urate_val_!=. //test done within 12 months of ULT
+bys patient_id (had_test_ult_12m): gen n=_n if had_test_ult_12m!=.
+by patient_id: egen count_urate_ult_12m = max(n) //number of tests within 12m of ULT
+recode count_urate_ult_12m .=0 //includes those who didn't receive ULT
+lab var count_urate_ult_12m "Number of urate levels within 12m of ULT initiation"
+drop n
+sort patient_id had_test_ult_12m
+by patient_id: replace had_test_ult_12m = had_test_ult_12m[_n-1] if missing(had_test_ult_12m)
+recode had_test_ult_12m .=0 //includes those who didn't receive ULT
+lab var had_test_ult_12m "Urate test performed within 12 months of ULT"
+lab def had_test_ult_12m 0 "No" 1 "Yes", modify
+lab val had_test_ult_12m had_test_ult_12m
+gen value_test_ult_12m = urate_val_ if time_to_test_ult_12m<=365 & time_to_test_ult_12m!=. & urate_val_!=. //test values within 12 months of ULT
+bys patient_id (value_test_ult_12m): gen n=_n if value_test_ult_12m!=.
+gen lowest_urate_ult_12m = value_test_ult_12m if n==1 //lowest urate value within 12m of ULT
+lab var lowest_urate_ult_12m "Lowest urate value within 12m of ULT initiation"
+sort patient_id (lowest_urate_ult_12m)
+by patient_id: replace lowest_urate_ult_12m = lowest_urate_ult_12m[_n-1] if missing(lowest_urate_ult_12m)
+drop n value_test_ult_12m
+gen urate_below360_ult_12m = 1 if lowest_urate_ult_12m<=360 & lowest_urate_ult_12m!=.
+recode urate_below360_ult_12m .=0 //includes those who didn't receive ULT or didn't have a test within 12m
+lab var urate_below360_ult_12m  "Urate <360 micromol/L within 12m of ULT initiation"
+lab def urate_below360_ult_12m 0 "No" 1 "Yes", modify
+lab val urate_below360_ult_12m urate_below360_ult_12m
+drop time_to_test_ult_12m
+
+drop test_after_ult		
 reshape wide urate_val_ urate_date_ urate_test_, i(patient_id) j(urate_order)
+
 tabstat baseline_urate, stats(n mean p50 p25 p75)
 tab baseline_urate_below360, missing
-tab baseline_urate_below300, missing
 
-*Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 12m of diagnosis //should this be 6m or 12m
-gen has_6m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-180) & has_6m_follow_up_ult==1 & ult_12m==1
-recode has_6m_post_ult .=0
-lab var has_6m_post_ult ">6m follow-up after ULT"
-lab define has_6m_post_ult 0 "No" 1 "Yes", modify
-lab val has_6m_post_ult has_6m_post_ult
-tab has_6m_post_ult, missing 
+tabstat lowest_urate_ult_6m, stats(n mean p50 p25 p75)
+tab urate_below360_ult_6m if has_6m_post_ult==1, missing //for those who received ULT within 6m and had >6m of follow-up
+tab urate_below360_ult_6m if has_6m_post_ult==1 & had_test_ult_6m==1, missing //for those who received ULT within 6m, had >6m of follow-up, and had a test performed within 6m of ULT
+tabstat count_urate_ult_6m if has_6m_post_ult==1, stats(n mean p50 p25 p75) //number of tests performed within 6m of ULT initiation
+gen two_urate_ult_6m=1 if count_urate_ult_6m>=2 & count_urate_ult_6m!=. //two or more urate tests performed within 6m of ULT initiation
+recode two_urate_ult_6m .=0 //includes those who didn't receive ULT
+lab var two_urate_ult_6m "At least 2 urate tests performed within 6 months of ULT initiation"
+lab def two_urate_ult_6m 0 "No" 1 "Yes", modify
+lab val two_urate_ult_6m two_urate_ult_6m
+tab two_urate_ult_6m if has_6m_post_ult==1, missing 
 
-gen has_12m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-365) & has_12m_follow_up_ult==1 & ult_12m==1
-recode has_12m_post_ult .=0
-lab var has_12m_post_ult ">12m follow-up after ULT"
-lab define has_12m_post_ult 0 "No" 1 "Yes", modify
-lab val has_12m_post_ult has_12m_post_ult
-tab has_12m_post_ult, missing 
+tabstat lowest_urate_ult_12m, stats(n mean p50 p25 p75)
+tab urate_below360_ult_12m if has_12m_post_ult==1, missing //for those who received ULT within 6m and had >12m of follow-up
+tab urate_below360_ult_12m if has_12m_post_ult==1 & had_test_ult_12m==1, missing //for those who received ULT within 6m, had >12m of follow-up, and had a test performed within 12m of ULT
+tabstat count_urate_ult_12m if has_12m_post_ult==1, stats(n mean p50 p25 p75) //number of tests performed within 12m of ULT initiation
+gen two_urate_ult_12m=1 if count_urate_ult_12m>=2 & count_urate_ult_12m!=. //two or more urate tests performed within 12m of ULT initiation
+recode two_urate_ult_12m .=0 //includes those who didn't receive ULT
+lab var two_urate_ult_12m "At least 2 urate tests performed within 6 months of ULT initiation"
+lab def two_urate_ult_12m 0 "No" 1 "Yes", modify
+lab val two_urate_ult_12m two_urate_ult_12m
+tab two_urate_ult_12m if has_12m_post_ult==1, missing 
 
 *Define flare==============================================================================*/
+
+save "$projectdir/output/data/temp.dta", replace //REMOVE LATER
+
+use "$projectdir/output/data/temp.dta", clear //REMOVE LATER
 
 *Define flare (adapted from https://jamanetwork.com/journals/jama/fullarticle/2794763): 1) presence of a non-index diagnostic code for gout exacerbation; 2) non-index admission with primary gout diagnostic code; 3) non-index ED attendance with primary gout diagnostic code; 4) any non-index gout diagnostic code AND prescription for a flare treatment on same day as that code; all within 6m of index diagnostic code. Exclude events that occur within 14 days of one another
 
@@ -749,6 +850,10 @@ bys patient_id (gout_admission_date_): gen n=_n
 replace gout_admission_=0 if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=. //remove admissions within 14 days of one another
 replace gout_admission_date_=. if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=.
 drop n
+bys patient_id (gout_admission_date_): gen n=_n
+replace gout_admission_=0 if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=. //remove admissions within 14 days of one another (repeat this)
+replace gout_admission_date_=. if (gout_admission_date_-14<gout_admission_date_[_n-1]) & gout_admission_date_!=. & gout_admission_date_[_n-1]!=.
+drop n
 reshape wide gout_admission_date_ gout_admission_, i(patient_id) j(admission_order)
 
 **Non-index ED attendance with primary gout diagnostic code
@@ -761,6 +866,10 @@ save "$projectdir/output/data/emerg_dates_long.dta", replace
 restore
 bys patient_id (gout_emerg_date_): gen n=_n
 replace gout_emerg_=0 if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=. //remove emergs within 14 days of one another
+replace gout_emerg_date_=. if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=.
+drop n
+bys patient_id (gout_emerg_date_): gen n=_n
+replace gout_emerg_=0 if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=. //remove emergs within 14 days of one another (repeat this)
 replace gout_emerg_date_=. if (gout_emerg_date_-14<gout_emerg_date_[_n-1]) & gout_emerg_date_!=. & gout_emerg_date_[_n-1]!=.
 drop n
 reshape wide gout_emerg_date_ gout_emerg_, i(patient_id) j(emerg_order)
@@ -780,6 +889,9 @@ save "$projectdir/output/data/code_tx_dates_long.dta", replace
 restore
 bys patient_id (code_and_tx_date_): gen n=_n
 replace code_and_tx_date_=. if (code_and_tx_date_-14<code_and_tx_date_[_n-1]) & code_and_tx_date_!=. & code_and_tx_date_[_n-1]!=. //remove flares within 14 days of one another
+drop n
+bys patient_id (code_and_tx_date_): gen n=_n
+replace code_and_tx_date_=. if (code_and_tx_date_-14<code_and_tx_date_[_n-1]) & code_and_tx_date_!=. & code_and_tx_date_[_n-1]!=. //remove flares within 14 days of one another (repeat this)
 drop n
 reshape wide gout_code_any_ gout_code_any_date_ code_and_tx_date_, i(patient_id) j(code_order)
 
@@ -817,30 +929,35 @@ bys patient_id (gout_flare_date_): gen n=_n
 replace gout_flare_=0 if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=. //remove flares within 14 days of one another
 replace gout_flare_date_=. if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=.
 drop n
+bys patient_id (gout_flare_date_): gen n=_n
+replace gout_flare_=0 if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=. //remove flares within 14 days of one another (repeat this)
+replace gout_flare_date_=. if (gout_flare_date_-14<gout_flare_date_[_n-1]) & gout_flare_date_!=. & gout_flare_date_[_n-1]!=.
+drop n
 reshape wide gout_flare_date_ gout_flare_, i(patient_id) j(flare_order)
 
 **Now merge flare count in with original dataset
 merge 1:1 patient_id using "$projectdir/output/data/flare_count.dta"
 drop _merge
 recode flare_count .=0
+lab var flare_count "Number of flares after diagnosis"
 tabstat flare_count, stats (n mean p50 p25 p75)
 gen multiple_flares = 1 if flare_count>=1 & flare_count!=. //define multiple flares as one or more additional flare within first 6 months of diagnosis
 recode multiple_flares .=0
+lab var multiple_flares "At least one additional flare within 6 months of diagnosis"
+lab def multiple_flares 0 "No" 1 "Yes", modify
+lab val multiple_flares multiple_flares
 tab multiple_flares	
 
 *Define high-risk patients for ULT===========================================================*/
 gen high_risk = 1 if tophi==1 | ckd==1 | diuretic==1 | multiple_flares==1
 recode high_risk .=0	
+lab var high_risk "Presence of risk factors"
+lab def high_risk 0 "No" 1 "Yes", modify
+lab val high_risk high_risk
 
+/*
 
-
-
-
-
-
-
-
-*Time to rheum referral (see notes above)=============================================*/
+*Time to rheum referral (see notes above)=============================================*
 
 **Time from last GP to rheum ref before rheum appt (i.e. if appts are present and in correct time order)
 gen time_gp_rheum_ref_appt = (referral_rheum_prerheum_date - last_gp_refrheum_date) if referral_rheum_prerheum_date!=. & last_gp_refrheum_date!=. & rheum_appt_date!=. & referral_rheum_prerheum_date>=last_gp_refrheum_date & referral_rheum_prerheum_date<=rheum_appt_date
@@ -870,7 +987,7 @@ gen time_gp_rheum_ref_comb = time_gp_rheum_ref_appt
 replace time_gp_rheum_ref_comb = time_gp_rheum_ref_code if time_gp_rheum_ref_appt==. & time_gp_rheum_ref_code!=.
 tabstat time_gp_rheum_ref_comb, stats (n mean p50 p25 p75)
 
-*Time to rheum appointment=============================================*/
+*Time to rheum appointment=============================================*
 
 **Time from last GP pre-rheum appt to first rheum appt (proxy for referral to appt delay)
 gen time_gp_rheum_appt = (rheum_appt_date - last_gp_prerheum_date) if rheum_appt_date!=. & last_gp_prerheum_date!=. & rheum_appt_date>=last_gp_prerheum_date
@@ -932,7 +1049,7 @@ gen time_refgp_rheum_appt = time_ref_rheum_appt
 replace time_refgp_rheum_appt = time_gp_rheum_appt if time_ref_rheum_appt==. & time_gp_rheum_appt!=.
 tabstat time_refgp_rheum_appt, stats (n mean p50 p25 p75)
 
-*Time to EIA code==================================================*/
+*Time to EIA code==================================================*
 
 **Time from last GP pre-code to EIA code (sensitivity analysis; includes those with no rheum ref and/or no rheum appt)
 gen time_gp_eia_code = (eia_code_date - last_gp_precode_date) if eia_code_date!=. & last_gp_precode_date!=. & eia_code_date>=last_gp_precode_date
@@ -960,9 +1077,9 @@ tabstat time_rheum2_eia_code, stats (n mean p50 p25 p75)
 gen time_rheum3_eia_code = (eia_code_date - rheum_appt3_date) if eia_code_date!=. & rheum_appt3_date!=. 
 tabstat time_rheum3_eia_code, stats (n mean p50 p25 p75) 
 
-*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================*/
+*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================*
 
-**Time to first csDMARD script for RA patients not including high cost MTX prescriptions; prescription must be within 6 months of first rheum appt for all csDMARDs below ==================*/
+**Time to first csDMARD script for RA patients not including high cost MTX prescriptions; prescription must be within 6 months of first rheum appt for all csDMARDs below ==================*
 gen time_to_csdmard=(csdmard_date-rheum_appt_date) if csdmard==1 & rheum_appt_date!=. & (csdmard_date<=rheum_appt_date+180)
 tabstat time_to_csdmard if ra_code==1, stats (n mean p50 p25 p75)
 
@@ -1280,6 +1397,8 @@ gen csdmard_shared=1 if lef_shared==1 | mtx_shared==1 | hcq_shared==1 | ssz_shar
 recode csdmard_shared .=0
 tab csdmard_shared
 tab csdmard //for comparison
+
+*/
 
 save "$projectdir/output/data/file_gout_all", replace
 

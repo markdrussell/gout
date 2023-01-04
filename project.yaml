@@ -16,6 +16,19 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.csv
+
+  generate_study_population_measures:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_measures --index-date-range "2015-01-01 to 2015-12-31 by month" --output-dir=output/measures
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_measures_*.csv 
+
+  generate_measures:
+    run: cohortextractor:latest generate_measures --study-definition study_definition_measures --output-dir=output/measures
+    needs: [generate_study_population_measures]
+    outputs:
+      moderately_sensitive:
+        measure_csv: output/measures/measure_*.csv           
   
   create_cohorts_allpts:
     run: stata-mp:latest analysis/001_define_covariates_allpts.do

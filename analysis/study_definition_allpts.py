@@ -5,6 +5,8 @@ from codelists import *
 year_preceding = "2018-01-01"
 # Choosing mid-study year as reference date
 start_date = "2019-01-01"
+ten_year_date = "2009-01-01"
+four_month_date = "2018-09-01"
 end_date = "today"
 
 # Presence/date of specified comorbidities
@@ -30,7 +32,7 @@ study = StudyDefinition(
         "incidence": 0.5,
     },
  
-    # Define study population (filter by EIA code data within Stata)
+    # Define study population
     population=patients.satisfying(
             """
             has_follow_up AND
@@ -38,7 +40,9 @@ study = StudyDefinition(
             (sex = "M" OR sex = "F")
             """,
             has_follow_up=patients.registered_with_one_practice_between(
-                "2018-01-01", "2019-01-01"        
+                start_date=year_preceding,
+                end_date=start_date,   
+                return_expectations={"incidence": 0.99}  
             ),
         ),
     
@@ -130,7 +134,7 @@ study = StudyDefinition(
         on_or_before=start_date,
         returning="numeric_value",
         include_date_of_match=True,
-        date_format="YYYY-MM",
+        date_format="YYYY-MM-DD",
         return_expectations={
             "date": {"latest": start_date},
             "float": {"distribution": "normal", "mean": 40.0, "stddev": 20},
@@ -143,7 +147,7 @@ study = StudyDefinition(
         on_or_before=start_date,
         returning="numeric_value",
         include_date_of_match=True,
-        date_format="YYYY-MM",
+        date_format="YYYY-MM-DD",
         return_expectations={
             "date": {"latest": start_date},
             "float": {"distribution": "normal", "mean": 5, "stddev": 2},
@@ -165,7 +169,7 @@ study = StudyDefinition(
         on_or_before=start_date,
         returning="numeric_value",
         include_date_of_match=True,
-        date_format="YYYY-MM",
+        date_format="YYYY-MM-DD",
         return_expectations={
             "float": {"distribution": "normal", "mean": 100.0, "stddev": 100.0},
             "date": {"latest": start_date},
@@ -175,10 +179,10 @@ study = StudyDefinition(
     organ_transplant=first_comorbidity_in_period(organ_transplant_codes),
 
     bmi=patients.most_recent_bmi(
-        between = ["2009-01-01", start_date],
+        between = [ten_year_date, start_date],
         minimum_age_at_measurement=16,
         include_measurement_date=True,
-        date_format="YYYY-MM",
+        date_format="YYYY-MM-DD",
         return_expectations={
             "incidence": 0.6,
             "float": {"distribution": "normal", "mean": 35, "stddev": 10},
@@ -210,5 +214,18 @@ study = StudyDefinition(
             filter_codes_by_category(clear_smoking_codes, include=["S", "E"]),
             on_or_before=start_date,
         ),
+    ),
+
+    ## Use of diuretics within 4m of index date
+    diuretic_date=patients.with_these_medications(
+        diuretic_codes,
+        between = [four_month_date, start_date],
+        returning="date",
+        date_format="YYYY-MM-DD",
+        find_last_match_in_period=True,
+        return_expectations={
+            "incidence": 0.2,
+            "date": {"earliest": "2014-01-01", "latest": end_date},
+        },
     ),
 )
