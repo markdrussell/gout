@@ -40,23 +40,22 @@ study = StudyDefinition(
                 start_date="index_date - 1 year",
                 end_date="index_date",   
                 return_expectations={"incidence": 0.98},  
-    ),            
+    ),             
     # Prevalent gout patients: i.e. gout diagnosis code at any point before index date
     prevalent_gout=patients.with_these_clinical_events(
         gout_codes,
         returning="binary_flag",
-        find_first_match_in_period=True,
         on_or_before="index_date",
         return_expectations={
-            "incidence": 0.99,
+            "incidence": 0.1,
         },
     ),    
-    # Admissions to hospital with primary diagnosis code of gout in the month after index date
+    # Incidence of admissions to hospital with primary diagnosis code of gout in the 1 month after index date
     gout_admission=patients.admitted_to_hospital(
         with_these_diagnoses=gout_admission,
         returning="binary_flag",
         between=["index_date", "last_day_of_month(index_date)"],
-        return_expectations={"incidence": 0.2},
+        return_expectations={"incidence": 0.1},
    ),
 )
 

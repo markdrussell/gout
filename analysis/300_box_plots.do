@@ -2,10 +2,9 @@ version 16
 
 /*==============================================================================
 DO FILE NAME:			Box plots
-PROJECT:				EIA OpenSAFELY project
-DATE: 					07/03/2022
-AUTHOR:					J Galloway / M Russell
-						adapted from C Rentsch										
+PROJECT:				Gout OpenSAFELY project
+DATE: 					01/12/2022
+AUTHOR:					M Russell / J Galloway																					
 DESCRIPTION OF FILE:	Box plots
 DATASETS USED:			main data file
 DATASETS CREATED: 		Box plots and outputs
@@ -15,16 +14,15 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-global projectdir `c(pwd)'
-di "$projectdir"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir `c(pwd)'
 
-capture mkdir "$projectdir/output/figures"
+capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
+capture mkdir "$projectdir/output/figures"
 
 global logdir "$projectdir/logs"
-di "$logdir"
 
 **Open a log file
 cap log close
@@ -34,28 +32,26 @@ log using "$logdir/box_plots.log", replace
 adopath + "$projectdir/analysis/extra_ados"
 
 **Use cleaned data from previous step
-use "$projectdir/output/data/file_eia_all.dta", clear
+use "$projectdir/output/data/file_gout_all.dta", clear
 
 set scheme plotplainblind
 
-/*GP referral performance by region, all years; low capture of rheum referrals presently, therefore using last GP appt as proxy measure currently - see below===========================================================================*/
-
-***Restrict all analyses below to patients with rheum appt, GP appt and 6m follow-up and registration (changed from 12m requirement, for purposes of OpenSAFELY report)
-keep if has_6m_post_appt==1
+*Restrict all analyses to patients with at least 6m follow-up and registration after diagnosis================*/
+keep if has_6m_post_diag==1
 
 preserve
-gen qs1_0 =1 if time_gp_rheum_ref_appt<=3 & time_gp_rheum_ref_appt!=.
-recode qs1_0 .=0 if time_gp_rheum_ref_appt!=.
-gen qs1_1 =1 if time_gp_rheum_ref_appt>3 & time_gp_rheum_ref_appt<=7 & time_gp_rheum_ref_appt!=.
-recode qs1_1 .=0 if time_gp_rheum_ref_appt!=.
-gen qs1_2 = 1 if time_gp_rheum_ref_appt>7 & time_gp_rheum_ref_appt!=.
-recode qs1_2 .=0 if time_gp_rheum_ref_appt!=.
+gen ult_0 =1 if time_to_ult_6m<=90 & time_to_ult_6m!=.
+recode ult_0 .=0 if time_to_ult_6m!=.
+gen ult_1 =1 if time_to_ult_6m>90 & time_to_ult_6m<=180 & time_to_ult_6m!=.
+recode ult_1 .=0 if time_to_ult_6m!=.
+gen ult_2 = 1 if time_to_ult_6m>180 & time_to_ult_6m!=. //this needs editing I think
+recode ult_2 .=0 if time_to_ult_6m!=.
 
 expand=2, gen(copy)
 replace nuts_region = 0 if copy==1  
 
-graph hbar (mean) qs1_0 (mean) qs1_1 (mean) qs1_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 3 days" 2 "Within 7 days" 3 "More than 7 days")) title("Time to rheumatology referral") name(regional_qs1_bar, replace)
-graph export "$projectdir/output/figures/regional_qs1_bar_overall.svg", replace
+graph hbar (mean) ult_0 (mean) ult_1 (mean) ult_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 3 months" 2 "Within 6 months" 3 "More than 6 months")) title("Time to ULT initiation") name(regional_qs1_bar, replace)
+graph export "$projectdir/output/figures/regional_ult_overall.svg", replace
 restore
 
 /*GP referral performance by region, Apr 2019 to Apr 2020; low capture of rheum referrals presently, therefore using last GP appt as proxy measure currently - see below===========================================================================*/

@@ -2,30 +2,27 @@ version 16
 
 /*==============================================================================
 DO FILE NAME:			ITSA models
-PROJECT:				EIA OpenSAFELY project
-DATE: 					07/03/2022
-AUTHOR:					J Galloway / M Russell
-						adapted from C Rentsch										
+PROJECT:				Gout OpenSAFELY project
+DATE: 					01/12/2022
+AUTHOR:					M Russell / J Galloway												
 DESCRIPTION OF FILE:	ITSA models
 DATASETS USED:			main data file
-DATASETS CREATED: 		ITSA figures and outputs
+DATASETS CREATED: 		tables
 OTHER OUTPUT: 			logfiles, printed to folder $Logdir
 USER-INSTALLED ADO: 	 
   (place .ado file(s) in analysis folder)						
 ==============================================================================*/
 
-**Set filepaths#
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-global projectdir `c(pwd)'
-di "$projectdir"
+**Set filepaths
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
 capture mkdir "$projectdir/output/figures"
 
 global logdir "$projectdir/logs"
-di "$logdir"
 
 **Open a log file
 cap log close
@@ -35,59 +32,55 @@ log using "$logdir/itsa_models.log", replace
 adopath + "$projectdir/analysis/extra_ados"
 
 **Use cleaned data from previous step
-use "$projectdir/output/data/file_eia_all.dta", clear
+use "$projectdir/output/data/file_gout_all.dta", clear
 
 set scheme plotplainblind
 
-/*ITSA models for appt and referral times===========================================================================*/
+*Restrict all analyses to patients with at least 6m follow-up and registration after diagnosis================*/
+keep if has_6m_post_diag==1
 
-*Restrict all analyses below to patients with rheum appt, GP appt and 6m follow-up and registration (changed from 12m requirement, for purposes of OpenSAFELY report)
-keep if has_6m_post_appt==1
+*ITSA models for ULT prescription ===========================================================================*/
 
-**Time from rheum referral to rheum appt (all diagnoses) - low rheumatology referral capture currently, therefore last GP appointment proxy being used currently (see below)
+**Time from diagnosis to prescription of ULT 
 preserve
-recode ref_appt_3w 2=0
-lab var ref_appt_3w "Rheumatology assessment within 3 weeks of referral"
-lab def ref_appt_3w 0 "No" 1 "Yes", modify
-lab val ref_appt_3w ref_appt_3w
-tab mo_year_appt ref_appt_3w, row  //proportion of patients with rheum assessment within 3 weeks of referral
-collapse (mean) mean_ref_appt_delay=ref_appt_3w, by(mo_year_appt)
+tab ult_6m
+tab mo_year_diagn ult_6m, row 
+collapse (mean) mean_ult_delay=ult_6m, by(mo_year_diagn)
 
-tsset mo_year_appt
+tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa mean_ref_appt_delay if inrange(mo_year_appt, tm(2019m4), tm(2022m03)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion assessed within 3 weeks of referral", size(medsmall) margin(small)) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021", nogrid) note("", size(v.small)) legend(off)) posttrend 
-	graph export "$projectdir/output/figures/ITSA_diagnostic_delay_newey.svg", as(svg) replace
+itsa mean_ult_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m12)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion prescribed ULT within 6 months", size(medsmall) margin(small)) xlabel(, nogrid) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+	graph export "$projectdir/output/figures/ITSA_ult_newey.svg", as(svg) replace
+	
 actest, lag(18)	
-
-**Prais-Winsten	
-itsa mean_ref_appt_delay if inrange(mo_year_appt, tm(2019m4), tm(2022m03)), single trperiod(2020m4; 2021m4) replace prais rhotype(tscorr) vce(robust) figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion assessed within 3 weeks of referral", size(medsmall) margin(small)) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022", nogrid) note("", size(v.small)) legend(off)) posttrend 
-	graph export "$projectdir/output/figures/ITSA_diagnostic_delay_prais.svg", as(svg) replace	
+	
 restore
 
-**Time from last GP (pre-rheum appt) to rheum appt (all diagnoses)
+*Restrict all analyses to patients prescribed ULT within 6m who had at least 6m follow-up after ULT================*/
+
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+keep if has_6m_follow_up_ult==1 & ult_6m==1
+
+//Could also look at target attainment overall; i.e. irrespective of ULT
+
+*ITSA models for urate attainment ===========================================================================*/
+
+**Time from diagnosis to prescription of ULT 
 preserve
-recode gp_appt_3w 2=0
-lab var gp_appt_3w "Rheumatology assessment within 3 weeks of referral"
-lab def gp_appt_3w 0 "No" 1 "Yes", modify
-lab val gp_appt_3w gp_appt_3w
-tab mo_year_appt gp_appt_3w, row  //proportion of patients with rheum appointment within 3 weeks of last GP appointment
-eststo X: estpost tabstat gp_appt_3w, stat(n mean) by(mo_year_appt_s)
-esttab X using "$projectdir/output/tables/gp_to_appt_ITSA_table.csv", cells("count mean") collabels("Count" "Mean proportion") replace plain nomtitle noobs
-collapse (mean) mean_gp_appt_delay=gp_appt_3w, by(mo_year_appt)
+tab urate_below360_ult_6m
+tab mo_year_diagn urate_below360_ult_6m, row 
+collapse (mean) mean_360_delay=urate_below360_ult_6m, by(mo_year_diagn)
 
-**for table with rounded values - see ITSA_tables_rounded
-
-tsset mo_year_appt
+tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa mean_gp_appt_delay if inrange(mo_year_appt, tm(2019m4), tm(2022m03)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion assessed within 3 weeks of referral", size(small) margin(small)) yscale(range(0.2(0.1)0.8)) ylabel(0.2(0.1)0.8, format(%03.1f) nogrid labsize(vsmall)) xtitle("Date of first rheumatology appointment", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022", nogrid labsize(vsmall)) note("", size(v.small)) legend(off)) posttrend 
-	graph export "$projectdir/output/figures/ITSA_diagnostic_delay_GP_newey.svg", width(12in) as(svg) replace
+itsa mean_360_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m12)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion prescribed ULT and attaining urate target within 6 months", size(medsmall) margin(small)) xlabel(, nogrid) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+	graph export "$projectdir/output/figures/ITSA_360_newey.svg", as(svg) replace
+	
 actest, lag(18)	
-
-**Prais-Winsten	
-itsa mean_gp_appt_delay if inrange(mo_year_appt, tm(2019m4), tm(2022m03)), single trperiod(2020m4; 2021m4) replace prais rhotype(tscorr) vce(robust) figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion assessed within 3 weeks of referral", size(small) margin(small)) yscale(range(0.2(0.1)0.8)) ylabel(0.2(0.1)0.8, format(%03.1f) nogrid) xtitle("Date of first rheumatology appointment", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022", nogrid) note("", size(v.small)) legend(off)) posttrend 
-	graph export "$projectdir/output/figures/ITSA_diagnostic_delay_GP_prais.svg", as(svg) replace	
+	
 restore
 
 log close
