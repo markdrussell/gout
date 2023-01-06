@@ -14,8 +14,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -31,9 +31,6 @@ log using "$logdir/descriptive_tables.log", replace
 **Set Ado file path
 adopath + "$projectdir/analysis/extra_ados"
 
-**Use cleaned data from previous step
-use "$projectdir/output/data/file_gout_all.dta", clear
-
 set scheme plotplainblind
 
 **Set index dates ===========================================================*/
@@ -43,80 +40,147 @@ global end_date = "31/12/2022"
 
 *Diagnostic incidence======================================================================*/
 
-**Total number of patients with diagnosis date after 1st April 2019 and before end date
+**Use cleaned data from previous step
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+**Total number of gout patients within study dates
 tab gout_code
 
 **Verify that all diagnoses were in study windows
 tab mo_year_diagn, missing
 tab diagnosis_year, missing
 
-*Diagnostic incidence by year
+*Diagnostic incidence by year, overall
 preserve
-collapse (count) total_diag=gout_code, by(diagnosis_year) 
+collapse (count) total_diag=gout_code, by(year_diag)
+rename year_diag year 
+keep if year!=.
+
+**Merge in yearly population (denominator)
+merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
+keep total_diag pop_all year
+ 
 **Round to nearest 5
-foreach var of varlist *_diag {
+foreach var of varlist total_diag pop_all {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
-**Generate incidences by year (baseline population 17,683,500)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/17683500)*10000)
-}
+
+**Generate incidences by year
+gen incidence_gout=((total_diag_round/pop_all_round)*10000)
 export delimited using "$projectdir/output/tables/diag_count_byyear.csv", replace
 restore
 
 *Diagnostic incidence by year; female patients
 preserve
 keep if male==0
-collapse (count) total_diag=gout_code, by(diagnosis_year) 
+collapse (count) total_diag=gout_code, by(year_diag)
+rename year_diag year 
+keep if year!=.
+
+**Merge in yearly population (denominator)
+merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
+keep total_diag pop_female year
+ 
 **Round to nearest 5
-foreach var of varlist *_diag {
+foreach var of varlist total_diag pop_female {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
-**Generate incidences by year (baseline female population 8,866,535)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/8866535)*10000)
-}
+
+**Generate incidences by year
+gen incidence_gout=((total_diag_round/pop_female_round)*10000)
 export delimited using "$projectdir/output/tables/diag_count_byyear_female.csv", replace
 restore
 
 *Diagnostic incidence by year, by disease; male patients
 preserve
 keep if male==1
-collapse (count) total_diag=gout_code, by(diagnosis_year) 
+collapse (count) total_diag=gout_code, by(year_diag)
+rename year_diag year 
+keep if year!=.
+
+**Merge in yearly population (denominator)
+merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
+keep total_diag pop_male year
+ 
 **Round to nearest 5
-foreach var of varlist *_diag {
+foreach var of varlist total_diag pop_male {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
-**Generate incidences by year (baseline male population 8,816,965)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/8816965)*10000)
-}
+
+**Generate incidences by year
+gen incidence_gout=((total_diag_round/pop_male_round)*10000)
 export delimited using "$projectdir/output/tables/diag_count_byyear_male.csv", replace
 restore
 
-*Graph of diagnoses by month, by disease
+*Graph of diagnotic incidence month
 preserve
 collapse (count) total_diag=gout_code, by(mo_year_diagn) 
+gen year = year(dofm(mo_year_diagn))
+
+**Merge in yearly population (denominator)
+merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
+drop prev_* date 
+
 **Round to nearest 5
-foreach var of varlist *_diag {
+foreach var of varlist total_diag pop_all {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
 
-**Generate incidences by month (baseline population 17,683,500)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/17683500)*10000)
-}
+**Generate incidences by month using yearly denominator
+gen incidence_gout=((total_diag_round/pop_all_round)*10000)
 export delimited using "$projectdir/output/tables/diag_count_bymonth.csv", replace
 
-twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) xline(722) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) name(incidence_twoway, replace) legend(region(fcolor(white%0)) order(1 "Gout diagnoses")) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in)replace
+twoway connected incidence_gout mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) xline(722) xscale(range(660(12)756)) xlabel(660(12)756, nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) name(incidence_twoway, replace) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
+	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in) replace
 restore	
-//Ideally would input baseline population for each study year
-	
+
+*Graph of diagnotic incidence month copy
+preserve
+collapse (count) total_diag=gout_code, by(mo_year_diagn sex) 
+gen year = year(dofm(mo_year_diagn))
+replace sex = "All" if 
+
+**Merge in yearly population (denominator)
+merge m:1 sex year using "$projectdir/output/data/gout_prevalence_sex_long", keep(match) nogen
+drop prev_* date 
+
+**Round to nearest 5
+foreach var of varlist total_diag pop {
+	gen `var'_round=round(`var', 5)
+	drop `var'
+}
+
+**Generate incidences by month using yearly denominator
+gen incidence_gout=((total_diag_round/pop_round)*10000)
+sort mo_year_diagn
+export delimited using "$projectdir/output/tables/diag_count_bymonth.csv", replace
+
+twoway connected incidence_gout mo_year_diagn if sex=="M", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(blue) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "Male" 2 "Female")) name(incidence_twoway, replace) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
+	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in) replace
+restore	
+
+*Graph of gout prevalence by year
+preserve 
+use "$projectdir/output/data/gout_prevalence_long", clear
+
+**Round to nearest 5
+foreach var of varlist prev_gout_all pop_all {
+	gen `var'_round=round(`var', 5)
+	drop `var'
+}
+
+**Generate prevalences by year
+gen prevalence_gout=((prev_gout_all_round/pop_all_round)*100) //as a %
+
+export delimited using "$projectdir/output/tables/prev_byyear.csv", replace	
+
+twoway connected prevalence_gout year, ytitle("Gout prevalence (%)", size(small)) color(gold) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) name(incidence_twoway, replace) saving("$projectdir/output/figures/prevalance_rounded.gph", replace)
+	graph export "$projectdir/output/figures/prevalance_rounded.svg", width(12in) replace
+restore	
 
 /*
 twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) || connected incidence_ra_diag_round mo_year_diagn, color(sky) || connected incidence_psa_diag_round mo_year_diagn, color(red) || connected incidence_axspa_diag_round mo_year_diagn, color(green) || connected incidence_undiff_diag_round mo_year_diagn, color(gold) xline(722) yscale(range(0(0.1)0.6)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6", nogrid labsize(vsmall)) xtitle("Date of diagnosis", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022" 753 "Oct 2022", nogrid labsize(vsmall)) title("", size(small)) name(incidence_twoway, replace) legend(region(fcolor(white%0)) order(1 "Total IA diagnoses" 2 "RA" 3 "PsA" 4 "axSpA" 5 "Undifferentiated IA")) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)

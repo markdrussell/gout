@@ -17,8 +17,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -169,7 +169,6 @@ lab var male "Male"
 lab define male 0 "No" 1 "Yes", modify
 lab val male male
 tab male, missing
-drop sex
 
 ***Ethnicity
 replace ethnicity = .u if ethnicity == .
@@ -538,7 +537,7 @@ codebook first_ult_code_date //should be same as above; if so, delete above and 
 tab first_ult if gout_code_date!=. & first_ult_date!=. & first_ult_date<gout_code_date
 tab first_ult if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //30 days before
 tab first_ult if gout_code_date!=. & first_ult_date!=. & (first_ult_date+60)<gout_code_date //60 days before
-drop if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //drop if first ULT script more than 30 days before first gout code
+drop if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //drop if first ULT script more than 30 days before first gout code - think about what to do with these (don't drop?)
 
 *Recode index diagnosis date as first ULT date if first ULT date <30 days before index gout code date
 replace gout_code_date=first_ult_date if gout_code_date!=. & first_ult_date!=. & (first_ult_date<gout_code_date)
@@ -592,14 +591,14 @@ lab var mo_year_diagn "Month/Year of Diagnosis"
 lab var mo_year_diagn_s "Month/Year of Diagnosis"
 
 **Separate into 12-month time windows (for diagnosis date)
-gen diagnosis_year=1 if diagnosis_date>=td(01jan2015) & diagnosis_date<td(31dec2015)
-replace diagnosis_year=2 if diagnosis_date>=td(01jan2016) & diagnosis_date<td(31dec2016)
-replace diagnosis_year=3 if diagnosis_date>=td(01jan2017) & diagnosis_date<td(31dec2017)
-replace diagnosis_year=4 if diagnosis_date>=td(01jan2018) & diagnosis_date<td(31dec2018)
-replace diagnosis_year=5 if diagnosis_date>=td(01jan2019) & diagnosis_date<td(31dec2019)
-replace diagnosis_year=6 if diagnosis_date>=td(01jan2020) & diagnosis_date<td(31dec2020)
-replace diagnosis_year=7 if diagnosis_date>=td(01jan2021) & diagnosis_date<td(31dec2021)
-replace diagnosis_year=8 if diagnosis_date>=td(01jan2022) & diagnosis_date<td(31dec2022)
+gen diagnosis_year=1 if diagnosis_date>=td(01jan2015) & diagnosis_date<=td(31dec2015)
+replace diagnosis_year=2 if diagnosis_date>=td(01jan2016) & diagnosis_date<=td(31dec2016)
+replace diagnosis_year=3 if diagnosis_date>=td(01jan2017) & diagnosis_date<=td(31dec2017)
+replace diagnosis_year=4 if diagnosis_date>=td(01jan2018) & diagnosis_date<=td(31dec2018)
+replace diagnosis_year=5 if diagnosis_date>=td(01jan2019) & diagnosis_date<=td(31dec2019)
+replace diagnosis_year=6 if diagnosis_date>=td(01jan2020) & diagnosis_date<=td(31dec2020)
+replace diagnosis_year=7 if diagnosis_date>=td(01jan2021) & diagnosis_date<=td(31dec2021)
+replace diagnosis_year=8 if diagnosis_date>=td(01jan2022) & diagnosis_date<=td(31dec2022)
 lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
 lab val diagnosis_year diagnosis_year
 lab var diagnosis_year "Year of diagnosis"
@@ -979,6 +978,43 @@ recode ult_time_21 .=4
 gen ult_time_22=ult_time if diagnosis_year==4
 recode ult_time_22 .=4
 
+save "$projectdir/output/data/file_gout_all", replace
+
+**Import denominators for incidence and prevalence=========================*/
+
+import delimited "$projectdir/output/measures/measure_prevalent_gout.csv", clear
+
+gen date_dstr = date(date, "YMD") 
+format date_dstr %td
+drop date
+rename date_dstr date
+gen year=year(date)
+format year %ty
+drop value //will round and calculate prevalence at analysis step
+
+bys year: egen pop_all = total(population)
+bys year: egen prev_gout_all = total(prevalent_gout)
+rename prevalent_gout prev_gout
+rename population pop
+save "$projectdir/output/data/gout_prevalence_sex_long", replace
+
+gen pop_male = population if sex=="M"
+gen pop_female = population if sex=="F"
+gen prev_gout_male = prevalent_gout if sex=="M"
+gen prev_gout_female = prevalent_gout if sex=="F"
+sort year (pop_female)
+by year: replace pop_female = pop_female[_n-1] if missing(pop_female) 
+by year: replace prev_gout_female = prev_gout_female[_n-1] if missing(prev_gout_female) 
+sort year (pop_male)
+by year: replace pop_male = pop_male[_n-1] if missing(pop_male) 
+by year: replace prev_gout_male = prev_gout_male[_n-1] if missing(prev_gout_male) 
+bys year: gen n=_n
+keep if n==1
+drop n
+drop sex prevalent_gout population 
+
+save "$projectdir/output/data/gout_prevalence_sex_long", replace
+
 /*
 lab define csdmard_time_19 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2019", modify
 lab val csdmard_time_19 csdmard_time_19
@@ -1149,7 +1185,5 @@ tab first_csDMARD_hcd if undiff_code==1 //for Undiff IA patients
 *
 
 */
-
-save "$projectdir/output/data/file_gout_all", replace
 
 log close

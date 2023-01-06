@@ -25,6 +25,10 @@ gout_codes = codelist_from_csv(
     "codelists/user-markdrussell-gout.csv", system="snomed", column="code",
 )
 
+prevalent_gout_codes = codelist_from_csv(
+    "codelists/user-markdrussell-gout-prevalent.csv", system="snomed", column="code",
+)
+
 urate_codes = codelist_from_csv(
     "codelists/user-markdrussell-serum-urateuric-acid-ctv3.csv", system="ctv3", column="code",
 )
