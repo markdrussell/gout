@@ -17,8 +17,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -980,7 +980,7 @@ recode ult_time_22 .=4
 
 save "$projectdir/output/data/file_gout_all", replace
 
-**Import denominators for incidence and prevalence=========================*/
+**Import prevalence and denominators for incidence and prevalence=========================*/
 
 import delimited "$projectdir/output/measures/measure_prevalent_gout.csv", clear
 
@@ -998,22 +998,22 @@ rename prevalent_gout prev_gout
 rename population pop
 save "$projectdir/output/data/gout_prevalence_sex_long", replace
 
-gen pop_male = population if sex=="M"
-gen pop_female = population if sex=="F"
-gen prev_gout_male = prevalent_gout if sex=="M"
-gen prev_gout_female = prevalent_gout if sex=="F"
-sort year (pop_female)
-by year: replace pop_female = pop_female[_n-1] if missing(pop_female) 
-by year: replace prev_gout_female = prev_gout_female[_n-1] if missing(prev_gout_female) 
-sort year (pop_male)
-by year: replace pop_male = pop_male[_n-1] if missing(pop_male) 
-by year: replace prev_gout_male = prev_gout_male[_n-1] if missing(prev_gout_male) 
-bys year: gen n=_n
-keep if n==1
-drop n
-drop sex prevalent_gout population 
+**Import admissions and denominators for admissions=========================*/
 
-save "$projectdir/output/data/gout_prevalence_sex_long", replace
+import delimited "$projectdir/output/measures/measure_gout_admission_pop.csv", clear
+
+gen date_dstr = date(date, "YMD") 
+format date_dstr %td
+drop date
+rename date_dstr date
+gen year=year(date)
+format year %ty
+drop value //will round and calculate prevalence at analysis step
+
+bys year: egen pop_all = total(population)
+bys year: egen gout_admission_all = total(gout_admission)
+rename population pop
+save "$projectdir/output/data/gout_admissions_sex_long", replace
 
 /*
 lab define csdmard_time_19 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2019", modify

@@ -14,8 +14,8 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
@@ -50,103 +50,56 @@ tab gout_code
 tab mo_year_diagn, missing
 tab diagnosis_year, missing
 
-*Diagnostic incidence by year, overall
+*Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population
 preserve
-collapse (count) total_diag=gout_code, by(year_diag)
-rename year_diag year 
-keep if year!=.
+collapse (count) total_diag=gout_code, by(year sex) 
+rename year_diag year
 
 **Merge in yearly population (denominator)
-merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
-keep total_diag pop_all year
- 
-**Round to nearest 5
-foreach var of varlist total_diag pop_all {
-	gen `var'_round=round(`var', 5)
-	drop `var'
-}
-
-**Generate incidences by year
-gen incidence_gout=((total_diag_round/pop_all_round)*10000)
-export delimited using "$projectdir/output/tables/diag_count_byyear.csv", replace
-restore
-
-*Diagnostic incidence by year; female patients
-preserve
-keep if male==0
-collapse (count) total_diag=gout_code, by(year_diag)
-rename year_diag year 
-keep if year!=.
-
-**Merge in yearly population (denominator)
-merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
-keep total_diag pop_female year
- 
-**Round to nearest 5
-foreach var of varlist total_diag pop_female {
-	gen `var'_round=round(`var', 5)
-	drop `var'
-}
-
-**Generate incidences by year
-gen incidence_gout=((total_diag_round/pop_female_round)*10000)
-export delimited using "$projectdir/output/tables/diag_count_byyear_female.csv", replace
-restore
-
-*Diagnostic incidence by year, by disease; male patients
-preserve
-keep if male==1
-collapse (count) total_diag=gout_code, by(year_diag)
-rename year_diag year 
-keep if year!=.
-
-**Merge in yearly population (denominator)
-merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
-keep total_diag pop_male year
- 
-**Round to nearest 5
-foreach var of varlist total_diag pop_male {
-	gen `var'_round=round(`var', 5)
-	drop `var'
-}
-
-**Generate incidences by year
-gen incidence_gout=((total_diag_round/pop_male_round)*10000)
-export delimited using "$projectdir/output/tables/diag_count_byyear_male.csv", replace
-restore
-
-*Graph of diagnotic incidence month
-preserve
-collapse (count) total_diag=gout_code, by(mo_year_diagn) 
-gen year = year(dofm(mo_year_diagn))
-
-**Merge in yearly population (denominator)
-merge m:1 year using "$projectdir/output/data/gout_prevalence_long", keep(match) nogen
+merge m:1 sex year using "$projectdir/output/data/gout_prevalence_sex_long", keep(match) nogen
 drop prev_* date 
+sort year
+
+**Calculate counts/population for combined male and female
+expand=2, gen(copy)
+replace sex = "All" if copy==1
+bys year: replace total_diag = sum(total_diag) if copy==1
+bys year (sex total_diag): gen n=_n if copy==1
+drop if n==1
+drop n copy
+replace pop = pop_all if sex=="All"
+drop pop_all
 
 **Round to nearest 5
-foreach var of varlist total_diag pop_all {
+foreach var of varlist total_diag pop {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
 
 **Generate incidences by month using yearly denominator
-gen incidence_gout=((total_diag_round/pop_all_round)*10000)
-export delimited using "$projectdir/output/tables/diag_count_bymonth.csv", replace
+gen incidence_gout=((total_diag_round/pop_round)*10000)
+export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
+restore
 
-twoway connected incidence_gout mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) xline(722) xscale(range(660(12)756)) xlabel(660(12)756, nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) name(incidence_twoway, replace) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in) replace
-restore	
-
-*Graph of diagnotic incidence month copy
+*Graph of gout diagnotic incidence by month (all/male/female) - denominator = mid-year TPP population
 preserve
 collapse (count) total_diag=gout_code, by(mo_year_diagn sex) 
 gen year = year(dofm(mo_year_diagn))
-replace sex = "All" if 
 
 **Merge in yearly population (denominator)
 merge m:1 sex year using "$projectdir/output/data/gout_prevalence_sex_long", keep(match) nogen
 drop prev_* date 
+sort mo_year_diagn
+
+**Calculate counts/population for combined male and female
+expand=2, gen(copy)
+replace sex = "All" if copy==1
+bys mo_year_diagn: replace total_diag = sum(total_diag) if copy==1
+bys mo_year_diagn (sex total_diag): gen n=_n if copy==1
+drop if n==1
+drop n copy
+replace pop = pop_all if sex=="All"
+drop pop_all
 
 **Round to nearest 5
 foreach var of varlist total_diag pop {
@@ -157,85 +110,71 @@ foreach var of varlist total_diag pop {
 **Generate incidences by month using yearly denominator
 gen incidence_gout=((total_diag_round/pop_round)*10000)
 sort mo_year_diagn
-export delimited using "$projectdir/output/tables/diag_count_bymonth.csv", replace
+export delimited using "$projectdir/output/tables/incidence_month_rounded.csv", replace
 
-twoway connected incidence_gout mo_year_diagn if sex=="M", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(blue) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "Male" 2 "Female")) name(incidence_twoway, replace) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in) replace
+twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
+	graph export "$projectdir/output/figures/incidence_month_rounded.svg", width(12in) replace
 restore	
 
-*Graph of gout prevalence by year
+*Graph of gout diagnostic prevalence by year (all/male/female) - denominator = mid-year TPP population
 preserve 
-use "$projectdir/output/data/gout_prevalence_long", clear
+use "$projectdir/output/data/gout_prevalence_sex_long", clear
+
+**Calculate counts/population for combined male and female
+expand=2, gen(copy)
+replace sex = "All" if copy==1
+replace prev_gout = prev_gout_all if sex=="All"
+replace pop = pop_all if sex=="All"
+bys year (sex prev_gout): gen n=_n if sex=="All"
+drop if n==1
+drop n copy
+drop pop_all prev_gout_all
 
 **Round to nearest 5
-foreach var of varlist prev_gout_all pop_all {
+foreach var of varlist prev_gout pop {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
 
 **Generate prevalences by year
-gen prevalence_gout=((prev_gout_all_round/pop_all_round)*100) //as a %
+gen prevalence_gout=((prev_gout_round/pop_round)*100) //as a %
 
-export delimited using "$projectdir/output/tables/prev_byyear.csv", replace	
+export delimited using "$projectdir/output/tables/prevalance_year_rounded.csv", replace	
 
-twoway connected prevalence_gout year, ytitle("Gout prevalence (%)", size(small)) color(gold) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) name(incidence_twoway, replace) saving("$projectdir/output/figures/prevalance_rounded.gph", replace)
-	graph export "$projectdir/output/figures/prevalance_rounded.svg", width(12in) replace
+twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)", size(small)) color(gold) || connected prevalence_gout year if sex=="M", ytitle("Gout prevalence (%)", size(small)) color(blue) || connected prevalence_gout year if sex=="F", ytitle("Gout prevalence (%)", size(small)) color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(prevalance_year_rounded, replace) saving("$projectdir/output/figures/prevalance_year_rounded.gph", replace)
+	graph export "$projectdir/output/figures/prevalance_year_rounded.svg", width(12in) replace
+restore	
+
+*Graph of gout admission incidence by year (all/male/female) - denominator = mid-year TPP population
+preserve 
+use "$projectdir/output/data/gout_admissions_sex_long", clear
+
+**Calculate counts/population for combined male and female
+expand=2, gen(copy)
+replace sex = "All" if copy==1
+replace gout_admission = gout_admission_all if sex=="All"
+replace pop = pop_all if sex=="All"
+bys year (sex gout_admission): gen n=_n if sex=="All"
+drop if n==1
+drop n copy
+drop pop_all gout_admission_all
+
+**Round to nearest 5
+foreach var of varlist gout_admission pop {
+	gen `var'_round=round(`var', 5)
+	drop `var'
+}
+
+**Generate prevalences by year
+gen incident_gout_adm=((gout_admission_round/pop_round)*10000) //as a %
+
+export delimited using "$projectdir/output/tables/incidence_admission_year_rounded.csv", replace	
+
+twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
+	graph export "$projectdir/output/figures/incidence_admission_year_rounded.svg", width(12in) replace
 restore	
 
 /*
-twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) || connected incidence_ra_diag_round mo_year_diagn, color(sky) || connected incidence_psa_diag_round mo_year_diagn, color(red) || connected incidence_axspa_diag_round mo_year_diagn, color(green) || connected incidence_undiff_diag_round mo_year_diagn, color(gold) xline(722) yscale(range(0(0.1)0.6)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6", nogrid labsize(vsmall)) xtitle("Date of diagnosis", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022" 753 "Oct 2022", nogrid labsize(vsmall)) title("", size(small)) name(incidence_twoway, replace) legend(region(fcolor(white%0)) order(1 "Total IA diagnoses" 2 "RA" 3 "PsA" 4 "axSpA" 5 "Undifferentiated IA")) saving("$projectdir/output/figures/incidence_twoway_rounded.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded.svg", width(12in)replace
-
-	
-restore	
-
-*Graph of diagnoses by month, by disease; female patients
-preserve
-keep if male==0
-recode ra_code 0=.
-recode psa_code 0=.
-recode anksp_code 0=.
-recode undiff_code 0=.
-collapse (count) total_diag=eia_code ra_diag=ra_code psa_diag=psa_code axspa_diag=anksp_code undiff_diag=undiff_code, by(mo_year_diagn) 
-**Round to nearest 5
-foreach var of varlist *_diag {
-	gen `var'_round=round(`var', 5)
-	drop `var'
-}
-**Generate incidences by month (baseline female population 8,866,535)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/8866535)*10000)
-}
-export delimited using "$projectdir/output/tables/diag_count_bymonth_female.csv", replace
-
-twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of IA diagnoses per 10,000 female population", size(small)) || connected incidence_ra_diag_round mo_year_diagn, color(sky) || connected incidence_psa_diag_round mo_year_diagn, color(red) || connected incidence_axspa_diag_round mo_year_diagn, color(green) || connected incidence_undiff_diag_round mo_year_diagn, color(gold) xline(722) yscale(range(0(0.1)0.8)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7" 0.8 "0.8", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022" 753 "Oct 2022", nogrid ) title("", size(small)) name(incidence_twoway_rounded_female, replace) legend(region(fcolor(white%0)) order(1 "Total EIA diagnoses" 2 "RA" 3 "PsA" 4 "AxSpA" 5 "Undifferentiated IA")) saving("$projectdir/output/figures/incidence_twoway_rounded_female.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded_female.svg", replace	
-	
-restore	
-
-*Graph of diagnoses by month, by disease; male patients
-preserve
-keep if male==1
-recode ra_code 0=.
-recode psa_code 0=.
-recode anksp_code 0=.
-recode undiff_code 0=.
-collapse (count) total_diag=eia_code ra_diag=ra_code psa_diag=psa_code axspa_diag=anksp_code undiff_diag=undiff_code, by(mo_year_diagn) 
-**Round to nearest 5
-foreach var of varlist *_diag {
-	gen `var'_round=round(`var', 5)
-	drop `var'
-}
-**Generate incidences by month (baseline male population 8,816,965)
-foreach var of varlist *_diag_round {
-	gen incidence_`var'=((`var'/8816965)*10000)
-}
-export delimited using "$projectdir/output/tables/diag_count_bymonth_male.csv", replace
-
-twoway connected incidence_total_diag_round mo_year_diagn, ytitle("Monthly incidence of IA diagnoses per 10,000 male population", size(small)) || connected incidence_ra_diag_round mo_year_diagn, color(sky) || connected incidence_psa_diag_round mo_year_diagn, color(red) || connected incidence_axspa_diag_round mo_year_diagn, color(green) || connected incidence_undiff_diag_round mo_year_diagn, color(gold) xline(722) yscale(range(0(0.1)0.8)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7" 0.8 "0.8", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) xlabel(711 "Apr 2019" 717 "Oct 2019" 723 "Apr 2020" 729 "Oct 2020" 735 "Apr 2021" 741 "Oct 2021" 747 "Apr 2022" 753 "Oct 2022", nogrid ) title("", size(small)) name(incidence_twoway_rounded_male, replace) legend(region(fcolor(white%0)) order(1 "Total EIA diagnoses" 2 "RA" 3 "PsA" 4 "AxSpA" 5 "Undifferentiated IA")) saving("$projectdir/output/figures/incidence_twoway_rounded_male.gph", replace)
-	graph export "$projectdir/output/figures/incidence_twoway_rounded_male.svg", replace	
-	
-restore
 
 *Incidence of rheumatology diagnoses, by ethnicity
 preserve

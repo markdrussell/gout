@@ -91,7 +91,7 @@ measures = [
         id="gout_admission_pop",
         numerator="gout_admission",
         denominator="population",
-        group_by="population"
+        group_by="sex"
     ),
     # Perhaps should restrict to admissions in patients with prevalent gout codes - may bias against index diagnoses - therefore could remove this
     Measure(
