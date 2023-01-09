@@ -17,9 +17,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir `c(pwd)'
+global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -735,14 +735,73 @@ gen abs_time_to_test = abs(time_to_test) if time_to_test!=. & time_to_test<=180 
 bys patient_id (abs_time_to_test): gen n=_n 
 gen baseline_urate=urate_val_ if n==1 & abs_time_to_test!=. 
 lab var baseline_urate "Serum urate at baseline"
+gen had_baseline_urate = 1 if baseline_urate!=.
+lab var had_baseline_urate "Had serum urate performed at baseline"
+lab define had_baseline_urate 0 "No" 1 "Yes", modify
+lab val had_baseline_urate had_baseline_urate
 drop n
 by patient_id: replace baseline_urate = baseline_urate[_n-1] if missing(baseline_urate)
+by patient_id: replace had_baseline_urate = had_baseline_urate[_n-1] if missing(had_baseline_urate)
+recode had_baseline_urate .=0
 gen baseline_urate_below360=1 if baseline_urate<=360 & baseline_urate!=.
 lab var baseline_urate_below360 "Baseline serum urate <360 micromol/L"
 lab define baseline_urate_below360 0 "No" 1 "Yes", modify
 lab val baseline_urate_below360 baseline_urate_below360
 replace baseline_urate_below360=0 if baseline_urate>360 & baseline_urate!=.
 drop abs_time_to_test
+
+*Define proportion of patients who attained serum urate <360 within 6 months of diagnosis, irrespective of ULT
+gen had_test_6m = 1 if (time_to_test>0 & time_to_test<=180) & urate_val_!=. //any test done within 6 months of diagnosis
+bys patient_id (had_test_6m): gen n=_n if had_test_6m!=.
+by patient_id: egen count_urate_6m = max(n) //number of tests within 6m
+recode count_urate_6m .=0 //includes those who didn't receive ULT
+lab var count_urate_6m "Number of urate levels within 6m of diagnosis"
+drop n
+sort patient_id had_test_6m
+by patient_id: replace had_test_6m = had_test_6m[_n-1] if missing(had_test_6m) //any test done within 6 months of diagnosis
+recode had_test_6m .=0 //includes those who didn't receive ULT
+lab var had_test_6m "Urate test performed within 6 months of diagnosis"
+lab def had_test_6m 0 "No" 1 "Yes", modify
+lab val had_test_6m had_test_6m
+gen value_test_6m = urate_val_ if (time_to_test>0 & time_to_test<=180) & urate_val_!=. //test values within 6 months of diagnosis
+bys patient_id (value_test_6m): gen n=_n if value_test_6m!=.
+gen lowest_urate_6m = value_test_6m if n==1 //lowest urate value within 6m of diagnosis
+lab var lowest_urate_6m "Lowest urate value within 6m of diagnosis"
+sort patient_id (lowest_urate_6m)
+by patient_id: replace lowest_urate_6m = lowest_urate_6m[_n-1] if missing(lowest_urate_6m)
+drop n value_test_6m
+gen urate_below360_6m = 1 if lowest_urate_6m<=360 & lowest_urate_6m!=.
+lab var urate_below360_6m  "Urate <360 micromol/L within 6m of diagnosis"
+lab def urate_below360_6m 0 "No" 1 "Yes", modify
+lab val urate_below360_6m urate_below360_6m
+recode urate_below360_6m .=0 //includes those who didn't have a test within 6m
+
+*Define proportion of patients who attained serum urate <360 within 12 months of diagnosis, irrespective of ULT
+gen had_test_12m = 1 if (time_to_test>0 & time_to_test<=365) & urate_val_!=. //any test done within 12 months of diagnosis
+bys patient_id (had_test_12m): gen n=_n if had_test_12m!=.
+by patient_id: egen count_urate_12m = max(n) //number of tests within 12m
+recode count_urate_12m .=0 //includes those who didn't receive ULT
+lab var count_urate_12m "Number of urate levels within 12m of diagnosis"
+drop n
+sort patient_id had_test_12m
+by patient_id: replace had_test_12m = had_test_12m[_n-1] if missing(had_test_12m) //any test done within 12 months of diagnosis
+recode had_test_12m .=0 //includes those who didn't receive ULT
+lab var had_test_12m "Urate test performed within 12 months of diagnosis"
+lab def had_test_12m 0 "No" 1 "Yes", modify
+lab val had_test_12m had_test_12m
+gen value_test_12m = urate_val_ if (time_to_test>0 & time_to_test<=365) & urate_val_!=. //test values within 12 months of diagnosis
+bys patient_id (value_test_12m): gen n=_n if value_test_12m!=.
+gen lowest_urate_12m = value_test_12m if n==1 //lowest urate value within 12m of diagnosis
+lab var lowest_urate_12m "Lowest urate value within 12m of diagnosis"
+sort patient_id (lowest_urate_12m)
+by patient_id: replace lowest_urate_12m = lowest_urate_12m[_n-1] if missing(lowest_urate_12m)
+drop n value_test_12m
+gen urate_below360_12m = 1 if lowest_urate_12m<=360 & lowest_urate_12m!=.
+lab var urate_below360_12m  "Urate <360 micromol/L within 12m of diagnosis"
+lab def urate_below360_12m 0 "No" 1 "Yes", modify
+lab val urate_below360_12m urate_below360_12m
+recode urate_below360_12m .=0 //includes those who didn't have a test within 12m
+
 drop time_to_test
 
 *Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement (assuming they had at least 6 months of follow-up available)
@@ -968,7 +1027,7 @@ lab define ult_time 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within
 lab val ult_time ult_time
 lab var ult_time "ULT initiation, overall" 
 
-//Need to amend below
+/*/Need to amend below if needed
 gen ult_time_19=ult_time if diagnosis_year==1
 recode ult_time_19 .=4
 gen ult_time_20=ult_time if diagnosis_year==2
@@ -978,105 +1037,6 @@ recode ult_time_21 .=4
 gen ult_time_22=ult_time if diagnosis_year==4
 recode ult_time_22 .=4
 
-save "$projectdir/output/data/file_gout_all", replace
-
-**Import prevalence and denominators for incidence and prevalence=========================*/
-
-import delimited "$projectdir/output/measures/measure_prevalent_gout.csv", clear
-
-gen date_dstr = date(date, "YMD") 
-format date_dstr %td
-drop date
-rename date_dstr date
-gen year=year(date)
-format year %ty
-drop value //will round and calculate prevalence at analysis step
-
-bys year: egen pop_all = total(population)
-bys year: egen prev_gout_all = total(prevalent_gout)
-rename prevalent_gout prev_gout
-rename population pop
-save "$projectdir/output/data/gout_prevalence_sex_long", replace
-
-**Import admissions and denominators for admissions=========================*/
-
-import delimited "$projectdir/output/measures/measure_gout_admission_pop.csv", clear
-
-gen date_dstr = date(date, "YMD") 
-format date_dstr %td
-drop date
-rename date_dstr date
-gen year=year(date)
-format year %ty
-drop value //will round and calculate prevalence at analysis step
-
-bys year: egen pop_all = total(population)
-bys year: egen gout_admission_all = total(gout_admission)
-rename population pop
-save "$projectdir/output/data/gout_admissions_sex_long", replace
-
-/*
-lab define csdmard_time_19 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2019", modify
-lab val csdmard_time_19 csdmard_time_19
-lab var csdmard_time_19 "csDMARD in primary care, Apr 2019-2020" 
-lab define csdmard_time_20 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2020", modify
-lab val csdmard_time_20 csdmard_time_20
-lab var csdmard_time_20 "csDMARD in primary care, Apr 2020-2021" 
-lab define csdmard_time_21 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
-lab val csdmard_time_21 csdmard_time_21
-lab var csdmard_time_21 "csDMARD in primary care, Apr 2021-2022" 
-lab define csdmard_time_22 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
-lab val csdmard_time_22 csdmard_time_22
-lab var csdmard_time_22 "csDMARD in primary care, Apr 2022-2023" 
-
-
-*Time to rheum referral (see notes above)=============================================*
-
-**Time from last GP to rheum ref before rheum appt (i.e. if appts are present and in correct time order)
-gen time_gp_rheum_ref_appt = (referral_rheum_prerheum_date - last_gp_refrheum_date) if referral_rheum_prerheum_date!=. & last_gp_refrheum_date!=. & rheum_appt_date!=. & referral_rheum_prerheum_date>=last_gp_refrheum_date & referral_rheum_prerheum_date<=rheum_appt_date
-tabstat time_gp_rheum_ref_appt, stats (n mean p50 p25 p75) //all patients (should be same number as all_appts)
-
-gen gp_ref_cat=1 if time_gp_rheum_ref_appt<=3 & time_gp_rheum_ref_appt!=. 
-replace gp_ref_cat=2 if time_gp_rheum_ref_appt>3 & time_gp_rheum_ref_appt<=7 & time_gp_rheum_ref_appt!=. & gp_ref_cat==.
-replace gp_ref_cat=3 if time_gp_rheum_ref_appt>7 & time_gp_rheum_ref_appt!=. & gp_ref_cat==.
-lab define gp_ref_cat 1 "Within 3 days" 2 "Between 3-7 days" 3 "More than 7 days", modify
-lab val gp_ref_cat gp_ref_cat
-lab var gp_ref_cat "Time to GP referral"
-tab gp_ref_cat, missing
-
-gen gp_ref_3d=1 if time_gp_rheum_ref_appt<=3 & time_gp_rheum_ref_appt!=. 
-replace gp_ref_3d=2 if time_gp_rheum_ref_appt>3 & time_gp_rheum_ref_appt!=.
-lab define gp_ref_3d 1 "Within 3 days" 2 "More than 3 days", modify
-lab val gp_ref_3d gp_ref_3d
-lab var gp_ref_3d "Time to GP referral"
-tab gp_ref_3d, missing
-
-**Time from last GP to rheum ref before gout code (sensitivity analysis; includes those with no rheum appt)
-gen time_gp_rheum_ref_code = (referral_rheum_precode_date - last_gp_refcode_date) if referral_rheum_precode_date!=. & last_gp_refcode_date!=. & referral_rheum_precode_date>=last_gp_refcode_date & referral_rheum_precode_date<=gout_code_date
-tabstat time_gp_rheum_ref_code, stats (n mean p50 p25 p75)
-
-**Time from last GP to rheum ref (combined - sensitivity analysis; includes those with no rheum appt)
-gen time_gp_rheum_ref_comb = time_gp_rheum_ref_appt 
-replace time_gp_rheum_ref_comb = time_gp_rheum_ref_code if time_gp_rheum_ref_appt==. & time_gp_rheum_ref_code!=.
-tabstat time_gp_rheum_ref_comb, stats (n mean p50 p25 p75)
-
-*Time to rheum appointment=============================================*
-
-**Time from last GP pre-rheum appt to first rheum appt (proxy for referral to appt delay)
-gen time_gp_rheum_appt = (rheum_appt_date - last_gp_prerheum_date) if rheum_appt_date!=. & last_gp_prerheum_date!=. & rheum_appt_date>=last_gp_prerheum_date
-tabstat time_gp_rheum_appt, stats (n mean p50 p25 p75)
-
-**Time from rheum ref to rheum appt (i.e. if appts are present and in correct order)
-gen time_ref_rheum_appt = (rheum_appt_date - referral_rheum_prerheum_date) if rheum_appt_date!=. & referral_rheum_prerheum_date!=. & referral_rheum_prerheum_date<=rheum_appt_date
-tabstat time_ref_rheum_appt, stats (n mean p50 p25 p75)
-
-gen gp_appt_cat=1 if time_gp_rheum_appt<=21 & time_gp_rheum_appt!=. 
-replace gp_appt_cat=2 if time_gp_rheum_appt>21 & time_gp_rheum_appt<=42 & time_gp_rheum_appt!=. & gp_appt_cat==.
-replace gp_appt_cat=3 if time_gp_rheum_appt>42 & time_gp_rheum_appt!=. & gp_appt_cat==.
-lab define gp_appt_cat 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val gp_appt_cat gp_appt_cat
-lab var gp_appt_cat "Time to rheumatology assessment, overall"
-tab gp_appt_cat, missing
 
 gen gp_appt_cat_19=gp_appt_cat if appt_year==1
 gen gp_appt_cat_20=gp_appt_cat if appt_year==2
@@ -1122,68 +1082,73 @@ gen time_refgp_rheum_appt = time_ref_rheum_appt
 replace time_refgp_rheum_appt = time_gp_rheum_appt if time_ref_rheum_appt==. & time_gp_rheum_appt!=.
 tabstat time_refgp_rheum_appt, stats (n mean p50 p25 p75)
 
-*Time to EIA code==================================================*
-
-**Time from last GP pre-code to EIA code (sensitivity analysis; includes those with no rheum ref and/or no rheum appt)
-gen time_gp_eia_code = (eia_code_date - last_gp_precode_date) if eia_code_date!=. & last_gp_precode_date!=. & eia_code_date>=last_gp_precode_date
-tabstat time_gp_eia_code, stats (n mean p50 p25 p75)
-
-**Time from last GP to EIA diagnosis (combined - sensitivity analysis; includes those with no rheum appt)
-gen time_gp_eia_diag = time_gp_rheum_appt
-replace time_gp_eia_diag = time_gp_eia_code if time_gp_rheum_appt==. & time_gp_eia_code!=.
-tabstat time_gp_eia_diag, stats (n mean p50 p25 p75)
-
-**Time from rheum ref to EIA code (sensitivity analysis; includes those with no rheum appt)
-gen time_ref_rheum_eia = (eia_code_date - referral_rheum_precode_date) if eia_code_date!=. & referral_rheum_precode_date!=. & referral_rheum_precode_date<=eia_code_date  
-tabstat time_ref_rheum_eia, stats (n mean p50 p25 p75)
-
-**Time from rheum ref to EIA diagnosis (combined - sensitivity analysis; includes those with no rheum appt)
-gen time_ref_rheum_eia_comb = time_ref_rheum_appt
-replace time_ref_rheum_eia_comb = time_ref_rheum_eia if time_ref_rheum_appt==. & time_ref_rheum_eia!=.
-tabstat time_ref_rheum_eia_comb, stats (n mean p50 p25 p75)
-
-**Time from rheum appt to EIA code
-gen time_rheum_eia_code = (eia_code_date - rheum_appt_date) if eia_code_date!=. & rheum_appt_date!=. 
-tabstat time_rheum_eia_code, stats (n mean p50 p25 p75) 
-gen time_rheum2_eia_code = (eia_code_date - rheum_appt2_date) if eia_code_date!=. & rheum_appt2_date!=. 
-tabstat time_rheum2_eia_code, stats (n mean p50 p25 p75) 
-gen time_rheum3_eia_code = (eia_code_date - rheum_appt3_date) if eia_code_date!=. & rheum_appt3_date!=. 
-tabstat time_rheum3_eia_code, stats (n mean p50 p25 p75) 
-
-*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================*
-
-
-
-
-**What was first csDMARD in GP record (not including high cost MTX prescriptions) - removed leflunomide (for OpenSAFELY report) due to small counts at more granular time periods
-gen first_csD=""
-foreach var of varlist hydroxychloroquine_date methotrexate_date methotrexate_inj_date sulfasalazine_date {
-	replace first_csD="`var'" if csdmard_date==`var' & csdmard_date!=. & (`var'<=(rheum_appt_date+180)) & time_to_csdmard!=.
-	}
-gen first_csDMARD = substr(first_csD, 1, length(first_csD) - 5) if first_csD!="" 
-drop first_csD
-replace first_csDMARD="Methotrexate" if first_csDMARD=="methotrexate" | first_csDMARD=="methotrexate_inj" //combine oral and s/c MTX
-replace first_csDMARD="Sulfasalazine" if first_csDMARD=="sulfasalazine"
-replace first_csDMARD="Hydroxychloroquine" if first_csDMARD=="hydroxychloroquine" 
-tab first_csDMARD if ra_code==1 //for RA patients
-tab first_csDMARD if psa_code==1 //for PsA patients
-tab first_csDMARD if anksp_code==1 //for axSpA patients
-tab first_csDMARD if undiff_code==1 //for Undiff IA patients
-
-**What was first csDMARD in GP record (including high cost MTX prescriptions)
-gen first_csD_hcd=""
-foreach var of varlist hydroxychloroquine_date methotrexate_date methotrexate_inj_date methotrexate_hcd_date sulfasalazine_date {
-	replace first_csD_hcd="`var'" if csdmard_hcd_date==`var' & csdmard_hcd_date!=. & (csdmard_hcd_date<=rheum_appt_date+180) & time_to_csdmard_hcd!=.
-	}
-gen first_csDMARD_hcd = substr(first_csD_hcd, 1, length(first_csD_hcd) - 5) if first_csD_hcd!=""
-drop first_csD_hcd
-tab first_csDMARD_hcd if ra_code==1 //for RA patients
-tab first_csDMARD_hcd if psa_code==1 //for PsA patients
-tab first_csDMARD_hcd if anksp_code==1 //for axSpA patients
-tab first_csDMARD_hcd if undiff_code==1 //for Undiff IA patients
- 
-*
-
 */
+
+*What was first ULT drug in GP record==============================================================================*
+
+**Within 6 months of diagnosis
+gen first_ult_d_6m=""
+foreach var of varlist first_allo_date first_febux_date {
+	replace first_ult_d_6m="`var'" if first_ult_date==`var' & first_ult_date!=. & (`var'<=(gout_code_date+180)) & `var'!=.
+	}
+gen first_ult_drug_6m = substr(first_ult_d_6m, 1, length(first_ult_d_6m) - 5) if first_ult_d_6m!="" 
+drop first_ult_d_6m
+replace first_ult_drug_6m="Febuxostat" if first_ult_drug_6m =="first_febux"
+replace first_ult_drug_6m="Allopurinol" if first_ult_drug_6m =="first_allo"
+lab var first_ult_drug_6m "First ULT drug"
+
+tab first_ult_drug_6m, missing
+tab ult_6m //as a check
+
+**Within 12 months of diagnosis
+gen first_ult_d_12m=""
+foreach var of varlist first_allo_date first_febux_date {
+	replace first_ult_d_12m="`var'" if first_ult_date==`var' & first_ult_date!=. & (`var'<=(gout_code_date+365)) & `var'!=.
+	}
+gen first_ult_drug_12m = substr(first_ult_d_12m, 1, length(first_ult_d_12m) - 5) if first_ult_d_12m!="" 
+drop first_ult_d_12m
+replace first_ult_drug_12m="Febuxostat" if first_ult_drug_12m =="first_febux"
+replace first_ult_drug_12m="Allopurinol" if first_ult_drug_12m =="first_allo"
+lab var first_ult_drug_12m "First ULT drug"
+
+tab first_ult_drug_12m, missing
+tab ult_12m //as a check
+
+save "$projectdir/output/data/file_gout_all", replace
+
+**Import prevalence and denominators for incidence and prevalence=========================*/
+
+import delimited "$projectdir/output/measures/measure_prevalent_gout.csv", clear
+
+gen date_dstr = date(date, "YMD") 
+format date_dstr %td
+drop date
+rename date_dstr date
+gen year=year(date)
+format year %ty
+drop value //will round and calculate prevalence at analysis step
+
+bys year: egen pop_all = total(population)
+bys year: egen prev_gout_all = total(prevalent_gout)
+rename prevalent_gout prev_gout
+rename population pop
+save "$projectdir/output/data/gout_prevalence_sex_long", replace
+
+**Import admissions and denominators for admissions=========================*/
+
+import delimited "$projectdir/output/measures/measure_gout_admission_pop.csv", clear
+
+gen date_dstr = date(date, "YMD") 
+format date_dstr %td
+drop date
+rename date_dstr date
+gen year=year(date)
+format year %ty
+drop value //will round and calculate prevalence at analysis step
+
+bys year: egen pop_all = total(population)
+bys year: egen gout_admission_all = total(gout_admission)
+rename population pop
+save "$projectdir/output/data/gout_admissions_sex_long", replace
 
 log close

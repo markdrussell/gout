@@ -14,9 +14,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir `c(pwd)'
+global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
@@ -365,18 +365,13 @@ bys `var': tab ult_12m, missing
 bys `var': tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 }
 
-***Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
-tab has_6m_post_ult, missing
-tab has_6m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
-tab has_12m_post_ult, missing 
-tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m 
-
 *ULT standards, by year (for those with at least 6m follow-up after diagnosis)
 table1_mc if has_6m_post_diag==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
 	vars(ult_6m cat %3.1f \ ///
 		 allo_6m cat %3.1f \ ///
 		 febux_6m cat %3.1f \ ///
-		 baseline_urate cat %3.1f \ ///
+		 had_baseline_urate cat %3.1f \ ///
+		 baseline_urate conts %3.1f \ ///
 		 ) saving("$projectdir/output/tables/ult6m_byyear.xls", replace) 
 		 
 *ULT standards, by region (for those with at least 6m follow-up after diagnosis)
@@ -384,21 +379,39 @@ table1_mc if nuts_region!=. & has_6m_post_diag==1, by(nuts_region) total(before)
 	vars(ult_6m cat %3.1f \ ///
 		 allo_6m cat %3.1f \ ///
 		 febux_6m cat %3.1f \ ///
-		 baseline_urate cat %3.1f \ ///
+		 had_baseline_urate cat %3.1f \ ///
+		 baseline_urate conts %3.1f \ ///
 		 ) saving("$projectdir/output/tables/ult6m_byregion.xls", replace)
 
 //could do heat map
 
+*First ULT drug===================================================================================================*/
+
+*If ULT within 6m of diagnosis
+tab first_ult_drug_6m, missing
+tab first_ult_drug_6m if has_6m_post_diag==1, missing
+
+*If ULT within 12m of diagnosis
+tab first_ult_drug_12m, missing
+tab first_ult_drug_12m if has_12m_post_diag==1, missing
+
 *Baseline urate==================================================================================================*/
 
 **Define baseline serum urate level as urate level closest to index diagnosis date (must be within 6m before/after diagnosis and before ULT commencement)
+tab had_baseline_urate, missing
 tabstat baseline_urate, stats(n mean p50 p25 p75)
 tab baseline_urate_below360, missing
 tab baseline_urate_below360 if baseline_urate!=., missing //of those who had a baseline urate performed
 
-*Urate target attainment=========================================================================================*/
+*Urate target attainment following ULT commencement=========================================================================================*/
 
-**6 months
+**Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
+tab has_6m_post_ult, missing
+tab has_6m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
+tab has_12m_post_ult, missing 
+tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m 
+
+**6 months (must have 6m of follow-up post-ULT)
 tab ult_6m, missing //those who received ULT within 6m of diagnosis
 tab has_6m_post_ult if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 6m of registration and follow-up after first ULT prescription
 tab had_test_ult_6m if has_6m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 6m
@@ -406,14 +419,34 @@ tabstat lowest_urate_ult_6m, stats(n mean p50 p25 p75) //lowest urate value with
 tab urate_below360_ult_6m if has_6m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >6m of follow-up
 tab urate_below360_ult_6m if has_6m_post_ult==1 & had_test_ult_6m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >6m of follow-up, and had a test performed within 6m of ULT
 
-**12 months 
+**12 months (must have 12m of follow-up post-ULT)
 tab ult_6m, missing //those who received ULT within 6m of diagnosis
 tab has_12m_post_ult if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 12m of registration and follow-up after first ULT prescription
 tab had_test_ult_12m if has_12m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 12m
-tabstat lowest_urate_ult_12m, stats(n mean p50 p25 p75) //lowest urate value within 12m of ULT
+tabstat lowest_urate_ult_12m if has_12m_post_ult==1, stats(n mean p50 p25 p75) //lowest urate value within 12m of ULT
 tab urate_below360_ult_12m if has_12m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >12m of follow-up
 tab urate_below360_ult_12m if has_12m_post_ult==1 & had_test_ult_12m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >12m of follow-up, and had a test performed within 12m of ULT
- 
+
+*Urate target attainment within 6m/12m of diagnosis; i.e. irrespective of ULT===================================================================*/
+
+**Proportion of patients with >6/12m of follow-up after diagnosis
+tab has_6m_post_diag, missing
+tab has_12m_post_diag, missing
+
+**6 months (must have 6m of follow-up after diagnosis)
+tab has_6m_post_diag, missing //proportion who had at least 6m of registration and follow-up after diagnosis
+tab had_test_6m if has_6m_post_diag==1, missing //proportion with >6m follow-up who had a least one test performed within 6m
+tabstat lowest_urate_6m if has_6m_post_diag==1, stats(n mean p50 p25 p75) //lowest urate value within 6m 
+tab urate_below360_6m if has_6m_post_diag==1, missing //proportion who attained <360 micromol/L with 6m of diagnosis
+tab urate_below360_6m if has_6m_post_diag==1 & had_test_6m==1, missing //proportion who attained <360 micromol/L from those who had >6m of follow-up and had a test performed within 6m of diagnosis
+
+**12 months 
+tab has_12m_post_diag, missing //proportion who had at least 12m of registration and follow-up after diagnosis
+tab had_test_12m if has_12m_post_diag==1, missing //proportion with >12m follow-up who had a least one test performed within 12m
+tabstat lowest_urate_12m, stats(n mean p50 p25 p75) //lowest urate value within 12m 
+tab urate_below360_12m if has_12m_post_diag==1, missing //proportion who attained <360 micromol/L with 12m of diagnosis
+tab urate_below360_12m if has_12m_post_diag==1 & had_test_12m==1, missing //proportion who attained <360 micromol/L from those who had >12m of follow-up and had a test performed within 12m of diagnosis
+
 *Number of urate levels perfomred within 6m/12m of ULT initiation=========================================================*/
 
 **6 months
@@ -445,48 +478,24 @@ table1_mc if ult_6m==1 & has_6m_post_ult==1 & nuts_region!=., by(nuts_region) to
 		 ) saving("$projectdir/output/tables/urate6m_byregion.xls", replace)
 		 
 		
-*Time from rheum appt to first csDMARD prescriptions on primary care record======================================================================
+*Output tables as CSVs================================================================================================*/		 
 
-
-/*
-
-*Output tables as CSVs		 
 import excel "$projectdir/output/tables/baseline_bydiagnosis.xls", clear
 outsheet * using "$projectdir/output/tables/baseline_bydiagnosis.csv" , comma nonames replace	
 
 import excel "$projectdir/output/tables/baseline_byyear.xls", clear
 outsheet * using "$projectdir/output/tables/baseline_byyear.csv" , comma nonames replace		 
 
-import excel "$projectdir/output/tables/referral_bydiag_nomiss.xls", clear
-outsheet * using "$projectdir/output/tables/referral_bydiag_nomiss.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/ult6m_byyear.xls", clear
+outsheet * using "$projectdir/output/tables/ult6m_byyear.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/referral_byyear_nomiss.xls", clear
-outsheet * using "$projectdir/output/tables/referral_byyear_nomiss.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/ult6m_byregion.xls", clear
+outsheet * using "$projectdir/output/tables/ult6m_byregion.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/referral_byregion_nomiss.xls", clear
-outsheet * using "$projectdir/output/tables/referral_byregion_nomiss.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/urate6m_byyear.xls", clear
+outsheet * using "$projectdir/output/tables/urate6m_byyear.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/drug_bydiag_miss.xls", clear
-outsheet * using "$projectdir/output/tables/drug_bydiag_miss.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyear_miss.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyear_miss.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyear_ra_miss.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyear_ra_miss.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyear_psa_miss.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyear_psa_miss.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyear_undiff_miss.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyear_undiff_miss.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyearanddisease.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyearanddisease.csv" , comma nonames replace	
-
-import excel "$projectdir/output/tables/drug_byyearandregion.xls", clear
-outsheet * using "$projectdir/output/tables/drug_byyearandregion.csv" , comma nonames replace	
-
-*/
+import excel "$projectdir/output/tables/urate6m_byregion.xls", clear
+outsheet * using "$projectdir/output/tables/urate6m_byregion.csv" , comma nonames replace	
 
 log close
