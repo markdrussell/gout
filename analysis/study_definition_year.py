@@ -54,14 +54,12 @@ study = StudyDefinition(
         return_expectations={"incidence": 0.1},
     ),
     # Denominator for incidence: patients with at least 12 months of registration with one practice before index date
-    # Do we need to do similar to https://ard.bmj.com/content/74/4/661?
     pre_registration=patients.registered_with_one_practice_between(
         start_date="index_date - 12 months",
         end_date="index_date",   
         return_expectations={"incidence": 0.98},  
     ),   
-    # Denominator for admissions could be patients with at least 6 months of registration before and after index date
-    # Instead, may need to do person-time at risk vs. single mid-year
+    # Denominator for admissions could be patients with at least 6 months of registration before and after index date vs. single mid-year (as above)
     adm_registration=patients.registered_with_one_practice_between(
         start_date="index_date - 6 months",
         end_date="index_date + 6 months",   
@@ -73,13 +71,13 @@ measures = [
         id="pre_registration",
         numerator="pre_registration",
         denominator="population",
-        group_by="population"
+        group_by="sex"
     ),
     Measure(
         id="adm_registration",
         numerator="adm_registration",
         denominator="population",
-        group_by="population"
+        group_by="sex"
     ),
     Measure(
         id="prevalent_gout",
@@ -98,6 +96,6 @@ measures = [
         id="gout_admission_prev",
         numerator="gout_admission",
         denominator="prevalent_gout",
-        group_by="population"
+        group_by="sex"
     ),
 ]    

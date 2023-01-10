@@ -18,8 +18,8 @@ USER-INSTALLED ADO:
 
 **Set filepaths
 *global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir `c(pwd)'
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -890,10 +890,6 @@ tab two_urate_ult_12m if has_12m_post_ult==1, missing
 
 *Define flare==============================================================================*/
 
-save "$projectdir/output/data/temp.dta", replace //REMOVE LATER
-
-use "$projectdir/output/data/temp.dta", clear //REMOVE LATER
-
 *Define flare (adapted from https://jamanetwork.com/journals/jama/fullarticle/2794763): 1) presence of a non-index diagnostic code for gout exacerbation; 2) non-index admission with primary gout diagnostic code; 3) non-index ED attendance with primary gout diagnostic code; 4) any non-index gout diagnostic code AND prescription for a flare treatment on same day as that code; all within 6m of index diagnostic code. Exclude events that occur within 14 days of one another
 
 **Non-index admission with primary gout diagnostic code
@@ -1114,9 +1110,9 @@ lab var first_ult_drug_12m "First ULT drug"
 tab first_ult_drug_12m, missing
 tab ult_12m //as a check
 
-save "$projectdir/output/data/file_gout_all", replace
+save "$projectdir/output/data/file_gout_all.dta", replace
 
-**Import prevalence and denominators for incidence and prevalence=========================*/
+**Import prevalence and denominator for prevalence=========================*/
 
 import delimited "$projectdir/output/measures/measure_prevalent_gout.csv", clear
 
@@ -1132,7 +1128,13 @@ bys year: egen pop_all = total(population)
 bys year: egen prev_gout_all = total(prevalent_gout)
 rename prevalent_gout prev_gout
 rename population pop
-save "$projectdir/output/data/gout_prevalence_sex_long", replace
+save "$projectdir/output/data/gout_prevalence_sex_long.dta", replace
+
+**Import denominator for incidence=========================*/
+
+import delimited "$projectdir/output/measures/measure_pre_registration.csv", clear
+
+
 
 **Import admissions and denominators for admissions=========================*/
 
@@ -1149,6 +1151,6 @@ drop value //will round and calculate prevalence at analysis step
 bys year: egen pop_all = total(population)
 bys year: egen gout_admission_all = total(gout_admission)
 rename population pop
-save "$projectdir/output/data/gout_admissions_sex_long", replace
+save "$projectdir/output/data/gout_admissions_sex_long.dta", replace
 
 log close
