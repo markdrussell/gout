@@ -88,7 +88,8 @@ actions:
         log1: logs/cleaning_dataset.log 
         data1: output/data/file_gout_all.dta
         data2: output/data/gout_prevalence_sex_long.dta
-        data3: output/data/gout_admissions_sex_long.dta
+        data3: output/data/gout_incidence_sex_long.dta
+        data4: output/data/gout_admissions_sex_long.dta
 
   run_baseline_tables_allpts:
     run: stata-mp:latest analysis/101_baseline_characteristics_allpts.do
@@ -108,7 +109,6 @@ actions:
         doc2: output/tables/incidence_month_rounded.csv 
         doc3: output/tables/prevalance_year_rounded.csv   
         doc4: output/tables/incidence_admission_year_rounded.csv   
-        doc5: output/tables/referral_byregion_nomiss.csv   
         doc6: output/tables/baseline_bydiagnosis.csv 
         doc7: output/tables/baseline_byyear.csv 
         doc8: output/tables/ult6m_byyear.csv   
@@ -139,6 +139,7 @@ actions:
         figure 3: output/figures/regional_ult_2020.svg       
         figure 4: output/figures/regional_ult_2021.svg  
         figure 5: output/figures/regional_ult_2022.svg 
+        figure 6: output/figures/regional_ult_merged.svg
 
   # run_redacted_tables:
   #   run: stata-mp:latest analysis/400_redacted_tables.do

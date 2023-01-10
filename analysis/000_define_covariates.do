@@ -18,8 +18,8 @@ USER-INSTALLED ADO:
 
 **Set filepaths
 *global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir `c(pwd)'
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -1134,7 +1134,20 @@ save "$projectdir/output/data/gout_prevalence_sex_long.dta", replace
 
 import delimited "$projectdir/output/measures/measure_pre_registration.csv", clear
 
+summ value //check - what proportion of individuals has 12 months of preceding registration
 
+gen date_dstr = date(date, "YMD") 
+format date_dstr %td
+drop date
+rename date_dstr date
+gen year=year(date)
+format year %ty
+drop value //will round and calculate prevalence at analysis step
+
+drop population
+rename pre_registration pop_inc
+bys year: egen pop_inc_all = total(pop_inc)
+save "$projectdir/output/data/gout_incidence_sex_long.dta", replace
 
 **Import admissions and denominators for admissions=========================*/
 

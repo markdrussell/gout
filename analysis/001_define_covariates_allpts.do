@@ -471,7 +471,7 @@ lab val diuretic diuretic
 lab var diuretic "Diuretic at diagnosis"
 
 
-save "$projectdir/output/data/file_eia_allpts", replace	
+save "$projectdir/output/data/file_gout_allpts", replace	
 
 log close
 

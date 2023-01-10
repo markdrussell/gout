@@ -32,7 +32,7 @@ log using "$logdir/descriptive_tables_allpts.log", replace
 adopath + "$projectdir/analysis/extra_ados"
 
 **Use cleaned data from previous step
-use "$projectdir/output/data/file_eia_allpts.dta", clear
+use "$projectdir/output/data/file_gout_allpts.dta", clear
 
 set scheme plotplainblind
 

@@ -50,14 +50,14 @@ tab gout_code
 tab mo_year_diagn, missing
 tab diagnosis_year, missing
 
-*Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population
+*Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population who had >12m of registration
 preserve
 collapse (count) total_diag=gout_code, by(year sex) 
 rename year_diag year
 
 **Merge in yearly population (denominator)
-merge m:1 sex year using "$projectdir/output/data/gout_prevalence_sex_long", keep(match) nogen
-drop prev_* date 
+merge m:1 sex year using "$projectdir/output/data/gout_incidence_sex_long", keep(match) nogen
+drop date 
 sort year
 
 **Calculate counts/population for combined male and female
@@ -67,28 +67,28 @@ bys year: replace total_diag = sum(total_diag) if copy==1
 bys year (sex total_diag): gen n=_n if copy==1
 drop if n==1
 drop n copy
-replace pop = pop_all if sex=="All"
-drop pop_all
+replace pop_inc = pop_inc_all if sex=="All"
+drop pop_inc_all
 
 **Round to nearest 5
-foreach var of varlist total_diag pop {
+foreach var of varlist total_diag pop_inc {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
 
-**Generate incidences by month using yearly denominator
-gen incidence_gout=((total_diag_round/pop_round)*10000)
+**Generate incidences by year using yearly denominator
+gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
 restore
 
-*Graph of gout diagnotic incidence by month (all/male/female) - denominator = mid-year TPP population
+*Graph of gout diagnotic incidence by month (all/male/female) - denominator = as above
 preserve
 collapse (count) total_diag=gout_code, by(mo_year_diagn sex) 
 gen year = year(dofm(mo_year_diagn))
 
 **Merge in yearly population (denominator)
-merge m:1 sex year using "$projectdir/output/data/gout_prevalence_sex_long", keep(match) nogen
-drop prev_* date 
+merge m:1 sex year using "$projectdir/output/data/gout_incidence_sex_long", keep(match) nogen
+drop date 
 sort mo_year_diagn
 
 **Calculate counts/population for combined male and female
@@ -98,17 +98,17 @@ bys mo_year_diagn: replace total_diag = sum(total_diag) if copy==1
 bys mo_year_diagn (sex total_diag): gen n=_n if copy==1
 drop if n==1
 drop n copy
-replace pop = pop_all if sex=="All"
-drop pop_all
+replace pop_inc = pop_inc_all if sex=="All"
+drop pop_inc_all
 
 **Round to nearest 5
-foreach var of varlist total_diag pop {
+foreach var of varlist total_diag pop_inc {
 	gen `var'_round=round(`var', 5)
 	drop `var'
 }
 
 **Generate incidences by month using yearly denominator
-gen incidence_gout=((total_diag_round/pop_round)*10000)
+gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 sort mo_year_diagn
 export delimited using "$projectdir/output/tables/incidence_month_rounded.csv", replace
 
@@ -145,7 +145,7 @@ twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)
 	graph export "$projectdir/output/figures/prevalance_year_rounded.svg", width(12in) replace
 restore	
 
-*Graph of gout admission incidence by year (all/male/female) - denominator = mid-year TPP population
+*Graph of gout admissions incidence by year (all/male/female) - denominator = mid-year TPP population (as per prevalence)
 preserve 
 use "$projectdir/output/data/gout_admissions_sex_long", clear
 
