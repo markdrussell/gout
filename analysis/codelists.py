@@ -22,30 +22,42 @@ clear_smoking_codes = codelist_from_csv(
 
 # Clinical conditions
 gout_codes = codelist_from_csv(
-    "codelists/user-markdrussell-gout.csv", system="snomed", column="code",
+    "codelists/user-markdrussell-gout.csv",
+    system="snomed",
+    column="code",
 )
 
 prevalent_gout_codes = codelist_from_csv(
-    "codelists/user-markdrussell-gout-prevalent.csv", system="snomed", column="code",
+    "codelists/user-markdrussell-gout-prevalent.csv",
+    system="snomed",
+    column="code",
 )
 
 urate_codes = codelist_from_csv(
-    "codelists/user-markdrussell-serum-urateuric-acid-ctv3.csv", system="ctv3", column="code",
+    "codelists/user-markdrussell-serum-urateuric-acid-ctv3.csv",
+    system="ctv3",
+    column="code",
 )
 
 chronic_cardiac_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-cardiac-disease.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-chronic-cardiac-disease.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 diabetes_codes = codelist_from_csv(
-    "codelists/opensafely-diabetes.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-diabetes.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 hba1c_new_codes = codelist(["XaPbt", "Xaeze", "Xaezd"], system="ctv3")
 hba1c_old_codes = codelist(["X772q", "XaERo", "XaERp"], system="ctv3")
 
 hypertension_codes = codelist_from_csv(
-    "codelists/opensafely-hypertension.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-hypertension.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 chronic_respiratory_disease_codes = codelist_from_csv(
@@ -55,23 +67,33 @@ chronic_respiratory_disease_codes = codelist_from_csv(
 )
 
 copd_codes = codelist_from_csv(
-    "codelists/opensafely-current-copd.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-current-copd.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 chronic_liver_disease_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-liver-disease.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-chronic-liver-disease.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 stroke_codes = codelist_from_csv(
-    "codelists/opensafely-stroke-updated.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-stroke-updated.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 lung_cancer_codes = codelist_from_csv(
-    "codelists/opensafely-lung-cancer.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-lung-cancer.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 haem_cancer_codes = codelist_from_csv(
-    "codelists/opensafely-haematological-cancer.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-haematological-cancer.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 other_cancer_codes = codelist_from_csv(
@@ -83,7 +105,9 @@ other_cancer_codes = codelist_from_csv(
 creatinine_codes = codelist(["XE2q5"], system="ctv3")
 
 ckd_codes = codelist_from_csv(
-    "codelists/opensafely-chronic-kidney-disease.csv", system="ctv3", column="CTV3ID",
+    "codelists/opensafely-chronic-kidney-disease.csv",
+    system="ctv3",
+    column="CTV3ID",
 )
 
 organ_transplant_codes = codelist_from_csv(
@@ -129,10 +153,7 @@ febuxostat120_codes = codelist_from_csv(
     column="dmd_id",
 )
 
-ult_codes = combine_codelists(
-allopurinol_codes,
-febuxostat_codes
-)
+ult_codes = combine_codelists(allopurinol_codes, febuxostat_codes)
 
 loop_diuretics_codes = codelist_from_csv(
     "codelists/pincer-diur.csv",
@@ -146,10 +167,7 @@ thiazide_diuretics_codes = codelist_from_csv(
     column="id",
 )
 
-diuretic_codes = combine_codelists(
-loop_diuretics_codes,
-thiazide_diuretics_codes
-)
+diuretic_codes = combine_codelists(loop_diuretics_codes, thiazide_diuretics_codes)
 
 oral_steroids = codelist_from_csv(
     "codelists/nhsd-oral-steroid-drugs-pra-dmd.csv",
@@ -169,14 +187,12 @@ colchicine = codelist_from_csv(
     column="dmd_id",
 )
 
-flare_treatment = combine_codelists(
-oral_steroids,
-nsaids,
-colchicine
-)
+flare_treatment = combine_codelists(oral_steroids, nsaids, colchicine)
 
 tophi_codes = codelist_from_csv(
-    "codelists/user-markdrussell-gouty-tophi.csv", system="snomed", column="code",
+    "codelists/user-markdrussell-gouty-tophi.csv",
+    system="snomed",
+    column="code",
 )
 
 # Admissions
@@ -184,7 +200,7 @@ gout_admission = codelist_from_csv(
     "codelists/user-markdrussell-gout-admissions.csv",
     system="icd10",
     column="code",
-)  
+)
 
 # Flare codes
 gout_flare = codelist_from_csv(
