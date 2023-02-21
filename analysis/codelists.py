@@ -94,13 +94,13 @@ organ_transplant_codes = codelist_from_csv(
 
 # Medications
 allopurinol_codes = codelist_from_csv(
-    "codelists/markdrussell-allopurinol-dmd.csv",
+    "codelists/user-markdrussell-allopurinol-dmd.csv",
     system="snomed",
     column="dmd_id",
 )
 
 febuxostat_codes = codelist_from_csv(
-    "codelists/markdrussell-febuxostat-dmd.csv",
+    "codelists/user-markdrussell-febuxostat-dmd.csv",
     system="snomed",
     column="dmd_id",
 )
@@ -140,7 +140,7 @@ nsaids = codelist_from_csv(
 )
 
 colchicine = codelist_from_csv(
-    "codelists/markdrussell-colchicine-dmd.csv",
+    "codelists/user-markdrussell-colchicine-dmd.csv",
     system="snomed",
     column="dmd_id",
 )
