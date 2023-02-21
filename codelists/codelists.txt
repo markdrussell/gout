@@ -2,8 +2,8 @@ user/markdrussell/gout/7a2a1f9e/
 user/markdrussell/gout-prevalent/048d1131/
 user/markdrussell/serum-urate/15ec52ca/
 user/markdrussell/serum-urateuric-acid-ctv3/04f51f77/
-user/markdrussell/allopurinol/7cdcdf94/
-user/markdrussell/febuxostat/4abdf92a/
+user/markdrussell/allopurinol-dmd/725db30b/
+user/markdrussell/febuxostat-dmd/594e3fd6/
 user/markdrussell/gout-admissions/07a7df6d/
 opensafely/cancer-excluding-lung-and-haematological/2020-04-15
 opensafely/chronic-cardiac-disease/2020-04-08
@@ -26,5 +26,5 @@ opensafely/thiazide-type-diuretic-medication/2020-05-19/
 user/markdrussell/gouty-tophi/41df05b9/
 nhsd/oral-steroid-drugs-pra-dmd/44292c02
 pincer/nsaid/23edd06e
-user/markdrussell/colchicine/76b0ac19/
+user/markdrussell/colchicine-dmd/403ecca1/
 user/markdrussell/gout-flaresattacks/5334de55/

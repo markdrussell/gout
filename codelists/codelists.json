@@ -24,17 +24,17 @@
       "downloaded_at": "2022-11-29 11:56:57.718929Z",
       "sha": "3337528f94b80a1837b3b9a425055f7bca3b11bc"
     },
-    "user-markdrussell-allopurinol.csv": {
-      "id": "user/markdrussell/allopurinol/7cdcdf94",
-      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/allopurinol/7cdcdf94/",
-      "downloaded_at": "2022-11-28 16:03:54.381239Z",
-      "sha": "8d2f92ce16680df3c4a71297cfa2de4f11eb1f41"
+    "user-markdrussell-allopurinol-dmd.csv": {
+      "id": "user/markdrussell/allopurinol-dmd/725db30b",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/allopurinol-dmd/725db30b/",
+      "downloaded_at": "2023-02-21 14:15:18.054013Z",
+      "sha": "4db49e56ff7997bb26c511a81e76291b7428ab6b"
     },
-    "user-markdrussell-febuxostat.csv": {
-      "id": "user/markdrussell/febuxostat/4abdf92a",
-      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/febuxostat/4abdf92a/",
-      "downloaded_at": "2022-11-28 16:03:54.618857Z",
-      "sha": "d228f963aa27773ffdd5812ff8eeeaa4bec479a7"
+    "user-markdrussell-febuxostat-dmd.csv": {
+      "id": "user/markdrussell/febuxostat-dmd/594e3fd6",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/febuxostat-dmd/594e3fd6/",
+      "downloaded_at": "2023-02-21 14:15:18.302056Z",
+      "sha": "2244f62700f8e82bb63d42f9d03afd85caf190e1"
     },
     "user-markdrussell-gout-admissions.csv": {
       "id": "user/markdrussell/gout-admissions/07a7df6d",
@@ -168,11 +168,11 @@
       "downloaded_at": "2022-12-05 10:28:43.616312Z",
       "sha": "36655feddbfcbf9ec475d6c31e87bf19230a0236"
     },
-    "user-markdrussell-colchicine.csv": {
-      "id": "user/markdrussell/colchicine/76b0ac19",
-      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/colchicine/76b0ac19/",
-      "downloaded_at": "2022-12-05 10:26:13.110194Z",
-      "sha": "a1ce4e8cce8a6bf5925c02b8855a3520cd5c7cbc"
+    "user-markdrussell-colchicine-dmd.csv": {
+      "id": "user/markdrussell/colchicine-dmd/403ecca1",
+      "url": "https://codelists.opensafely.org/codelist/user/markdrussell/colchicine-dmd/403ecca1/",
+      "downloaded_at": "2023-02-21 14:15:24.732699Z",
+      "sha": "3548bc9647cecc4324a8f501ec236d0a58e14b17"
     },
     "user-markdrussell-gout-flaresattacks.csv": {
       "id": "user/markdrussell/gout-flaresattacks/5334de55",
