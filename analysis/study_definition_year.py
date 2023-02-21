@@ -1,4 +1,4 @@
-from cohortextractor import StudyDefinition, patients
+from cohortextractor import StudyDefinition, patients, Measure
 
 from cohortextractor.codelistlib import filter_codes_by_category
 
