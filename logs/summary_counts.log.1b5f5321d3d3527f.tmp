@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /workspace/logs/summary_counts.log
+  log type:  text
+ opened on:  21 Feb 2023, 13:59:10
+
+. 
+. *shell gunzip "$projectdir/output/input_count.csv.gz", replace
+. import delimited "$projectdir/output/input_count.csv", clear
+file /workspace/output/input_count.csv not found
+r(601);
+
+end of do-file
+r(601);
+
+end of do-file
+
+r(601);
+
+

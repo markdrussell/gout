@@ -31,6 +31,8 @@ global logdir "$projectdir/logs"
 cap log close
 log using "$logdir/cleaning_dataset.log", replace
 
+
+!gunzip "$projectdir/output/input.csv.gz"
 import delimited "$projectdir/output/input.csv", clear
 
 **Set Ado file path

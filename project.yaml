@@ -6,16 +6,16 @@ expectations:
 actions:
 
   generate_study_population:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition
+    run: cohortextractor:latest generate_cohort --study-definition study_definition --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/input.csv
+        cohort: output/input.csv.gz
 
   generate_study_population_count:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_count
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_count --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/input_count.csv
+        cohort: output/input_count.csv.gz
 
   summary_counts:
     run: stata-mp:latest analysis/002_summary_counts.do
@@ -25,10 +25,10 @@ actions:
         log1: logs/summary_counts.log
 
   generate_study_population_allpts:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_allpts
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_allpts --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/input_allpts.csv
+        cohort: output/input_allpts.csv.gz
 
   generate_study_population_2015:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_year --index-date-range "2015-07-01" --output-dir=output/measures --output-format=csv.gz

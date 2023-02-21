@@ -32,7 +32,7 @@ global logdir "$projectdir/logs"
 cap log close
 log using "$logdir/summary_counts.log", replace
 
-*shell gunzip "$projectdir/output/input_count.csv.gz", replace
+!gunzip "$projectdir/output/input_count.csv.gz"
 import delimited "$projectdir/output/input_count.csv", clear
 
 **Set Ado file path
