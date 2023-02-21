@@ -1,11 +1,6 @@
-from cohortextractor import (
-    StudyDefinition,
-    patients,
-    codelist,
-    codelist_from_csv,
-    combine_codelists,
-    filter_codes_by_category,
-)
+from cohortextractor import StudyDefinition, patients
+
+from cohortextractor.codelistlib import filter_codes_by_category
 
 from codelists import *
 
@@ -360,7 +355,7 @@ study = StudyDefinition(
         name="urate_test",
         codelist=urate_codes,
         index_date="gout_code_date - 6 months",
-        n=9,
+        n=7,
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
             "float": {"distribution": "normal", "mean": 400.0, "stddev": 100},
@@ -475,7 +470,7 @@ study = StudyDefinition(
         name="gout_admission",
         codelist=gout_admission,
         index_date="gout_code_date - 1 month",
-        n=9,
+        n=3,
         return_expectations={
             "date": {"earliest": "2014-03-01", "latest": end_date},
             "incidence": 0.3,
@@ -498,7 +493,7 @@ study = StudyDefinition(
         name="gout_emerg",
         codelist=gout_codes,
         index_date="gout_code_date - 1 month",
-        n=9,
+        n=3,
         return_expectations={
             "date": {"earliest": "2014-03-01", "latest": end_date},
             "incidence": 0.3,
@@ -533,7 +528,7 @@ study = StudyDefinition(
         name="gout_flare",
         codelist=gout_flare,
         index_date="gout_code_date + 14 days",
-        n=9,
+        n=3,
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
             "incidence": 0.4,
@@ -543,7 +538,7 @@ study = StudyDefinition(
         name="gout_code_any",
         codelist=gout_codes,
         index_date="gout_code_date + 14 days",
-        n=9,
+        n=3,
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
             "incidence": 0.5,
@@ -553,7 +548,7 @@ study = StudyDefinition(
         name="flare_treatment",
         codelist=flare_treatment,
         index_date="gout_code_date + 14 days",
-        n=9,
+        n=6,
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
             "incidence": 0.4,
