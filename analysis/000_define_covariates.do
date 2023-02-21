@@ -45,7 +45,6 @@ global end_date = "31/12/2022"
 **Rename variables =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease
 rename chronic_cardiac_disease chronic_card_disease
-rename first_ult_code first_ult_dmd
 rename bmi_date_measured bmi_date
 
 foreach var of varlist 	 bmi 								///
@@ -83,7 +82,6 @@ foreach var of varlist   died_date_ons						///
 **Change date format and create binary indicator variables for relevant conditions ====================================================*/
 
 foreach var of varlist 	 gout_code_date						///
-						 first_ult_code_date	 			///
 						 first_ult_date						///
 						 first_allo_date					///
 						 first_febux_date					///
