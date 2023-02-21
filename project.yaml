@@ -11,6 +11,19 @@ actions:
       highly_sensitive:
         cohort: output/input.csv
 
+  generate_study_population_count:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_count
+    outputs:
+      highly_sensitive:
+        cohort: output/input_count.csv
+
+  summary_counts:
+    run: stata-mp:latest analysis/002_summary_counts.do
+    needs: [generate_study_population_count]
+    outputs:
+      highly_sensitive:
+        log1: logs/summary_counts.log
+
   generate_study_population_allpts:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_allpts
     outputs:
