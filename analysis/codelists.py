@@ -94,37 +94,13 @@ organ_transplant_codes = codelist_from_csv(
 
 # Medications
 allopurinol_codes = codelist_from_csv(
-    "local_codelists/markdrussell-allopurinol-7cdcdf94-dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
-
-allopurinol100_codes = codelist_from_csv(
-    "local_codelists/markdrussell-allopurinol-100mg-tablets-6be5ac41-dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
-
-allopurinol300_codes = codelist_from_csv(
-    "local_codelists/markdrussell-allopurinol-300mg-doses-52d6390c-dmd.csv",
+    "codelists/user-markdrussell-allopurinol-dmd.csv",
     system="snomed",
     column="dmd_id",
 )
 
 febuxostat_codes = codelist_from_csv(
-    "local_codelists/markdrussell-febuxostat-4abdf92a-dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
-
-febuxostat80_codes = codelist_from_csv(
-    "local_codelists/markdrussell-febuxostat-80mg-doses-39c6c5d7-dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
-
-febuxostat120_codes = codelist_from_csv(
-    "local_codelists/markdrussell-febuxostat-120mg-doses-20b752a2-dmd.csv",
+    "codelists/user-markdrussell-febuxostat-dmd.csv",
     system="snomed",
     column="dmd_id",
 )
@@ -164,7 +140,7 @@ nsaids = codelist_from_csv(
 )
 
 colchicine = codelist_from_csv(
-    "local_codelists/markdrussell-colchicine-76b0ac19-dmd.csv",
+    "codelists/user-markdrussell-colchicine-dmd.csv",
     system="snomed",
     column="dmd_id",
 )

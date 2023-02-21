@@ -27,6 +27,7 @@ capture mkdir "$projectdir/output/tables"
 
 global logdir "$projectdir/logs"
 
+!gunzip "$projectdir/output/input_allpts.csv.gz"
 import delimited "$projectdir/output/input_allpts.csv", clear
 
 **Open a log file

@@ -31,6 +31,7 @@ global logdir "$projectdir/logs"
 cap log close
 log using "$logdir/cleaning_dataset.log", replace
 
+!gunzip "$projectdir/output/input.csv.gz"
 import delimited "$projectdir/output/input.csv", clear
 
 **Set Ado file path
@@ -44,10 +45,7 @@ global end_date = "31/12/2022"
 **Rename variables =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease
 rename chronic_cardiac_disease chronic_card_disease
-rename first_ult_code first_ult_dmd
 rename bmi_date_measured bmi_date
-rename last_ult_6m last_ult_6m_code
-rename last_ult_12m last_ult_12m_code
 
 foreach var of varlist 	 bmi 								///
 						 creatinine							///
@@ -84,18 +82,9 @@ foreach var of varlist   died_date_ons						///
 **Change date format and create binary indicator variables for relevant conditions ====================================================*/
 
 foreach var of varlist 	 gout_code_date						///
-						 first_ult_code_date	 			///
 						 first_ult_date						///
 						 first_allo_date					///
-						 first_allo100_date					///
-						 first_allo300_date					///
 						 first_febux_date					///
-						 last_ult_6m_date					///
-						 last_allo100_6m_date				///
-						 last_allo300_6m_date				///
-						 last_ult_12m_date					///
-						 last_allo100_12m_date				///
-						 last_allo300_12m_date				///
 						 bmi_date 							///
 						 creatinine_date 					///
 						 died_date_ons						///
@@ -532,7 +521,6 @@ keep if gout_code==1
 
 **Date of first ULT script
 codebook first_ult_date
-codebook first_ult_code_date //should be same as above; if so, delete above and study definition and below
 
 tab first_ult if gout_code_date!=. & first_ult_date!=. & first_ult_date<gout_code_date
 tab first_ult if gout_code_date!=. & first_ult_date!=. & (first_ult_date+30)<gout_code_date //30 days before
@@ -708,6 +696,10 @@ lab define has_12m_post_ult 0 "No" 1 "Yes", modify
 lab val has_12m_post_ult has_12m_post_ult
 tab has_12m_post_ult, missing 
 
+**Number of ULT prescriptions issued in 6m after first script issued (Nb. doses may be double counted if both 300mg and 100mg issued)
+tabstat ult_count_6m, stats (n mean sd p50 p25 p75)
+tabstat ult_count_12m, stats (n mean sd p50 p25 p75)
+
 *Serum urate measurements==================================================*/
 
 *Set implausible urate values to missing (Note: zero changed to missing) and remove urate dates if no measurements, and vice versa 
@@ -804,8 +796,8 @@ recode urate_below360_12m .=0 //includes those who didn't have a test within 12m
 
 drop time_to_test
 
-*Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement (assuming they had at least 6 months of follow-up available)
-gen time_to_test_ult_6m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1 & has_6m_post_ult==1
+*Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement 
+gen time_to_test_ult_6m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1
 gen had_test_ult_6m = 1 if time_to_test_ult_6m<=180 & time_to_test_ult_6m!=. & urate_val_!=. //any test done within 6 months of ULT
 bys patient_id (had_test_ult_6m): gen n=_n if had_test_ult_6m!=.
 by patient_id: egen count_urate_ult_6m = max(n) //number of tests within 6m of ULT
@@ -832,8 +824,8 @@ lab val urate_below360_ult_6m urate_below360_ult_6m
 recode urate_below360_ult_6m .=0 //includes those who didn't receive ULT or didn't have a test within 6m
 drop time_to_test_ult_6m
 
-*Define proportion of patients commenced on ULT within 6 months (important) of diagnosis who attained serum urate <360 within 12 months of ULT commencement (assuming they had at least 12 months of follow-up available)
-gen time_to_test_ult_12m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1 & has_12m_post_ult==1
+*Define proportion of patients commenced on ULT within 6 months (important) of diagnosis who attained serum urate <360 within 12 months of ULT commencement
+gen time_to_test_ult_12m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1
 gen had_test_ult_12m = 1 if time_to_test_ult_12m<=365 & time_to_test_ult_12m!=. & urate_val_!=. //test done within 12 months of ULT
 bys patient_id (had_test_ult_12m): gen n=_n if had_test_ult_12m!=.
 by patient_id: egen count_urate_ult_12m = max(n) //number of tests within 12m of ULT
@@ -1134,7 +1126,7 @@ save "$projectdir/output/data/gout_prevalence_sex_long.dta", replace
 
 import delimited "$projectdir/output/measures/measure_pre_registration.csv", clear
 
-summ value //check - what proportion of individuals has 12 months of preceding registration
+summ value //check - what proportion of individuals have 12 months of preceding registration
 
 gen date_dstr = date(date, "YMD") 
 format date_dstr %td
