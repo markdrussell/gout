@@ -60,11 +60,41 @@ study = StudyDefinition(
         }
     ),
 
-    # Urate level count (from 6 months before diagnosis to up to 2 years after diagnosis)
+    # Urate level count (from 6 months before diagnosis to up to 1 years after diagnosis)
+    ## CTV3 codelist, including missing
     urate_count=patients.with_these_clinical_events(
         codelist=urate_codes,
         returning="number_of_matches_in_period",
-        between=["gout_code_date - 6 months", "gout_code_date + 2 years"],
+        between=["gout_code_date - 6 months", "gout_code_date + 1 year"],
+        return_expectations={
+            "int": {"distribution": "normal", "mean": 3, "stddev": 2},
+        },
+    ),
+    ## CTV3 codelist, ignoring missing
+    urate_count_nom=patients.with_these_clinical_events(
+        codelist=urate_codes,
+        returning="number_of_matches_in_period",
+        ignore_missing_values=True,
+        between=["gout_code_date - 6 months", "gout_code_date + 1 year"],
+        return_expectations={
+            "int": {"distribution": "normal", "mean": 3, "stddev": 2},
+        },
+    ),
+    ## Snomed codelist, including missing
+    urate_count_sno=patients.with_these_clinical_events(
+        codelist=urate_codes_snomed,
+        returning="number_of_matches_in_period",
+        between=["gout_code_date - 6 months", "gout_code_date + 1 year"],
+        return_expectations={
+            "int": {"distribution": "normal", "mean": 3, "stddev": 2},
+        },
+    ),
+    ## Snomed codelist, ignoring missing
+    urate_count_sno_nom=patients.with_these_clinical_events(
+        codelist=urate_codes_snomed,
+        returning="number_of_matches_in_period",
+        ignore_missing_values=True,
+        between=["gout_code_date - 6 months", "gout_code_date + 1 year"],
         return_expectations={
             "int": {"distribution": "normal", "mean": 3, "stddev": 2},
         },
@@ -91,7 +121,7 @@ study = StudyDefinition(
     ## Flare codes
     gout_flare_count=patients.with_these_clinical_events(
         gout_flare,
-        between=["gout_code_date + 14 days", "gout_code_date + 6 months"],
+        between=["gout_code_date + 14 days", "gout_code_date + 1 year"],
         returning="number_of_matches_in_period",
         return_expectations={
             "int": {"distribution": "normal", "mean": 2, "stddev": 1},
@@ -99,7 +129,7 @@ study = StudyDefinition(
     ),
     gout_code_count=patients.with_these_clinical_events(
         gout_codes,
-        between=["gout_code_date + 14 days", "gout_code_date + 6 months"],
+        between=["gout_code_date + 14 days", "gout_code_date + 1 year"],
         returning="number_of_matches_in_period",
         return_expectations={
             "int": {"distribution": "normal", "mean": 2, "stddev": 1},
@@ -107,7 +137,7 @@ study = StudyDefinition(
     ),
     flare_treatment_count=patients.with_these_medications(
         flare_treatment,
-        between=["gout_code_date + 14 days", "gout_code_date + 6 months"],
+        between=["gout_code_date + 14 days", "gout_code_date + 1 year"],
         returning="number_of_matches_in_period",
         return_expectations={
             "int": {"distribution": "normal", "mean": 2, "stddev": 1},

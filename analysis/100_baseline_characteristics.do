@@ -14,9 +14,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir `c(pwd)'
+global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
@@ -319,13 +319,10 @@ table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle("
 **Proportion of patients with at least 6/12 months of registration after diagnosis 
 tab has_6m_follow_up, missing
 tab has_12m_follow_up, missing
-tab mo_year_diagn has_6m_follow_up
-tab mo_year_diagn has_12m_follow_up
-
-**Proportion of patients with at least 6/12 months of registration and follow-up time after diagnosis
-table mo_year_diagn has_6m_post_diag, stat(prop, total) 
-
-tab has_12m_post_diag mo_year_diagn, missing 
+tab mo_year_diagn has_6m_follow_up, row
+tab mo_year_diagn has_12m_follow_up, row
+tab mo_year_diagn has_6m_post_diag, row
+tab mo_year_diagn has_12m_post_diag, row
 
 *ULT prescriptions===============================================================================================*/
 
@@ -395,10 +392,12 @@ table1_mc if nuts_region!=. & has_6m_post_diag==1, by(nuts_region) total(before)
 *If ULT within 6m of diagnosis
 tab first_ult_drug_6m, missing
 tab first_ult_drug_6m if has_6m_post_diag==1, missing
+tab first_ult_drug_6m if has_6m_post_diag==1 & ult_6m==1, missing
 
 *If ULT within 12m of diagnosis
 tab first_ult_drug_12m, missing
 tab first_ult_drug_12m if has_12m_post_diag==1, missing
+tab first_ult_drug_12m if has_12m_post_diag==1 & ult_12m==1, missing
 
 *Baseline urate==================================================================================================*/
 

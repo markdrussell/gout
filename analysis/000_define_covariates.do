@@ -712,9 +712,13 @@ tabstat ult_count_12m, stats (n mean sd p50 p25 p75)
 
 *Set implausible urate values to missing (Note: zero changed to missing) and remove urate dates if no measurements, and vice versa 
 forval i = 1/7 	{
+						codebook urate_val_`i'
 						replace urate_val_`i' = . if !inrange(urate_val_`i', 50, 2000) 	
+						codebook urate_val_`i'
 						replace urate_val_`i' = . if urate_date_`i' == . 
+						codebook urate_val_`i'
 						replace urate_date_`i' = . if urate_val_`i' == . 
+						codebook urate_date_`i'
 						replace urate_test_`i' = . if urate_val_`i' == .
 						recode urate_test_`i' .=0
 						tab urate_test_`i', missing
@@ -1094,7 +1098,7 @@ replace first_ult_drug_6m="Allopurinol" if first_ult_drug_6m =="first_allo"
 lab var first_ult_drug_6m "First ULT drug"
 
 tab first_ult_drug_6m, missing
-tab first_ult_drug_6m if ult6m==1, missing
+tab first_ult_drug_6m if ult_6m==1, missing
 
 **Within 12 months of diagnosis
 gen first_ult_d_12m=""
@@ -1108,7 +1112,7 @@ replace first_ult_drug_12m="Allopurinol" if first_ult_drug_12m =="first_allo"
 lab var first_ult_drug_12m "First ULT drug"
 
 tab first_ult_drug_12m, missing
-tab first_ult_drug_12m if ult12m==1, missing
+tab first_ult_drug_12m if ult_12m==1, missing
 
 save "$projectdir/output/data/file_gout_all.dta", replace
 

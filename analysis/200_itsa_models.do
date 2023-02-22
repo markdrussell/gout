@@ -50,7 +50,7 @@ collapse (mean) mean_ult_delay=ult_6m, by(mo_year_diagn)
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa mean_ult_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m12)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion prescribed ULT within 6 months", size(medsmall) margin(small)) xlabel(, nogrid) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa mean_ult_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m6)), single trperiod(2020m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT within 6 months", size(medsmall) margin(small)) xlabel(, nogrid) yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_ult_newey.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -76,7 +76,7 @@ collapse (mean) mean_360_delay=urate_below360_ult_6m, by(mo_year_diagn)
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa mean_360_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m12)), single trperiod(2020m4; 2021m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Mean proportion prescribed ULT and attaining urate target within 6 months", size(medsmall) margin(small)) xlabel(, nogrid) ylabel(, nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa mean_360_delay if inrange(mo_year_diagn, tm(2015m1), tm(2022m6)), single trperiod(2020m4) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 within 6 months of ULT", size(medsmall) margin(small)) xlabel(, nogrid) yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_360_newey.svg", as(svg) replace
 	
 actest, lag(18)	

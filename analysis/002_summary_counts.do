@@ -84,7 +84,7 @@ codebook diagnosis_date
 
 *Check counts for key variables=======================================================*/
 
-foreach var of varlist urate_count gout_admission_count gout_ed_count gout_flare_count gout_code_count flare_treatment_count {
+foreach var of varlist urate_count urate_count_nom urate_count_sno urate_count_sno_nom gout_admission_count gout_ed_count gout_flare_count gout_code_count flare_treatment_count {
 	tabstat `var', stats (n mean sd p50 p25 p75 p5 p95)
 } 
 
