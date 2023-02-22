@@ -137,17 +137,23 @@ foreach var of varlist 	 gout_code_date						///
 
 **For repeated measures, change number to end of variable number (for reshaping)
 		
-forval i = 1/9 	{
+forval i = 1/7 	{
 					rename urate_test_`i'_date urate_date_`i'
 					order urate_test_`i', after(urate_date_`i')
 					rename urate_test_`i'_val urate_val_`i'
+}
+
+forval i = 1/3 	{
 					rename gout_flare_`i'_date gout_flare_date_`i'
 					rename gout_code_any_`i'_date gout_code_any_date_`i'
-					rename flare_treatment_`i'_date flare_treatment_date_`i'
 					rename gout_emerg_`i'_date gout_emerg_date_`i'
-					rename gout_admission_`i'_date  gout_admission_date_`i'
-}		
+					rename gout_admission_`i'_date  gout_admission_date_`i'	
+}
 
+forval i = 1/6 	{
+					rename flare_treatment_`i'_date flare_treatment_date_`i'					
+}
+					
 **Create and label variables ===========================================================*/
 
 **Demographics
@@ -703,7 +709,7 @@ tabstat ult_count_12m, stats (n mean sd p50 p25 p75)
 *Serum urate measurements==================================================*/
 
 *Set implausible urate values to missing (Note: zero changed to missing) and remove urate dates if no measurements, and vice versa 
-forval i = 1/9 	{
+forval i = 1/7 	{
 						replace urate_val_`i' = . if !inrange(urate_val_`i', 50, 2000) 	
 						replace urate_val_`i' = . if urate_date_`i' == . 
 						replace urate_date_`i' = . if urate_val_`i' == . 
@@ -924,7 +930,7 @@ reshape wide gout_emerg_date_ gout_emerg_, i(patient_id) j(emerg_order)
 reshape long gout_code_any_ gout_code_any_date_, i(patient_id) j(code_order)
 gen code_and_tx_date_=.
 format %td code_and_tx_date_
-forval i = 1/9 	{
+forval i = 1/6 	{
 replace code_and_tx_date_=gout_code_any_date_ if gout_code_any_date_==flare_treatment_date_`i' & gout_code_any_date_!=. & flare_treatment_date_`i'!=.
 }
 preserve

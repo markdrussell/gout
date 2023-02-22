@@ -1,11 +1,6 @@
-from cohortextractor import (
-    StudyDefinition,
-    patients,
-    codelist,
-    codelist_from_csv,
-    combine_codelists,
-    filter_codes_by_category,
-)
+from cohortextractor import StudyDefinition, patients
+
+from cohortextractor.codelistlib import filter_codes_by_category
 
 from codelists import *
 
