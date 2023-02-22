@@ -1,15 +1,12 @@
 version 16
 
 /*==============================================================================
-DO FILE NAME:			define covariates
+DO FILE NAME:			defines admissions
 PROJECT:				Gout OpenSAFELY project
 DATE: 					01/12/2022
 AUTHOR:					M Russell / J Galloway			
-DESCRIPTION OF FILE:	data management for Gout project  
-						reformat variables 
-						categorise variables
-						label variables 
-DATASETS USED:			data in memory (from output/input.csv)
+DESCRIPTION OF FILE:	define monthly gout admissions
+DATASETS USED:			data in memory 
 DATASETS CREATED: 		analysis files
 OTHER OUTPUT: 			logfiles, printed to folder $Logdir
 USER-INSTALLED ADO: 	 
@@ -17,9 +14,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir `c(pwd)'
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -29,8 +26,17 @@ global logdir "$projectdir/logs"
 
 **Open a log file
 cap log close
-log using "$logdir/cleaning_dataset.log", replace
+log using "$logdir/admissions_dataset.log", replace
 
+**Location relevant input files
+cd "$projectdir/output/measures/"
+local filelist : dir . files "input_year_*.csv.gz"
+foreach file of local filelist {
+  di "`file'"
+}
+
+
+foreach  
 !gunzip "$projectdir/output/input.csv.gz"
 import delimited "$projectdir/output/input.csv", clear
 
@@ -523,20 +529,6 @@ lab var tophus "Tophaceous gout"
 tab gout_code, missing
 keep if gout_code==1
 
-*Generate diagnosis date===============================================================*/
-
-*Use first gout code date (in GP record) as diagnosis date
-gen diagnosis_date=gout_code_date
-format diagnosis_date %td
-
-*Refine diagnostic window=============================================================*/
-
-**Keep patients with diagnosis date was after study start date and before end date
-keep if diagnosis_date>=date("$start_date", "DMY") & diagnosis_date!=. 
-tab gout_code, missing
-keep if diagnosis_date<date("$end_date", "DMY") & diagnosis_date!=. 
-tab gout_code, missing
-
 *Check if first ULT prescription was before index diagnosis code=====================================================*/
 
 **Date of first ULT script
@@ -571,6 +563,20 @@ tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & (gout_emerg_date_
 
 *Recode index diagnosis date as gout emerg date if gout emerg date less than 30 days before index gout code date
 replace gout_code_date=gout_emerg_date_1 if gout_code_date!=. & first_ult_date!=. & (gout_emerg_date_1<gout_code_date)
+
+*Generate diagnosis date===============================================================*/
+
+*Use first gout code date (in GP record) as diagnosis date
+gen diagnosis_date=gout_code_date
+format diagnosis_date %td
+
+*Refine diagnostic window=============================================================*/
+
+**Keep patients with diagnosis date was after study start date and before end date
+keep if diagnosis_date>=date("$start_date", "DMY") & diagnosis_date!=. 
+tab gout_code, missing
+keep if diagnosis_date<date("$end_date", "DMY") & diagnosis_date!=. 
+tab gout_code, missing
 
 *Number of diagnoses in time windows=========================================*/
 
@@ -694,7 +700,6 @@ lab var has_6m_post_ult ">6m follow-up after ULT commenced"
 lab define has_6m_post_ult 0 "No" 1 "Yes", modify
 lab val has_6m_post_ult has_6m_post_ult
 tab has_6m_post_ult, missing 
-tab has_6m_post_ult if ult_6m==1, missing 
 
 gen has_12m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-365) & has_12m_follow_up_ult==1 & ult_6m==1
 recode has_12m_post_ult .=0
@@ -702,7 +707,6 @@ lab var has_12m_post_ult ">12m follow-up after ULT commenced"
 lab define has_12m_post_ult 0 "No" 1 "Yes", modify
 lab val has_12m_post_ult has_12m_post_ult
 tab has_12m_post_ult, missing 
-tab has_12m_post_ult if ult_12m==1, missing 
 
 **Number of ULT prescriptions issued in 6m after first script issued (Nb. doses may be double counted if both 300mg and 100mg issued)
 tabstat ult_count_6m, stats (n mean sd p50 p25 p75)
@@ -1094,7 +1098,7 @@ replace first_ult_drug_6m="Allopurinol" if first_ult_drug_6m =="first_allo"
 lab var first_ult_drug_6m "First ULT drug"
 
 tab first_ult_drug_6m, missing
-tab first_ult_drug_6m if ult6m==1, missing
+tab ult_6m //as a check
 
 **Within 12 months of diagnosis
 gen first_ult_d_12m=""
@@ -1108,7 +1112,7 @@ replace first_ult_drug_12m="Allopurinol" if first_ult_drug_12m =="first_allo"
 lab var first_ult_drug_12m "First ULT drug"
 
 tab first_ult_drug_12m, missing
-tab first_ult_drug_12m if ult12m==1, missing
+tab ult_12m //as a check
 
 save "$projectdir/output/data/file_gout_all.dta", replace
 

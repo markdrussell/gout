@@ -55,6 +55,18 @@ study = StudyDefinition(
         between=["index_date - 6 months", "index_date + 6 months"],
         return_expectations={"incidence": 0.1},
     ),
+    # Returns data of first admission within that year for patient (would miss repeat admissions)
+    gout_adm_date=patients.admitted_to_hospital(
+        with_these_diagnoses=gout_admission,
+        find_first_match_in_period=True,
+        returning="date_admitted",
+        date_format="YYYY-MM-DD",
+        between=["index_date - 6 months", "index_date + 6 months"],
+        return_expectations={
+            "date": {"earliest": "index_date - 6 months", "latest": "index_date + 6 months"},
+            "incidence": 0.05,
+        },
+    ),
     # Denominator for incidence: patients with at least 12 months of registration with one practice before index date
     pre_registration=patients.registered_with_one_practice_between(
         start_date="index_date - 12 months",

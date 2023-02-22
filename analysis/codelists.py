@@ -29,8 +29,17 @@ prevalent_gout_codes = codelist_from_csv(
     "codelists/user-markdrussell-gout-prevalent.csv", system="snomed", column="code",
 )
 
-urate_codes = codelist_from_csv(
+urate_codes_ctv3 = codelist_from_csv(
     "codelists/user-markdrussell-serum-urateuric-acid-ctv3.csv", system="ctv3", column="code",
+)
+
+urate_codes_snomed = codelist_from_csv(
+    "codelists/user-markdrussell-serum-urate.csv", system="snomed", column="code",
+)
+
+urate_codes = combine_codelists(
+urate_codes_ctv3,
+urate_codes_snomed
 )
 
 chronic_cardiac_disease_codes = codelist_from_csv(

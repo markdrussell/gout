@@ -14,9 +14,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir `c(pwd)'
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
@@ -79,6 +79,10 @@ foreach var of varlist total_diag pop_inc {
 **Generate incidences by year using yearly denominator
 gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
+
+twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", color(red) xline(722) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
+	graph export "$projectdir/output/figures/incidence_year_rounded.svg", width(12in) replace
+
 restore
 
 *Graph of gout diagnotic incidence by month (all/male/female) - denominator = as above
@@ -319,8 +323,9 @@ tab mo_year_diagn has_6m_follow_up
 tab mo_year_diagn has_12m_follow_up
 
 **Proportion of patients with at least 6/12 months of registration and follow-up time after diagnosis
-tab has_6m_post_diag, missing 
-tab has_12m_post_diag, missing 
+table mo_year_diagn has_6m_post_diag, stat(prop, total) 
+
+tab has_12m_post_diag mo_year_diagn, missing 
 
 *ULT prescriptions===============================================================================================*/
 

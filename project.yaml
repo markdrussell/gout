@@ -128,8 +128,10 @@ actions:
         doc9: output/tables/ult6m_byregion.csv
         doc10: output/tables/urate6m_byyear.csv
         doc11: output/tables/urate6m_byregion.csv
-        figure2: output/figures/prevalance_year_rounded.svg
-        figure3: output/figures/incidence_admission_year_rounded.svg
+        figure1: output/figures/incidence_year_rounded.svg
+        figure2: output/figures/incidence_month_rounded.svg
+        figure3: output/figures/prevalance_year_rounded.svg
+        figure4: output/figures/incidence_admission_year_rounded.svg
   
   run_itsa_models:
     run: stata-mp:latest analysis/200_itsa_models.do
