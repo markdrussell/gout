@@ -711,17 +711,23 @@ tabstat ult_count_12m, stats (n mean sd p50 p25 p75)
 *Serum urate measurements==================================================*/
 
 *Set implausible urate values to missing (Note: zero changed to missing) and remove urate dates if no measurements, and vice versa 
+**Depending on code, urate is in range 0.05 - 2 (mmol/L) or 50 - 2000 (micromol/L). Need also to consider mg/dL
 forval i = 1/7 	{
-						codebook urate_val_`i'
-						replace urate_val_`i' = . if !inrange(urate_val_`i', 50, 2000) 	
+						codebook urate_val_`i' 
+						summ urate_val_`i' if inrange(urate_val_`i', 0.05, 2) // for mmol/L
+						summ urate_val_`i' if inrange(urate_val_`i', 50, 2000) // for micromol/L
+						summ urate_val_`i' if urate_val_`i'==. | urate_val_`i'==0 // missing or zero
+						summ urate_val_`i' if ((!inrange(urate_val_`i', 0.05, 2)) & (!inrange(urate_val_`i', 50, 2000)) & urate_val_`i'!=. & urate_val_`i'!=0) // not missing or zero or in above ranges	
+						replace urate_val_`i' = . if ((!inrange(urate_val_`i', 0.05, 2)) & (!inrange(urate_val_`i', 50, 2000))) // keep values that are mmol/L or micromol/L	
 						codebook urate_val_`i'
 						replace urate_val_`i' = . if urate_date_`i' == . 
-						codebook urate_val_`i'
 						replace urate_date_`i' = . if urate_val_`i' == . 
-						codebook urate_date_`i'
+						codebook urate_val_`i'
 						replace urate_test_`i' = . if urate_val_`i' == .
 						recode urate_test_`i' .=0
 						tab urate_test_`i', missing
+						replace urate_val_`i' = (urate_val_`i'*1000) if inrange(urate_val_`i', 0.05, 2) //*1000 for those that are in mmol/L
+						codebook urate_val_`i'
 }
 
 reshape long urate_val_ urate_date_ urate_test_, i(patient_id) j(urate_order)
