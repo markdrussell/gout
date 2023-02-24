@@ -121,14 +121,15 @@ actions:
 
   run_baseline_tables:
     run: stata-mp:latest analysis/100_baseline_characteristics.do
-    needs: [create_cohorts]
+    needs: [create_cohorts, create_admission_counts]
     outputs:
       moderately_sensitive:
         log1: logs/descriptive_tables.log   
         doc1: output/tables/incidence_year_rounded.csv   
         doc2: output/tables/incidence_month_rounded.csv 
         doc3: output/tables/prevalance_year_rounded.csv   
-        doc4: output/tables/incidence_admission_year_rounded.csv   
+        doc4: output/tables/incidence_admission_year_rounded.csv  
+        doc5: output/tables/admission_month_rounded.csv 
         doc6: output/tables/baseline_bydiagnosis.csv 
         doc7: output/tables/baseline_byyear.csv 
         doc8: output/tables/ult6m_byyear.csv   
@@ -139,6 +140,7 @@ actions:
         figure2: output/figures/incidence_month_rounded.svg
         figure3: output/figures/prevalance_year_rounded.svg
         figure4: output/figures/incidence_admission_year_rounded.svg
+        figure5: output/figures/admission_month_rounded.svg
   
   run_itsa_models:
     run: stata-mp:latest analysis/200_itsa_models.do
@@ -156,12 +158,22 @@ actions:
     outputs:
       moderately_sensitive:
         log1: logs/box_plots.log
-        figure 1: output/figures/regional_ult_overall.svg
-        figure 2: output/figures/regional_ult_2019.svg 
-        figure 3: output/figures/regional_ult_2020.svg       
-        figure 4: output/figures/regional_ult_2021.svg  
-        figure 5: output/figures/regional_ult_2022.svg 
-        figure 6: output/figures/regional_ult_merged.svg
+        figure 1: output/figures/regional_ult_overall_6m.svg
+        figure 2: output/figures/regional_ult_merged_6m.svg
+        figure 3: output/figures/regional_ult_overall_12m.svg
+        figure 4: output/figures/regional_ult_merged_12m.svg
+        figure 5: output/figures/regional_urate_overall_6m.svg
+        figure 6: output/figures/regional_urate_merged_6m.svg
+        figure 7: output/figures/regional_urate_overall_6m_test.svg
+        figure 8: output/figures/regional_urate_merged_6m_test.svg
+        figure 9: output/figures/regional_urate_overall_6m_ult.svg
+        figure 10: output/figures/regional_urate_merged_6m_ult.svg
+        figure 11: output/figures/reg_urate_overall_6m_ult_test.svg
+        figure 12: output/figures/reg_urate_merged_6m_ult_test.svg
+        figure 13: output/figures/regional_urate_overall_12m.svg
+        figure 14: output/figures/regional_urate_merged_12m.svg
+        figure 15: output/figures/regional_urate_overall_12m_test.svg
+        figure 16: output/figures/regional_urate_merged_12m_test.svg
 
   # run_redacted_tables:
   #   run: stata-mp:latest analysis/400_redacted_tables.do

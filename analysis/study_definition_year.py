@@ -63,7 +63,7 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
         between=["index_date - 6 months", "index_date + 6 months"],
         return_expectations={
-            "date": {"earliest": "index_date - 6 months", "latest": "index_date + 6 months"},
+            "date": {"earliest": "2015-01-01", "latest": "2022-01-31"},
             "incidence": 0.05,
         },
     ),

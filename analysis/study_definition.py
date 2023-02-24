@@ -94,7 +94,6 @@ def with_these_bloods_date_X(name, codelist, index_date, n, return_expectations)
                 codelist,
                 find_first_match_in_period=True,
                 returning="numeric_value",
-                ignore_missing_values=True,
                 include_date_of_match=True,
                 date_format="YYYY-MM-DD",
                 between=[on_or_after, "gout_code_date + 1 year"],

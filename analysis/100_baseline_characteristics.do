@@ -169,13 +169,49 @@ foreach var of varlist gout_admission pop {
 	drop `var'
 }
 
-**Generate prevalences by year
+**Generate admission incidence by year
 gen incident_gout_adm=((gout_admission_round/pop_round)*10000) //as a %
 
 export delimited using "$projectdir/output/tables/incidence_admission_year_rounded.csv", replace	
 
 twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_admission_year_rounded.svg", width(12in) replace
+restore	
+
+*Graph of gout admissions incidence by month (all/male/female) - denominator = mid-year TPP population (as per prevalence)
+preserve
+use "$projectdir/output/measures/gout_admissions.dta", clear
+collapse (count) total_adm=adm_count, by(gout_adm_ym sex) 
+gen year = year(dofm(gout_adm_ym))
+
+**Merge in yearly population (denominator)
+merge m:m sex year using "$projectdir/output/data/gout_admissions_sex_long", keep(match) nogen
+drop date gout_admission gout_admission_all
+sort gout_adm_ym
+
+**Calculate counts/population for combined male and female
+expand=2, gen(copy)
+replace sex = "All" if copy==1
+bys gout_adm_ym: replace total_adm = sum(total_adm) if copy==1
+bys gout_adm_ym (sex total_adm): gen n=_n if copy==1
+drop if n==1
+drop n copy
+replace pop = pop_all if sex=="All"
+drop pop_all
+
+**Round to nearest 5
+foreach var of varlist total_adm pop {
+	gen `var'_round=round(`var', 5)
+	drop `var'
+}
+
+**Generate incidences by month using yearly denominator
+gen incidence_adm=((total_adm_round/pop_round)*10000)
+sort gout_adm_ym
+export delimited using "$projectdir/output/tables/admission_month_rounded.csv", replace
+
+twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
+	graph export "$projectdir/output/figures/admission_month_rounded.svg", width(12in) replace
 restore	
 
 /*

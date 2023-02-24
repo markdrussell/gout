@@ -28,33 +28,31 @@ global logdir "$projectdir/logs"
 cap log close
 log using "$logdir/admissions_dataset.log", replace
 
-**Locates relevant input files, then keeps year and month of gout admissions
+**Create blank dta
+clear
+save "$projectdir/output/measures/gout_admissions", emptyok replace
+
+**Locates relevant input files, then keeps year and month of gout admissions, then append
 cd "$projectdir/output/measures/"
 local filelist : dir . files "input_year_*.csv.gz"
 foreach file of local filelist {
 	di "`file'"
 	!gunzip "$projectdir/output/measures/`file'"
-	import delimited "$projectdir/output/measures/`file'", clear
+	local filesub = substr("`file'", 1, strlen("`file'") - 7)
+	di "`filesub'"
+	import delimited "$projectdir/output/measures/`filesub'.csv", clear
 	gen date_dstr = date(gout_adm_date, "YMD") 
 	format date_dstr %td
 	drop gout_adm_date
 	rename date_dstr gout_adm_date
 	gen gout_adm_ym= ym(year(gout_adm_date),month(gout_adm_date))
+	gen adm_count=1 if gout_adm_ym!=.
 	format %tm gout_adm_ym
-	keep patient_id gout_adm_ym
+	keep adm_count gout_adm_ym sex
 	drop if gout_adm_ym==.
-	save "$projectdir/output/measures/`file'", replace
-}
-
-**Append admission files to a blank dta
-clear
-save "$projectdir/output/measures/gout_admissions", emptyok replace
-use "$projectdir/output/measures/gout_admissions", clear
-cd "$projectdir/output/measures/"
-local filelist : dir . files "input_year_*.csv.gz"
-foreach file of local filelist {
-	di "`file'"
-	append using "$projectdir/output/measures/`file'"
+	save "$projectdir/output/measures/`filesub'.dta", replace
+	use "$projectdir/output/measures/gout_admissions", clear
+	append using "$projectdir/output/measures/`filesub'.dta"
 	save "$projectdir/output/measures/gout_admissions", replace
 }
 
