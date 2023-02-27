@@ -237,7 +237,7 @@ restore
 *Urate attainment within 6m of ULT by region, merged; irrespective of whether a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if year_diag==2019 | year_diag==2020 | year_diag==2021 | year_diag==2022
+keep if year_ult==2019 | year_ult==2020 | year_ult==2021 | year_ult==2022  //Note, this is year of first ULT, not year of diagnosis
 
 gen urate_0 =1 if urate_below360_ult_6m==1
 recode urate_0 .=0
@@ -250,7 +250,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(year_diag, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(regional_urate_merged_6m_ult, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(year_ult, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(regional_urate_merged_6m_ult, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_6m_ult.svg", width(12in) replace
 restore
 
@@ -280,7 +280,7 @@ restore
 *Urate attainment within 6m of diagnosis by region, merged; restricted to those that had a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if year_diag==2019 | year_diag==2020 | year_diag==2021 | year_diag==2022
+keep if year_ult==2019 | year_ult==2020 | year_ult==2021 | year_ult==2022
 
 gen urate_0 =1 if urate_below360_ult_6m==1
 recode urate_0 .=0
@@ -293,7 +293,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(year_diag, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(reg_urate_merged_6m_ult_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(year_ult, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(reg_urate_merged_6m_ult_test, replace)
 graph export "$projectdir/output/figures/reg_urate_merged_6m_ult_test.svg", width(12in) replace
 restore
 
@@ -389,6 +389,100 @@ lab val nuts_region nuts_region
 
 graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(year_diag, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment") name(regional_urate_merged_12m_test, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_12m_test.svg", width(12in) replace
+restore
+
+*Urate attainment within 12m of ULT by region, overall (all years); assuming ULT was within 6m of diagnosis, irrespective of whether a test was performed within that timeframe=========================================================================*
+
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+**Restrict all analyses to patients with at least 12m follow-up and registration after ULT 
+keep if ult_6m==1 & has_12m_post_ult==1
+
+preserve
+gen urate_0 =1 if urate_below360_ult_6m==1
+recode urate_0 .=0
+gen urate_1 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m==1
+recode urate_1 .=0
+gen urate_2 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m!=1
+recode urate_2 .=0
+
+expand=2, gen(copy)
+replace nuts_region = 0 if copy==1  
+
+lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
+lab val nuts_region nuts_region
+
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(regional_urate_overall_12m_ult, replace)
+graph export "$projectdir/output/figures/regional_urate_overall_12m_ult.svg", replace
+restore
+
+*Urate attainment within 12m of ULT by region, merged; assuming ULT was within 6m of diagnosis, irrespective of whether a test was performed within that timeframe=========================================================================*
+
+preserve
+keep if year_ult==2019 | year_ult==2020 | year_ult==2021 | year_ult==2022  //Note, this is year of first ULT, not year of diagnosis
+
+gen urate_0 =1 if urate_below360_ult_6m==1
+recode urate_0 .=0
+gen urate_1 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m==1
+recode urate_1 .=0
+gen urate_2 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m!=1
+recode urate_2 .=0
+
+expand=2, gen(copy)
+replace nuts_region = 0 if copy==1  
+
+lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
+lab val nuts_region nuts_region
+
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(year_ult, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(regional_urate_merged_12m_ult, replace)
+graph export "$projectdir/output/figures/regional_urate_merged_12m_ult.svg", width(12in) replace
+restore
+
+*Urate attainment within 12m of ULT by region, overall (all years); assuming ULT was within 6m of diagnosis, restricted to those that had a test was performed within that timeframe=========================================================================*
+
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+**Restrict all analyses to patients with at least 12m follow-up and registration after ULT
+keep if ult_6m==1 & has_12m_post_ult==1 & had_test_ult_12m==1
+
+preserve
+gen urate_0 =1 if urate_below360_ult_6m==1
+recode urate_0 .=0
+gen urate_1 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m==1
+recode urate_1 .=0
+gen urate_2 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m!=1
+recode urate_2 .=0
+
+expand=2, gen(copy)
+replace nuts_region = 0 if copy==1  
+
+lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
+lab val nuts_region nuts_region
+
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(reg_urate_overall_12m_ult_test, replace)
+graph export "$projectdir/output/figures/reg_urate_overall_12m_ult_test.svg", replace
+restore
+
+*Urate attainment within 12m of ULT by region, merged; assuming ULT was within 6m of diagnosis, restricted to those that had a test was performed within that timeframe=========================================================================*
+
+preserve
+keep if year_ult==2019 | year_ult==2020 | year_ult==2021 | year_ult==2022
+
+gen urate_0 =1 if urate_below360_ult_6m==1
+recode urate_0 .=0
+gen urate_1 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m==1
+recode urate_1 .=0
+gen urate_2 =1 if urate_below360_ult_6m!=1 & urate_below360_ult_12m!=1
+recode urate_2 .=0
+
+expand=2, gen(copy)
+replace nuts_region = 0 if copy==1  
+
+lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
+lab val nuts_region nuts_region
+
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(year_ult, gap(20) label(labsize(*0.75))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(reg_urate_merged_12m_ult_test, replace)
+graph export "$projectdir/output/figures/reg_urate_merged_12m_ult_test.svg", width(12in) replace
 restore
 
 
