@@ -119,7 +119,7 @@ def with_these_admitted_events_date_X(name, codelist, index_date, n, return_expe
     def var_signature(name, codelist, on_or_after, return_expectations):
         return {
             name: patients.admitted_to_hospital(
-                with_these_diagnoses=codelist,
+                with_these_primary_diagnoses=codelist,
                 find_first_match_in_period=True,
                 returning="date_admitted",
                 date_format="YYYY-MM-DD",
@@ -288,7 +288,7 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "incidence": 0.7,
+            "incidence": 0.95,
             "date": {"earliest": "2013-01-01", "latest": end_date},
         },
     ),
@@ -300,7 +300,7 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "incidence": 0.6,
+            "incidence": 0.9,
             "date": {"earliest": "2013-01-01", "latest": end_date},
         },
     ),
@@ -312,7 +312,7 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "incidence": 0.2,
+            "incidence": 0.9,
             "date": {"earliest": "2013-01-01", "latest": end_date},
         },
     ),
@@ -323,7 +323,7 @@ study = StudyDefinition(
         returning="number_of_matches_in_period",
         return_expectations={
             "int": {"distribution": "normal", "mean": 3, "stddev": 2},
-            "incidence": 0.4,
+            "incidence": 0.6,
         },
     ),
     ## Number of ULT prescriptions issued in 1 year after first script issued
@@ -333,20 +333,20 @@ study = StudyDefinition(
         returning="number_of_matches_in_period",
         return_expectations={
             "int": {"distribution": "normal", "mean": 3, "stddev": 2},
-            "incidence": 0.4,
+            "incidence": 0.6,
         },
     ),
     ## Has at least 6m of registration after index ULT prescription
     has_6m_follow_up_ult=patients.registered_with_one_practice_between(
         start_date="first_ult_date",
         end_date="first_ult_date + 6 months",
-        return_expectations={"incidence": 0.95},
+        return_expectations={"incidence": 0.99},
     ),
     ## Has at least 12m of registration after index ULT prescription
     has_12m_follow_up_ult=patients.registered_with_one_practice_between(
         start_date="first_ult_date",
         end_date="first_ult_date + 1 year",
-        return_expectations={"incidence": 0.90},
+        return_expectations={"incidence": 0.95},
     ),
     # Serum urate monitoring (from 6 months before diagnosis to up to 1 year after diagnosis)
     ## Return first n serum urate levels after diagnosis
@@ -357,8 +357,8 @@ study = StudyDefinition(
         n=7,
         return_expectations={
             "date": {"earliest": "2014-04-01", "latest": end_date},
-            "float": {"distribution": "normal", "mean": 400.0, "stddev": 100},
-            "incidence": 0.70,
+            "float": {"distribution": "normal", "mean": 300, "stddev": 100},
+            "incidence": 0.95,
         },
     ),
     # Comorbidities (first comorbidity code prior to index code date; for bloods, test closest to index date chosen)
@@ -477,7 +477,7 @@ study = StudyDefinition(
     ),
     ## Any admissions more than a month before index diagnosis code
     gout_admission_pre_date=patients.admitted_to_hospital(
-        with_these_diagnoses=gout_admission,
+        with_these_primary_diagnoses=gout_admission,
         find_first_match_in_period=True,
         returning="date_admitted",
         date_format="YYYY-MM-DD",

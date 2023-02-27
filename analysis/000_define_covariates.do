@@ -17,9 +17,9 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 *global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir `c(pwd)'
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -597,6 +597,32 @@ lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 
 lab val diagnosis_year diagnosis_year
 lab var diagnosis_year "Year of diagnosis"
 tab diagnosis_year, missing
+
+*Number of diagnoses in time windows=========================================*/
+
+**Month/Year of first ult
+gen year_ult=year(first_ult_date)
+format year_ult %ty
+gen month_ult=month(first_ult_date)
+gen mo_year_ult=ym(year_ult, month_ult)
+format mo_year_ult %tmMon-CCYY
+generate str16 mo_year_ult_s = strofreal(mo_year_ult,"%tmCCYY!mNN")
+lab var mo_year_ult "Month/Year of first ULT prescription"
+lab var mo_year_ult_s "Month/Year of first ULT prescription"
+
+**Separate into 12-month time windows (for first ult date)
+gen ult_year=1 if first_ult_date>=td(01jan2015) & first_ult_date<=td(31dec2015)
+replace ult_year=2 if first_ult_date>=td(01jan2016) & first_ult_date<=td(31dec2016)
+replace ult_year=3 if first_ult_date>=td(01jan2017) & first_ult_date<=td(31dec2017)
+replace ult_year=4 if first_ult_date>=td(01jan2018) & first_ult_date<=td(31dec2018)
+replace ult_year=5 if first_ult_date>=td(01jan2019) & first_ult_date<=td(31dec2019)
+replace ult_year=6 if first_ult_date>=td(01jan2020) & first_ult_date<=td(31dec2020)
+replace ult_year=7 if first_ult_date>=td(01jan2021) & first_ult_date<=td(31dec2021)
+replace ult_year=8 if first_ult_date>=td(01jan2022) & first_ult_date<=td(31dec2022)
+lab define ult_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
+lab val ult_year ult_year
+lab var ult_year "Year of first ULT prescription"
+tab ult_year, missing
 
 *Prescription of ULT==================================================*/
 

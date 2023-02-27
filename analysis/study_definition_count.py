@@ -102,7 +102,7 @@ study = StudyDefinition(
     # Gout emergency attendances/admissions
     ## Gout hospital admission count in first year
     gout_admission_count=patients.admitted_to_hospital(
-        with_these_diagnoses=gout_admission,
+        with_these_primary_diagnoses=gout_admission,
         returning="number_of_matches_in_period",
         between=["gout_code_date - 1 month", "gout_code_date + 1 year"],
         return_expectations={

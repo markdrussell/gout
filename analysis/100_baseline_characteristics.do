@@ -50,6 +50,10 @@ tab gout_code
 tab mo_year_diagn, missing
 tab diagnosis_year, missing
 
+**Verify that all first ULT scripts were in study windows
+tab mo_year_ult, missing
+tab ult_year, missing
+
 *Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population who had >12m of registration
 preserve
 collapse (count) total_diag=gout_code, by(year sex) 
@@ -80,7 +84,7 @@ foreach var of varlist total_diag pop_inc {
 gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
 
-twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", color(red) xline(722) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
+twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", yscale(range(0(5)35)) ylabel(0(5)35, nogrid) color(red) xline(722) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_year_rounded.svg", width(12in) replace
 
 restore
@@ -171,10 +175,10 @@ foreach var of varlist gout_admission pop {
 
 **Generate admission incidence by year
 gen incident_gout_adm=((gout_admission_round/pop_round)*10000) //as a %
-
+keep if date>=date("01/01/2017", "DMY") & date!=. //admission data available from April 2016, so limit to 2017
 export delimited using "$projectdir/output/tables/incidence_admission_year_rounded.csv", replace	
 
-twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
+twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xscale(range(2017(1)2022)) xlabel(2017(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_admission_year_rounded.svg", width(12in) replace
 restore	
 
@@ -208,9 +212,10 @@ foreach var of varlist total_adm pop {
 **Generate incidences by month using yearly denominator
 gen incidence_adm=((total_adm_round/pop_round)*10000)
 sort gout_adm_ym
+keep if gout_adm_ym>=ym(2016, 4) & gout_adm_ym!=. //admission data available from April 2016
 export delimited using "$projectdir/output/tables/admission_month_rounded.csv", replace
 
-twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
+twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) xscale(range(676(12)760)) xlabel(676 "Apr 2016" 688 "Apr 2017" 700 "Apr 2018" 712 "Apr 2019" 724 "Apr 2020" 736 "Apr 2021" 748 "Apr 2022" 760 "Apr 2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
 	graph export "$projectdir/output/figures/admission_month_rounded.svg", width(12in) replace
 restore	
 
@@ -403,23 +408,25 @@ bys `var': tab ult_12m, missing
 bys `var': tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 }
 
-*ULT standards, by year (for those with at least 6m follow-up after diagnosis)
-table1_mc if has_6m_post_diag==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
-	vars(ult_6m cat %3.1f \ ///
-		 allo_6m cat %3.1f \ ///
-		 febux_6m cat %3.1f \ ///
+foreach x in "6m" "12m" { 
+*ULT standards, by year (for those with at least 6m/12m follow-up after diagnosis)
+table1_mc if has_`x'_post_diag==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(ult_`x' cat %3.1f \ ///
+		 allo_`x' cat %3.1f \ ///
+		 febux_`x' cat %3.1f \ ///
 		 had_baseline_urate cat %3.1f \ ///
 		 baseline_urate conts %3.1f \ ///
-		 ) saving("$projectdir/output/tables/ult6m_byyear.xls", replace) 
+		 ) saving("$projectdir/output/tables/ult`x'_byyear.xls", replace) 
 		 
-*ULT standards, by region (for those with at least 6m follow-up after diagnosis)
-table1_mc if nuts_region!=. & has_6m_post_diag==1, by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
-	vars(ult_6m cat %3.1f \ ///
-		 allo_6m cat %3.1f \ ///
-		 febux_6m cat %3.1f \ ///
+*ULT standards, by region (for those with at least 6m/12m follow-up after diagnosis)
+table1_mc if nuts_region!=. & has_`x'_post_diag==1, by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(ult_`x' cat %3.1f \ ///
+		 allo_`x' cat %3.1f \ ///
+		 febux_`x' cat %3.1f \ ///
 		 had_baseline_urate cat %3.1f \ ///
 		 baseline_urate conts %3.1f \ ///
-		 ) saving("$projectdir/output/tables/ult6m_byregion.xls", replace)
+		 ) saving("$projectdir/output/tables/ult`x'_byregion.xls", replace)
+}		 
 
 //could do heat map
 
@@ -498,26 +505,69 @@ tabstat count_urate_ult_12m if has_12m_post_ult==1, stats(n mean p50 p25 p75) //
 tab two_urate_ult_12m if has_12m_post_ult==1, missing //two or more urate tests performed within 12m of ULT initiation
 
 *====================================================================================================================*/  
- 
-*Urate standards, by year (for those with at least 6m follow-up after ULT)
-table1_mc if ult_6m==1 & has_6m_post_ult==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
-	vars(had_test_ult_6m cat %3.1f \ ///
-		 lowest_urate_ult_6m conts %3.1f \ ///
-		 urate_below360_ult_6m cat %3.1f \ /// 
-		 count_urate_ult_6m conts %3.1f \ ///
-		 two_urate_ult_6m cat %3.1f \ /// 
-		 ) saving("$projectdir/output/tables/urate6m_byyear.xls", replace) 
+
+foreach x in "6m" "12m" { 
+*Urate standards, by year (for those with at least 6m/12m follow-up; irrespective of ULT)
+table1_mc if has_`x'_post_diag==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(had_test_`x' cat %3.1f \ ///
+		 lowest_urate_`x' conts %3.1f \ ///
+		 urate_below360_`x' cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate`x'_byyear_diag.xls", replace) 
 		 
-*Urate standards, by region (for those with at least 6m follow-up after ULT)
-table1_mc if ult_6m==1 & has_6m_post_ult==1 & nuts_region!=., by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
-	vars(had_test_ult_6m cat %3.1f \ ///
-		 lowest_urate_ult_6m conts %3.1f \ ///
-		 urate_below360_ult_6m cat %3.1f \ /// 
-		 count_urate_ult_6m conts %3.1f \ ///
-		 two_urate_ult_6m cat %3.1f \ /// 
-		 ) saving("$projectdir/output/tables/urate6m_byregion.xls", replace)
+*Urate standards, by region (for those with at least 6m/12m follow-up; irrespective of ULT)
+table1_mc if has_`x'_post_diag==1 & nuts_region!=., by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(had_test_`x' cat %3.1f \ ///
+		 lowest_urate_`x' conts %3.1f \ ///
+		 urate_below360_`x' cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate`x'_byregion_diag.xls", replace)	
 		 
-		
+*Urate standards, by year (for those with at least 6m/12m follow-up and had a test performed; irrespective of ULT)
+table1_mc if has_`x'_post_diag==1 & had_test_`x'==1, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(lowest_urate_`x' conts %3.1f \ ///
+		 urate_below360_`x' cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate`x'_byyear_diag_test.xls", replace) 
+		 
+*Urate standards, by region (for those with at least 6m/12m follow-up and had a test performed; irrespective of ULT)
+table1_mc if has_`x'_post_diag==1 & had_test_`x'==1 & nuts_region!=., by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(lowest_urate_`x' conts %3.1f \ ///
+		 urate_below360_`x' cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate`x'_byregion_diag_test.xls", replace)	 
+		 
+*Urate standards, by year (for those with at least 6m/12m follow-up after ULT) - Note - this is by ULT year, not diagnosis year
+table1_mc if ult_6m==1 & has_`x'_post_ult==1, by(ult_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(had_test_ult_`x' cat %3.1f \ ///
+		 lowest_urate_ult_`x' conts %3.1f \ ///
+		 urate_below360_ult_`x' cat %3.1f \ /// 
+		 count_urate_ult_`x' conts %3.1f \ ///
+		 two_urate_ult_`x' cat %3.1f \ /// 
+		 ) saving("$projectdir/output/tables/urate`x'_byyear_ult.xls", replace) 
+		 
+*Urate standards, by region (for those with at least 6m/12m follow-up after ULT)
+table1_mc if ult_6m==1 & has_`x'_post_ult==1 & nuts_region!=., by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(had_test_ult_`x' cat %3.1f \ ///
+		 lowest_urate_ult_`x' conts %3.1f \ ///
+		 urate_below360_ult_`x' cat %3.1f \ /// 
+		 count_urate_ult_`x' conts %3.1f \ ///
+		 two_urate_ult_`x' cat %3.1f \ /// 
+		 ) saving("$projectdir/output/tables/urate`x'_byregion_ult.xls", replace)
+		 
+*Urate standards, by ULT year (for those with at least 6m/12m follow-up after ULT, and had a test performed) - 
+table1_mc if ult_6m==1 & has_`x'_post_ult==1 & had_test_ult_`x'==1, by(ult_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(lowest_urate_ult_`x' conts %3.1f \ ///
+		 urate_below360_ult_`x' cat %3.1f \ /// 
+		 count_urate_ult_`x' conts %3.1f \ ///
+		 two_urate_ult_`x' cat %3.1f \ /// 
+		 ) saving("$projectdir/output/tables/urate`x'_byyear_ult_test.xls", replace) 
+		 
+*Urate standards, by region (for those with at least 6m/12m follow-up after ULT, and had a test performed)
+table1_mc if ult_6m==1 & has_`x'_post_ult==1 & had_test_ult_`x'==1 & nuts_region!=., by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(lowest_urate_ult_`x' conts %3.1f \ ///
+		 urate_below360_ult_`x' cat %3.1f \ /// 
+		 count_urate_ult_`x' conts %3.1f \ ///
+		 two_urate_ult_`x' cat %3.1f \ /// 
+		 ) saving("$projectdir/output/tables/urate`x'_byregion_ult_test.xls", replace)		 
+}
+		 
 *Output tables as CSVs================================================================================================*/		 
 
 import excel "$projectdir/output/tables/baseline_bydiagnosis.xls", clear
@@ -526,16 +576,37 @@ outsheet * using "$projectdir/output/tables/baseline_bydiagnosis.csv" , comma no
 import excel "$projectdir/output/tables/baseline_byyear.xls", clear
 outsheet * using "$projectdir/output/tables/baseline_byyear.csv" , comma nonames replace		 
 
-import excel "$projectdir/output/tables/ult6m_byyear.xls", clear
-outsheet * using "$projectdir/output/tables/ult6m_byyear.csv" , comma nonames replace	
+foreach x in "6m" "12m" {
+	
+import excel "$projectdir/output/tables/ult`x'_byyear.xls", clear
+outsheet * using "$projectdir/output/tables/ult`x'_byyear.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/ult6m_byregion.xls", clear
-outsheet * using "$projectdir/output/tables/ult6m_byregion.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/ult`x'_byregion.xls", clear
+outsheet * using "$projectdir/output/tables/ult`x'_byregion.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/urate6m_byyear.xls", clear
-outsheet * using "$projectdir/output/tables/urate6m_byyear.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/urate`x'_byyear_diag.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byyear_diag.csv" , comma nonames replace	
 
-import excel "$projectdir/output/tables/urate6m_byregion.xls", clear
-outsheet * using "$projectdir/output/tables/urate6m_byregion.csv" , comma nonames replace	
+import excel "$projectdir/output/tables/urate`x'_byregion_diag.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byregion_diag.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byyear_diag_test.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byyear_diag_test.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byregion_diag_test.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byregion_diag_test.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byyear_ult.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byyear_ult.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byregion_ult.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byregion_ult.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byyear_ult_test.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byyear_ult_test.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate`x'_byregion_ult_test.xls", clear
+outsheet * using "$projectdir/output/tables/urate`x'_byregion_ult_test.csv" , comma nonames replace	
+}
 
 log close

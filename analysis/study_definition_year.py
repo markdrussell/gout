@@ -50,14 +50,14 @@ study = StudyDefinition(
     ),    
     # Incidence of admissions to hospital with primary diagnosis code of gout in the 1 month after index date
     gout_admission=patients.admitted_to_hospital(
-        with_these_diagnoses=gout_admission,
+        with_these_primary_diagnoses=gout_admission,
         returning="binary_flag",
         between=["index_date - 6 months", "index_date + 6 months"],
         return_expectations={"incidence": 0.1},
     ),
     # Returns data of first admission within that year for patient (would miss repeat admissions)
     gout_adm_date=patients.admitted_to_hospital(
-        with_these_diagnoses=gout_admission,
+        with_these_primary_diagnoses=gout_admission,
         find_first_match_in_period=True,
         returning="date_admitted",
         date_format="YYYY-MM-DD",

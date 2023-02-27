@@ -1,7 +1,7 @@
 version: '3.0'
 
 expectations:
-  population_size: 100000
+  population_size: 500000
 
 actions:
 
@@ -134,8 +134,16 @@ actions:
         doc7: output/tables/baseline_byyear.csv 
         doc8: output/tables/ult6m_byyear.csv   
         doc9: output/tables/ult6m_byregion.csv
-        doc10: output/tables/urate6m_byyear.csv
-        doc11: output/tables/urate6m_byregion.csv
+        doc10: output/tables/ult12m_byyear.csv
+        doc11: output/tables/ult12m_byregion.csv
+        doc12: output/tables/urate6m_byyear_ult.csv
+        doc13: output/tables/urate6m_byregion_ult.csv
+        doc14: output/tables/urate6m_byyear_ult_test.csv
+        doc15: output/tables/urate6m_byregion_ult_test.csv
+        doc16: output/tables/urate6m_byyear_diag.csv
+        doc17: output/tables/urate6m_byregion_diag.csv
+        doc18: output/tables/urate6m_byyear_diag_test.csv
+        doc19: output/tables/urate6m_byregion_diag_test.csv        
         figure1: output/figures/incidence_year_rounded.svg
         figure2: output/figures/incidence_month_rounded.svg
         figure3: output/figures/prevalance_year_rounded.svg
@@ -148,8 +156,7 @@ actions:
     outputs:
       moderately_sensitive:
         log1: logs/itsa_models.log   
-        figure1:  output/figures/ITSA_ult_newey.svg
-        figure2:  output/figures/ITSA_360_newey.svg
+        figure1:  output/figures/ITSA*.svg
       #  doc1: output/tables/gp_to_appt_ITSA_table.csv
 
   run_box_plots:
@@ -174,6 +181,10 @@ actions:
         figure 14: output/figures/regional_urate_merged_12m.svg
         figure 15: output/figures/regional_urate_overall_12m_test.svg
         figure 16: output/figures/regional_urate_merged_12m_test.svg
+        figure 17: output/figures/regional_urate_overall_12m_ult.svg
+        figure 18: output/figures/regional_urate_merged_12m_ult.svg
+        figure 19: output/figures/reg_urate_overall_12m_ult_test.svg
+        figure 20: output/figures/reg_urate_merged_12m_ult_test.svg
 
   # run_redacted_tables:
   #   run: stata-mp:latest analysis/400_redacted_tables.do
