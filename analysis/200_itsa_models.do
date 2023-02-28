@@ -66,7 +66,33 @@ tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
 itsa mean_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
-	graph export "$projectdir/output/figures/ITSA_ult_newey_`x'.svg", as(svg) replace
+	graph export "$projectdir/output/figures/ITSA_ult_`x'.svg", as(svg) replace
+	
+actest, lag(18)	
+	
+restore
+
+*ITSA models for ULT prescription in patients who have additional risk factors =============================================================*/
+
+*Restrict all analyses to patients with at least 6m/12m follow-up and registration after diagnosis================*
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+keep if has_`x'_post_diag==1 
+
+*Restrict to patients with additional risk factors
+keep if high_risk==1
+
+**Time from diagnosis to prescription of ULT 
+preserve
+tab ult_`x'
+tab mo_year_diagn ult_`x', row 
+collapse (mean) mean_ult_delay=ult_`x', by(mo_year_diagn)
+
+tsset mo_year_diagn
+
+**Newey Standard Errors with 5 lags
+itsa mean_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) yscale(range(0(0.1)0.7)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+	graph export "$projectdir/output/figures/ITSA_ult_hrisk_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
 	
@@ -162,6 +188,47 @@ actest, lag(18)
 	
 restore
 
+*ITSA models for urate monitoring after ULT - at least 2 urate levels within 6m/12m of ULT ==================================================*/
+
+*Restrict all analyses to patients prescribed ULT within 6m who had at least 6m/12m follow-up after ULT ================*/
+
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+keep if has_`x'_post_ult==1 & ult_6m==1
+
+preserve
+tab two_urate_ult_`x'
+tab mo_year_ult two_urate_ult_`x', row 
+collapse (mean) mean_two_urate=two_urate_ult_`x', by(mo_year_ult)
+
+tsset mo_year_ult
+
+**Newey Standard Errors with 5 lags
+itsa mean_two_urate if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with two or more urate checks after ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+	graph export "$projectdir/output/figures/ITSA_two_urate_`x'.svg", as(svg) replace
+	
+actest, lag(18)	
+	
+restore
 }
+
+*ITSA models for baseline urate ===========================================================================*/
+	
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+preserve
+tab had_baseline_urate
+tab mo_year_diagn had_baseline_urate, row 
+collapse (mean) bl_urate=had_baseline_urate, by(mo_year_diagn)
+
+tsset mo_year_diagn
+
+**Newey Standard Errors with 5 lags
+itsa bl_urate if inrange(mo_year_diagn, tm(2015m3), tm(2023m2)), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with a serum urate level at diagnosis", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) yscale(range(0.5(0.1)1.0)) ylabel(0.5(0.1)1.0, format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+	graph export "$projectdir/output/figures/ITSA_baseline_urate.svg", as(svg) replace
+	
+actest, lag(18)	
+	
+restore
 
 log close
