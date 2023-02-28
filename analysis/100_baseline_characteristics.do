@@ -54,10 +54,12 @@ tab diagnosis_year, missing
 tab mo_year_ult, missing
 tab ult_year, missing
 
-*Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population who had >12m of registration
+*Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-period TPP population who had >12m of registration
 preserve
-collapse (count) total_diag=gout_code, by(year_diag sex) 
-rename year_diag year
+collapse (count) total_diag=gout_code, by(diagnosis_year sex) 
+decode diagnosis_year, gen(year_str)
+destring year_str, gen(year)
+drop diagnosis_year year_str
 
 **Merge in yearly population (denominator)
 merge m:1 sex year using "$projectdir/output/data/gout_incidence_sex_long", keep(match) nogen
@@ -81,10 +83,10 @@ foreach var of varlist total_diag pop_inc {
 }
 
 **Generate incidences by year using yearly denominator
-gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
+gen incidence_gout=((total_diag_round/pop_inc_round)*1000)
 export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
 
-twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", yscale(range(0(5)35)) ylabel(0(5)35, nogrid) color(red) xline(2020) xscale(range(2015(1)2022)) xlabel(2015 "Mar 2015" 2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022") xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
+twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 1,000 adult population", size(small)) color(gold) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", yscale(range(0(0.5)3.5)) ylabel(0 "0" 0.5 "0.5" 1 "1.0" 1.5 "1.5" 2 "2.0" 2.5 "2.5" 3 "3.0" 3.5 "3.5", nogrid) color(red) xline(2020) xscale(range(2015(1)2022)) xlabel(2015 "2015/16" 2016 "2016/17" 2017 "2017/18" 2018 "2018/19" 2019 "2019/20" 2020 "2020/21" 2021 "2021/22" 2022 "2022/23", nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_year_rounded.svg", width(12in) replace
 
 restore
@@ -93,12 +95,12 @@ restore
 preserve
 collapse (count) total_diag=gout_code, by(mo_year_diagn sex) 
 gen year = year(dofm(mo_year_diagn))
-
-keep if mo_year_diagn<=ym(2022, 12) //restrict to Dec 2022 for now; need to think how to merge mid-year population for 2023
+gen month = month(dofm(mo_year_diagn))
+replace year = (year-1) if inlist(month,1,2)
 
 **Merge in yearly population (denominator)
 merge m:1 sex year using "$projectdir/output/data/gout_incidence_sex_long", keep(match) nogen
-drop date 
+drop date month
 sort mo_year_diagn
 
 **Calculate counts/population for combined male and female
@@ -118,11 +120,11 @@ foreach var of varlist total_diag pop_inc {
 }
 
 **Generate incidences by month using yearly denominator
-gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
+gen incidence_gout=((total_diag_round/pop_inc_round)*1000)
 sort mo_year_diagn
 export delimited using "$projectdir/output/tables/incidence_month_rounded.csv", replace
 
-twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(721) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
+twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 1,000 adult population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(721) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_month_rounded.svg", width(12in) replace
 restore	
 
@@ -151,11 +153,11 @@ gen prevalence_gout=((prev_gout_round/pop_round)*100) //as a %
 
 export delimited using "$projectdir/output/tables/prevalance_year_rounded.csv", replace	
 
-twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)", size(small)) color(gold) || connected prevalence_gout year if sex=="M", ytitle("Gout prevalence (%)", size(small)) color(blue) || connected prevalence_gout year if sex=="F", ytitle("Gout prevalence (%)", size(small)) color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015 "Mar 2015" 2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022", nogrid) xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(prevalance_year_rounded, replace) saving("$projectdir/output/figures/prevalance_year_rounded.gph", replace)
+twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)", size(small)) color(gold) || connected prevalence_gout year if sex=="M", ytitle("Gout prevalence (%)", size(small)) color(blue) || connected prevalence_gout year if sex=="F", ytitle("Gout prevalence (%)", size(small)) color(red) yscale(range(0(1)6)) ylabel(0(1)6, nogrid) xscale(range(2015(1)2022)) xlabel(2015 "2015/16" 2016 "2016/17" 2017 "2017/18" 2018 "2018/19" 2019 "2019/20" 2020 "2020/21" 2021 "2021/22" 2022 "2022/23", nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(prevalance_year_rounded, replace) saving("$projectdir/output/figures/prevalance_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/prevalance_year_rounded.svg", width(12in) replace
 restore	
 
-*Graph of gout admissions incidence by year (all/male/female) - denominator = mid-year TPP population (as per prevalence); admission numbers are from April to April
+*Graph of gout admissions incidence by year (all/male/female) - denominator = mid-period TPP population (as per prevalence); admission numbers are from April to April
 preserve 
 use "$projectdir/output/data/gout_admissions_sex_long", clear
 
@@ -176,23 +178,28 @@ foreach var of varlist gout_admission pop {
 }
 
 **Generate admission incidence by year
-gen incident_gout_adm=((gout_admission_round/pop_round)*10000) //as a %
+gen incident_gout_adm=((gout_admission_round/pop_round)*100000) //as a %
+
 keep if date>=date("01/04/2016", "DMY") & date!=. //admission data available from April 2016
+
 export delimited using "$projectdir/output/tables/incidence_admission_year_rounded.csv", replace	
 
-twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xline(2020) xlabel(2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022", nogrid) xscale(range(2016(1)2022)) xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
+twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 100,000 adult population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) yscale(range(0(5)25)) ylabel(0(5)25, nogrid) xline(2020) xlabel(2016 "2016/17" 2017 "2017/18" 2018 "2018/19" 2019 "2019/20" 2020 "2020/21" 2021 "2021/22" 2022 "2022/23", nogrid) xscale(range(2016(1)2022)) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_admission_year_rounded.svg", width(12in) replace
 restore	
 
-*Graph of gout admissions incidence by month (all/male/female) - denominator = mid-year TPP population (as per prevalence)
+*Graph of gout admissions incidence by month (all/male/female) - denominator = mid-period TPP population (as per prevalence)
 preserve
 use "$projectdir/output/measures/gout_admissions.dta", clear
 collapse (count) total_adm=adm_count, by(gout_adm_ym sex) 
+
 gen year = year(dofm(gout_adm_ym))
+gen month = month(dofm(gout_adm_ym))
+replace year = (year-1) if inlist(month,1,2)
 
 **Merge in yearly population (denominator)
 merge m:m sex year using "$projectdir/output/data/gout_admissions_sex_long", keep(match) nogen
-drop date gout_admission gout_admission_all
+drop date gout_admission gout_admission_all month
 sort gout_adm_ym
 
 **Calculate counts/population for combined male and female
@@ -212,12 +219,14 @@ foreach var of varlist total_adm pop {
 }
 
 **Generate incidences by month using yearly denominator
-gen incidence_adm=((total_adm_round/pop_round)*10000)
+gen incidence_adm=((total_adm_round/pop_round)*100000)
 sort gout_adm_ym
+
 keep if gout_adm_ym>=ym(2016, 4) & gout_adm_ym<=ym(2022, 12) & gout_adm_ym!=. //admission data available from April 2016; restrict to before Dec 2022 for now
+
 export delimited using "$projectdir/output/tables/admission_month_rounded.csv", replace
 
-twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) xscale(range(676(12)760)) xlabel(676 "Apr 2016" 688 "Apr 2017" 700 "Apr 2018" 712 "Apr 2019" 724 "Apr 2020" 736 "Apr 2021" 748 "Apr 2022" 760 "Apr 2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
+twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 100,000 adult population", size(small)) color(gold) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) yscale(range(0(0.5)2.5)) ylabel(0 "0" 0.5 "0.5" 1 "1.0" 1.5 "1.5" 2 "2.0" 2.5 "2.5", nogrid) xscale(range(672(12)756)) xlabel(672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of admission", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
 	graph export "$projectdir/output/figures/admission_month_rounded.svg", width(12in) replace
 restore	
 
@@ -466,7 +475,7 @@ tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
 tab ult_6m, missing //those who received ULT within 6m of diagnosis
 tab has_6m_post_ult if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 6m of registration and follow-up after first ULT prescription
 tab had_test_ult_6m if has_6m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 6m
-tabstat lowest_urate_ult_6m, stats(n mean p50 p25 p75) //lowest urate value within 6m of ULT
+tabstat lowest_urate_ult_6m if has_6m_post_ult==1, stats(n mean p50 p25 p75) //lowest urate value within 6m of ULT
 tab urate_below360_ult_6m if has_6m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >6m of follow-up
 tab urate_below360_ult_6m if has_6m_post_ult==1 & had_test_ult_6m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >6m of follow-up, and had a test performed within 6m of ULT
 
@@ -494,7 +503,7 @@ tab urate_below360_6m if has_6m_post_diag==1 & had_test_6m==1, missing //proport
 **12 months 
 tab has_12m_post_diag, missing //proportion who had at least 12m of registration and follow-up after diagnosis
 tab had_test_12m if has_12m_post_diag==1, missing //proportion with >12m follow-up who had a least one test performed within 12m
-tabstat lowest_urate_12m, stats(n mean p50 p25 p75) //lowest urate value within 12m 
+tabstat lowest_urate_12m if has_12m_post_diag==1, stats(n mean p50 p25 p75) //lowest urate value within 12m 
 tab urate_below360_12m if has_12m_post_diag==1, missing //proportion who attained <360 micromol/L with 12m of diagnosis
 tab urate_below360_12m if has_12m_post_diag==1 & had_test_12m==1, missing //proportion who attained <360 micromol/L from those who had >12m of follow-up and had a test performed within 12m of diagnosis
 

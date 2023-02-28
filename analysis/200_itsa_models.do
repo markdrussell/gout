@@ -50,6 +50,8 @@ else if "`x'"=="12m" {
 	}	
 	
 *Restrict all analyses to patients with at least 6m/12m follow-up and registration after diagnosis================*
+use "$projectdir/output/data/file_gout_all.dta", clear
+
 keep if has_`x'_post_diag==1
 
 **Time from diagnosis to prescription of ULT 

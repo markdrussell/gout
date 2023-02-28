@@ -523,20 +523,6 @@ lab var tophus "Tophaceous gout"
 tab gout_code, missing
 keep if gout_code==1
 
-*Generate diagnosis date===============================================================*/
-
-*Use first gout code date (in GP record) as diagnosis date
-gen diagnosis_date=gout_code_date
-format diagnosis_date %td
-
-*Refine diagnostic window=============================================================*/
-
-**Keep patients with diagnosis date was after study start date and before end date
-keep if diagnosis_date>=date("$start_date", "DMY") & diagnosis_date!=. 
-tab gout_code, missing
-keep if diagnosis_date<date("$end_date", "DMY") & diagnosis_date!=. 
-tab gout_code, missing
-
 *Check if first ULT prescription was before index diagnosis code=====================================================*/
 
 **Date of first ULT script
@@ -571,6 +557,20 @@ tab gout_emerg_1 if gout_code_date!=. & gout_emerg_date_1!=. & (gout_emerg_date_
 
 *Recode index diagnosis date as gout emerg date if gout emerg date less than 30 days before index gout code date
 replace gout_code_date=gout_emerg_date_1 if gout_code_date!=. & first_ult_date!=. & (gout_emerg_date_1<gout_code_date)
+
+*Generate diagnosis date===============================================================*/
+
+*Use first gout code date (in GP record) as diagnosis date
+gen diagnosis_date=gout_code_date
+format diagnosis_date %td
+
+*Refine diagnostic window=============================================================*/
+
+**Keep patients with diagnosis date was after study start date and before end date
+keep if diagnosis_date>=date("$start_date", "DMY") & diagnosis_date!=. 
+tab gout_code, missing
+keep if diagnosis_date<date("$end_date", "DMY") & diagnosis_date!=. 
+tab gout_code, missing
 
 *Number of diagnoses in time windows=========================================*/
 
