@@ -38,9 +38,9 @@ import delimited "$projectdir/output/input.csv", clear
 adopath + "$projectdir/analysis/extra_ados"
 
 **Set index dates ===========================================================*/
-global year_preceding = "01/01/2014"
-global start_date = "01/01/2015"
-global end_date = "31/12/2022"
+global year_preceding = "01/03/2014"
+global start_date = "01/03/2015"
+global end_date = "28/02/2023"
 
 **Rename variables =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease
@@ -585,14 +585,14 @@ lab var mo_year_diagn "Month/Year of Diagnosis"
 lab var mo_year_diagn_s "Month/Year of Diagnosis"
 
 **Separate into 12-month time windows (for diagnosis date)
-gen diagnosis_year=1 if diagnosis_date>=td(01jan2015) & diagnosis_date<=td(31dec2015)
-replace diagnosis_year=2 if diagnosis_date>=td(01jan2016) & diagnosis_date<=td(31dec2016)
-replace diagnosis_year=3 if diagnosis_date>=td(01jan2017) & diagnosis_date<=td(31dec2017)
-replace diagnosis_year=4 if diagnosis_date>=td(01jan2018) & diagnosis_date<=td(31dec2018)
-replace diagnosis_year=5 if diagnosis_date>=td(01jan2019) & diagnosis_date<=td(31dec2019)
-replace diagnosis_year=6 if diagnosis_date>=td(01jan2020) & diagnosis_date<=td(31dec2020)
-replace diagnosis_year=7 if diagnosis_date>=td(01jan2021) & diagnosis_date<=td(31dec2021)
-replace diagnosis_year=8 if diagnosis_date>=td(01jan2022) & diagnosis_date<=td(31dec2022)
+gen diagnosis_year=1 if diagnosis_date>=td(01mar2015) & diagnosis_date<=td(28feb2016)
+replace diagnosis_year=2 if diagnosis_date>=td(01mar2016) & diagnosis_date<=td(28feb2017)
+replace diagnosis_year=3 if diagnosis_date>=td(01mar2017) & diagnosis_date<=td(28feb2018)
+replace diagnosis_year=4 if diagnosis_date>=td(01mar2018) & diagnosis_date<=td(28feb2019)
+replace diagnosis_year=5 if diagnosis_date>=td(01mar2019) & diagnosis_date<=td(28feb2020)
+replace diagnosis_year=6 if diagnosis_date>=td(01mar2020) & diagnosis_date<=td(28feb2021)
+replace diagnosis_year=7 if diagnosis_date>=td(01mar2021) & diagnosis_date<=td(28feb2022)
+replace diagnosis_year=8 if diagnosis_date>=td(01mar2022) & diagnosis_date<=td(28feb2023)
 lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
 lab val diagnosis_year diagnosis_year
 lab var diagnosis_year "Year of diagnosis"
@@ -611,14 +611,14 @@ lab var mo_year_ult "Month/Year of first ULT prescription"
 lab var mo_year_ult_s "Month/Year of first ULT prescription"
 
 **Separate into 12-month time windows (for first ult date)
-gen ult_year=1 if first_ult_date>=td(01jan2015) & first_ult_date<=td(31dec2015)
-replace ult_year=2 if first_ult_date>=td(01jan2016) & first_ult_date<=td(31dec2016)
-replace ult_year=3 if first_ult_date>=td(01jan2017) & first_ult_date<=td(31dec2017)
-replace ult_year=4 if first_ult_date>=td(01jan2018) & first_ult_date<=td(31dec2018)
-replace ult_year=5 if first_ult_date>=td(01jan2019) & first_ult_date<=td(31dec2019)
-replace ult_year=6 if first_ult_date>=td(01jan2020) & first_ult_date<=td(31dec2020)
-replace ult_year=7 if first_ult_date>=td(01jan2021) & first_ult_date<=td(31dec2021)
-replace ult_year=8 if first_ult_date>=td(01jan2022) & first_ult_date<=td(31dec2022)
+gen ult_year=1 if first_ult_date>=td(01mar2015) & first_ult_date<=td(28feb2016)
+replace ult_year=2 if first_ult_date>=td(01mar2016) & first_ult_date<=td(28feb2017)
+replace ult_year=3 if first_ult_date>=td(01mar2017) & first_ult_date<=td(28feb2018)
+replace ult_year=4 if first_ult_date>=td(01mar2018) & first_ult_date<=td(28feb2019)
+replace ult_year=5 if first_ult_date>=td(01mar2019) & first_ult_date<=td(28feb2020)
+replace ult_year=6 if first_ult_date>=td(01mar2020) & first_ult_date<=td(28feb2021)
+replace ult_year=7 if first_ult_date>=td(01mar2021) & first_ult_date<=td(28feb2022)
+replace ult_year=8 if first_ult_date>=td(01mar2022) & first_ult_date<=td(28feb2023)
 lab define ult_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
 lab val ult_year ult_year
 lab var ult_year "Year of first ULT prescription"
@@ -1058,63 +1058,6 @@ replace ult_time=3 if time_to_ult_6m>180 | time_to_ult_6m==.
 lab define ult_time 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months", modify
 lab val ult_time ult_time
 lab var ult_time "ULT initiation, overall" 
-
-/*/Need to amend below if needed
-gen ult_time_19=ult_time if diagnosis_year==1
-recode ult_time_19 .=4
-gen ult_time_20=ult_time if diagnosis_year==2
-recode ult_time_20 .=4
-gen ult_time_21=ult_time if diagnosis_year==3
-recode ult_time_21 .=4
-gen ult_time_22=ult_time if diagnosis_year==4
-recode ult_time_22 .=4
-
-
-gen gp_appt_cat_19=gp_appt_cat if appt_year==1
-gen gp_appt_cat_20=gp_appt_cat if appt_year==2
-gen gp_appt_cat_21=gp_appt_cat if appt_year==3
-gen gp_appt_cat_22=gp_appt_cat if appt_year==4
-lab define gp_appt_cat_19 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val gp_appt_cat_19 gp_appt_cat_19
-lab var gp_appt_cat_19 "Time to rheumatology assessment, Apr 2019-2020"
-lab define gp_appt_cat_20 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val gp_appt_cat_20 gp_appt_cat_20
-lab var gp_appt_cat_20 "Time to rheumatology assessment, Apr 2020-2021"
-lab define gp_appt_cat_21 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val gp_appt_cat_21 gp_appt_cat_21
-lab var gp_appt_cat_21 "Time to rheumatology assessment, Apr 2021-2022"
-lab define gp_appt_cat_22 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val gp_appt_cat_22 gp_appt_cat_22
-lab var gp_appt_cat_22 "Time to rheumatology assessment, Apr 2022-2023"
-
-gen gp_appt_3w=1 if time_gp_rheum_appt<=21 & time_gp_rheum_appt!=. 
-replace gp_appt_3w=2 if time_gp_rheum_appt>21 & time_gp_rheum_appt!=.
-lab define gp_appt_3w 1 "Within 3 weeks" 2 "More than 3 weeks", modify
-lab val gp_appt_3w gp_appt_3w
-lab var gp_appt_3w "Time to rheumatology assessment, overall"
-tab gp_appt_3w, missing
-
-gen ref_appt_cat=1 if time_ref_rheum_appt<=21 & time_ref_rheum_appt!=. 
-replace ref_appt_cat=2 if time_ref_rheum_appt>21 & time_ref_rheum_appt<=42 & time_ref_rheum_appt!=. & ref_appt_cat==.
-replace ref_appt_cat=3 if time_ref_rheum_appt>42 & time_ref_rheum_appt!=. & ref_appt_cat==.
-lab define ref_appt_cat 1 "Within 3 weeks" 2 "Between 3-6 weeks" 3 "More than 6 weeks", modify
-lab val ref_appt_cat ref_appt_cat
-lab var ref_appt_cat "Time to rheumatology assessment"
-tab ref_appt_cat, missing
-
-gen ref_appt_3w=1 if time_ref_rheum_appt<=21 & time_ref_rheum_appt!=. 
-replace ref_appt_3w=2 if time_ref_rheum_appt>21 & time_ref_rheum_appt!=.
-lab define ref_appt_3w 1 "Within 3 weeks" 2 "More than 3 weeks", modify
-lab val ref_appt_3w ref_appt_3w
-lab var ref_appt_3w "Time to rheumatology assessment"
-tab ref_appt_3w, missing
-
-**Time from rheum ref or last GP to rheum appt (combined; includes those with no rheum ref)
-gen time_refgp_rheum_appt = time_ref_rheum_appt
-replace time_refgp_rheum_appt = time_gp_rheum_appt if time_ref_rheum_appt==. & time_gp_rheum_appt!=.
-tabstat time_refgp_rheum_appt, stats (n mean p50 p25 p75)
-
-*/
 
 *What was first ULT drug in GP record==============================================================================*
 

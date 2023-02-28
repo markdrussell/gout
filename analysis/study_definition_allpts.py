@@ -2,11 +2,11 @@ from cohortextractor import StudyDefinition, patients, codelist, codelist_from_c
 
 from codelists import *
 
-year_preceding = "2018-01-01"
+year_preceding = "2018-03-01"
 # Choosing mid-study year as reference date
-start_date = "2019-01-01"
-ten_year_date = "2009-01-01"
-four_month_date = "2018-09-01"
+start_date = "2019-03-01"
+ten_year_date = "2009-03-01"
+four_month_date = "2018-11-01"
 end_date = "today"
 
 # Presence/date of specified comorbidities
@@ -225,7 +225,7 @@ study = StudyDefinition(
         find_last_match_in_period=True,
         return_expectations={
             "incidence": 0.2,
-            "date": {"earliest": "2014-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
 )

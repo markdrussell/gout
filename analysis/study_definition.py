@@ -4,8 +4,8 @@ from cohortextractor.codelistlib import filter_codes_by_category
 
 from codelists import *
 
-year_preceding = "2014-01-01"
-start_date = "2015-01-01"
+year_preceding = "2014-03-01"
+start_date = "2015-03-01"
 end_date = "today"
 
 
@@ -289,7 +289,7 @@ study = StudyDefinition(
         find_first_match_in_period=True,
         return_expectations={
             "incidence": 0.95,
-            "date": {"earliest": "2013-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
     ## Date of first allopurinol prescription on record
@@ -301,7 +301,7 @@ study = StudyDefinition(
         find_first_match_in_period=True,
         return_expectations={
             "incidence": 0.9,
-            "date": {"earliest": "2013-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
     ## Date of first febuxostat prescription on record
@@ -313,7 +313,7 @@ study = StudyDefinition(
         find_first_match_in_period=True,
         return_expectations={
             "incidence": 0.9,
-            "date": {"earliest": "2013-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
     ## Number of ULT prescriptions issued in 6m after first script issued (Nb. doses may be double counted if both 300mg and 100mg issued)
@@ -356,7 +356,7 @@ study = StudyDefinition(
         index_date="gout_code_date - 6 months",
         n=7,
         return_expectations={
-            "date": {"earliest": "2014-04-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
             "float": {"distribution": "normal", "mean": 300, "stddev": 100},
             "incidence": 0.95,
         },
@@ -461,7 +461,7 @@ study = StudyDefinition(
         find_last_match_in_period=True,
         return_expectations={
             "incidence": 0.2,
-            "date": {"earliest": "2014-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
     ## Dates of hospitals admission for flares (from the 1 month before index diagnostic code to 1 year after diagnosis, to account for index admissions)
@@ -519,7 +519,7 @@ study = StudyDefinition(
         date_format="YYYY-MM-DD",
         return_expectations={
             "incidence": 0.2,
-            "date": {"earliest": "2014-01-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
         },
     ),
     ## Flare codes
@@ -529,7 +529,7 @@ study = StudyDefinition(
         index_date="gout_code_date + 14 days",
         n=3,
         return_expectations={
-            "date": {"earliest": "2014-04-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
             "incidence": 0.4,
         },
     ),
@@ -539,7 +539,7 @@ study = StudyDefinition(
         index_date="gout_code_date + 14 days",
         n=3,
         return_expectations={
-            "date": {"earliest": "2014-04-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
             "incidence": 0.5,
         },
     ),
@@ -549,7 +549,7 @@ study = StudyDefinition(
         index_date="gout_code_date + 14 days",
         n=6,
         return_expectations={
-            "date": {"earliest": "2014-04-01", "latest": end_date},
+            "date": {"earliest": "2014-03-01", "latest": end_date},
             "incidence": 0.4,
         },
     ),

@@ -13,8 +13,8 @@ study = StudyDefinition(
         "incidence": 0.5,
     },
 
-    # Mid-year population estimate
-    index_date = "2015-07-01",
+    # Mid-year estimate (March to March for purposes of these analyses, so Sept = midpoint)
+    index_date = "2015-09-01",
  
     # Define study population
     population=patients.satisfying(
@@ -23,7 +23,7 @@ study = StudyDefinition(
             (age >=18 AND age <= 110) AND
             (sex = "M" OR sex = "F")
             """,
-            # Denominator for prevalence would be all patients registered at mid-year
+            # Denominator for prevalence would be all patients registered at index date
             registered=patients.registered_as_of("index_date"),
         ),        
     age=patients.age_as_of(
@@ -48,22 +48,22 @@ study = StudyDefinition(
             "incidence": 0.1,
         },
     ),    
-    # Incidence of admissions to hospital with primary diagnosis code of gout in the 1 month after index date
+    # Incidence of admissions to hospital with primary diagnosis code of gout; Nb. for admissions, this is from April to April
     gout_admission=patients.admitted_to_hospital(
         with_these_primary_diagnoses=gout_admission,
         returning="binary_flag",
-        between=["index_date - 6 months", "index_date + 6 months"],
+        between=["index_date - 5 months", "index_date + 7 months"],
         return_expectations={"incidence": 0.1},
     ),
-    # Returns data of first admission within that year for patient (would miss repeat admissions)
+    # Returns data of first admission within that year for patient (would miss repeat admissions); Nb. for admissions, this is from April to April
     gout_adm_date=patients.admitted_to_hospital(
         with_these_primary_diagnoses=gout_admission,
         find_first_match_in_period=True,
         returning="date_admitted",
         date_format="YYYY-MM-DD",
-        between=["index_date - 6 months", "index_date + 6 months"],
+        between=["index_date - 5 months", "index_date + 7 months"],
         return_expectations={
-            "date": {"earliest": "2015-01-01", "latest": "2022-01-31"},
+            "date": {"earliest": "2015-04-01", "latest": "2022-03-31"},
             "incidence": 0.05,
         },
     ),

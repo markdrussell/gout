@@ -39,9 +39,9 @@ import delimited "$projectdir/output/input_count.csv", clear
 adopath + "$projectdir/analysis/extra_ados"
 
 **Set index dates ===========================================================*/
-global year_preceding = "01/01/2018"
-global start_date = "01/01/2019"
-global end_date = "01/01/2020"
+global year_preceding = "01/03/2018"
+global start_date = "01/03/2019"
+global end_date = "01/03/2020"
 	
 **Change date format and create binary indicator variables for relevant conditions ====================================================*/
 

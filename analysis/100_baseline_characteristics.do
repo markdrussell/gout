@@ -34,9 +34,9 @@ adopath + "$projectdir/analysis/extra_ados"
 set scheme plotplainblind
 
 **Set index dates ===========================================================*/
-global year_preceding = "01/01/2014"
-global start_date = "01/01/2015"
-global end_date = "31/12/2022"
+global year_preceding = "01/03/2014"
+global start_date = "01/03/2015"
+global end_date = "28/02/2023"
 
 *Diagnostic incidence======================================================================*/
 
@@ -56,7 +56,7 @@ tab ult_year, missing
 
 *Table of gout diagnostic incidences by year (total/male/female) - denominator = mid-year TPP population who had >12m of registration
 preserve
-collapse (count) total_diag=gout_code, by(year sex) 
+collapse (count) total_diag=gout_code, by(year_diag sex) 
 rename year_diag year
 
 **Merge in yearly population (denominator)
@@ -84,7 +84,7 @@ foreach var of varlist total_diag pop_inc {
 gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 export delimited using "$projectdir/output/tables/incidence_year_rounded.csv", replace
 
-twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", yscale(range(0(5)35)) ylabel(0(5)35, nogrid) color(red) xline(722) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
+twoway connected incidence_gout year if sex=="All", ytitle("Yearly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) || connected incidence_gout year if sex=="M", color(blue) || connected incidence_gout year if sex=="F", yscale(range(0(5)35)) ylabel(0(5)35, nogrid) color(red) xline(2020) xscale(range(2015(1)2022)) xlabel(2015 "Mar 2015" 2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022") xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_year_rounded, replace) saving("$projectdir/output/figures/incidence_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_year_rounded.svg", width(12in) replace
 
 restore
@@ -93,6 +93,8 @@ restore
 preserve
 collapse (count) total_diag=gout_code, by(mo_year_diagn sex) 
 gen year = year(dofm(mo_year_diagn))
+
+keep if mo_year_diagn<=ym(2022, 12) //restrict to Dec 2022 for now; need to think how to merge mid-year population for 2023
 
 **Merge in yearly population (denominator)
 merge m:1 sex year using "$projectdir/output/data/gout_incidence_sex_long", keep(match) nogen
@@ -120,7 +122,7 @@ gen incidence_gout=((total_diag_round/pop_inc_round)*10000)
 sort mo_year_diagn
 export delimited using "$projectdir/output/tables/incidence_month_rounded.csv", replace
 
-twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(722) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
+twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(721) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_month_rounded.svg", width(12in) replace
 restore	
 
@@ -149,11 +151,11 @@ gen prevalence_gout=((prev_gout_round/pop_round)*100) //as a %
 
 export delimited using "$projectdir/output/tables/prevalance_year_rounded.csv", replace	
 
-twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)", size(small)) color(gold) || connected prevalence_gout year if sex=="M", ytitle("Gout prevalence (%)", size(small)) color(blue) || connected prevalence_gout year if sex=="F", ytitle("Gout prevalence (%)", size(small)) color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(prevalance_year_rounded, replace) saving("$projectdir/output/figures/prevalance_year_rounded.gph", replace)
+twoway connected prevalence_gout year if sex=="All", ytitle("Gout prevalence (%)", size(small)) color(gold) || connected prevalence_gout year if sex=="M", ytitle("Gout prevalence (%)", size(small)) color(blue) || connected prevalence_gout year if sex=="F", ytitle("Gout prevalence (%)", size(small)) color(red) ylabel(, nogrid) xscale(range(2015(1)2022)) xlabel(2015 "Mar 2015" 2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022", nogrid) xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(prevalance_year_rounded, replace) saving("$projectdir/output/figures/prevalance_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/prevalance_year_rounded.svg", width(12in) replace
 restore	
 
-*Graph of gout admissions incidence by year (all/male/female) - denominator = mid-year TPP population (as per prevalence)
+*Graph of gout admissions incidence by year (all/male/female) - denominator = mid-year TPP population (as per prevalence); admission numbers are from April to April
 preserve 
 use "$projectdir/output/data/gout_admissions_sex_long", clear
 
@@ -175,10 +177,10 @@ foreach var of varlist gout_admission pop {
 
 **Generate admission incidence by year
 gen incident_gout_adm=((gout_admission_round/pop_round)*10000) //as a %
-keep if date>=date("01/01/2017", "DMY") & date!=. //admission data available from April 2016, so limit to 2017
+keep if date>=date("01/04/2016", "DMY") & date!=. //admission data available from April 2016
 export delimited using "$projectdir/output/tables/incidence_admission_year_rounded.csv", replace	
 
-twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xscale(range(2017(1)2022)) xlabel(2017(1)2022, nogrid) xtitle("Year", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
+twoway connected incident_gout_adm year if sex=="All", ytitle("Incidence of gout admissions per 10,000 population", size(small)) color(gold) || connected incident_gout_adm year if sex=="M", color(blue) || connected incident_gout_adm year if sex=="F", color(red) ylabel(, nogrid) xline(2020) xlabel(2016 "Mar 2016" 2017 "Mar 2017" 2018 "Mar 2018" 2019 "Mar 2019" 2020 "Mar 2020" 2021 "Mar 2021" 2022 "Mar 2022", nogrid) xscale(range(2016(1)2022)) xtitle("Year commencing", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_admission_year_rounded, replace) saving("$projectdir/output/figures/incidence_admission_year_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_admission_year_rounded.svg", width(12in) replace
 restore	
 
@@ -212,7 +214,7 @@ foreach var of varlist total_adm pop {
 **Generate incidences by month using yearly denominator
 gen incidence_adm=((total_adm_round/pop_round)*10000)
 sort gout_adm_ym
-keep if gout_adm_ym>=ym(2016, 4) & gout_adm_ym!=. //admission data available from April 2016
+keep if gout_adm_ym>=ym(2016, 4) & gout_adm_ym<=ym(2022, 12) & gout_adm_ym!=. //admission data available from April 2016; restrict to before Dec 2022 for now
 export delimited using "$projectdir/output/tables/admission_month_rounded.csv", replace
 
 twoway connected incidence_adm gout_adm_ym if sex=="All", ytitle("Monthly incidence of gout admissions per 10,000 population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_adm gout_adm_ym if sex=="M", color(blue) || connected incidence_adm gout_adm_ym if sex=="F", color(red) xline(722) xscale(range(676(12)760)) xlabel(676 "Apr 2016" 688 "Apr 2017" 700 "Apr 2018" 712 "Apr 2019" 724 "Apr 2020" 736 "Apr 2021" 748 "Apr 2022" 760 "Apr 2023", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(admission_month_rounded, replace) saving("$projectdir/output/figures/admission_month_rounded.gph", replace)
@@ -331,6 +333,7 @@ table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
 		 tophus bin %5.1f \ ///
 		 multiple_flares bin %5.1f \ ///
 		 high_risk bin %5.1f \ ///
+		 baseline_urate conts %3.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_bydiagnosis.xls", replace)
 
 *Baseline table by year of diagnosis
@@ -353,6 +356,7 @@ table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle("
 		 tophus bin %5.1f \ ///
 		 multiple_flares bin %5.1f \ ///
 		 high_risk bin %5.1f \ ///
+		 baseline_urate conts %3.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_byyear.xls", replace)
 
 *Follow-up=======================================================================================================*/

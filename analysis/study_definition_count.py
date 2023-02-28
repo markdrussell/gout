@@ -4,9 +4,9 @@ from cohortextractor.codelistlib import filter_codes_by_category
 
 from codelists import *
 
-year_preceding = "2018-01-01"
-start_date = "2019-01-01"
-end_date = "2020-01-01"
+year_preceding = "2018-03-01"
+start_date = "2019-03-01"
+end_date = "2020-02-28"
 
 # This study definition is used to determine distribution of key variables used for iterations (e.g. multiple urate levels)
 
