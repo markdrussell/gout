@@ -124,7 +124,7 @@ gen incidence_gout=((total_diag_round/pop_inc_round)*1000)
 sort mo_year_diagn
 export delimited using "$projectdir/output/tables/incidence_month_rounded.csv", replace
 
-twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 1,000 adult population", size(small)) color(gold) ylabel(, nogrid) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(721) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
+twoway connected incidence_gout mo_year_diagn if sex=="All", ytitle("Monthly incidence of gout diagnoses per 1,000 adult population", size(small)) color(gold) || connected incidence_gout mo_year_diagn if sex=="M", color(blue) || connected incidence_gout mo_year_diagn if sex=="F", color(red) xline(721) yscale(range(0(0.1)0.4)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4", nogrid) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) xtitle("Date of diagnosis", size(small) margin(medsmall)) title("", size(small)) legend(region(fcolor(white%0)) order(1 "All" 2 "Male" 3 "Female")) name(incidence_month_rounded, replace) saving("$projectdir/output/figures/incidence_month_rounded.gph", replace)
 	graph export "$projectdir/output/figures/incidence_month_rounded.svg", width(12in) replace
 restore	
 
@@ -344,6 +344,9 @@ table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
 		 high_risk bin %5.1f \ ///
 		 baseline_urate conts %3.1f \ ///
 		 ) saving("$projectdir/output/tables/baseline_bydiagnosis.xls", replace)
+		 
+*Rounded baseline table
+table (var) (diagnosis_year), stat(fvfrequency agegroup male ethnicity imd bmicat smoke hypertension diabcatm chronic_card_disease stroke cancer chronic_resp_disease chronic_liver_disease ckd diuretic tophus multiple_flares high_risk) missing
 
 *Baseline table by year of diagnosis
 table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///

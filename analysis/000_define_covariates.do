@@ -166,7 +166,7 @@ lab val male male
 tab male, missing
 
 ***Ethnicity
-replace ethnicity = .u if ethnicity == .
+replace ethnicity = 9 if ethnicity == .
 ****rearrange in order of prevalence
 recode ethnicity 2=6 /* mixed to 6 */
 recode ethnicity 3=2 /* south asian to 2 */
@@ -178,17 +178,17 @@ label define ethnicity 	1 "White"  					///
 						2 "Asian/Asian British"		///
 						3 "Black"  					///
 						4 "Mixed/Other"				///
-						.u "Not known"
+						9 "Not known"
 label values ethnicity ethnicity
 lab var ethnicity "Ethnicity"
 tab ethnicity, missing
 
 gen ethnicity_bme=0 if ethnicity==1
 replace ethnicity_bme=1 if ethnicity>1 & ethnicity<5
-replace ethnicity_bme=.u if ethnicity==.u
+replace ethnicity_bme=9 if ethnicity==9
 label define ethnicity_bme 	0 "White"  		///
 						1 "Non-white"		///
-						.u "Not known"
+						9 "Not known"
 label values ethnicity_bme ethnicity_bme
 lab var ethnicity_bme "Ethnicity"
 tab ethnicity_bme, missing
@@ -216,8 +216,8 @@ replace region_nospace="YorkshireandTheHumber" if region=="Yorkshire and The Hum
 drop region
 
 ***IMD
-recode imd 0 = .u
-label define imd 1 "1 most deprived" 2 "2" 3 "3" 4 "4" 5 "5 least deprived" .u "Not known"
+recode imd 0 = 9
+label define imd 1 "1 most deprived" 2 "2" 3 "3" 4 "4" 5 "5 least deprived" 9 "Not known"
 label values imd imd 
 lab var imd "Index of multiple deprivation"
 tab imd, missing
@@ -273,7 +273,7 @@ recode  bmicat . = 3 if bmi_val < 30
 recode  bmicat . = 4 if bmi_val < 35
 recode  bmicat . = 5 if bmi_val < 40
 recode  bmicat . = 6 if bmi_val < .
-replace bmicat = .u if bmi_val >= .
+replace bmicat = 9 if bmi_val >= .
 
 label define bmicat 1 "Underweight (<18.5)" 	///
 					2 "Normal (18.5-24.9)"		///
@@ -281,14 +281,14 @@ label define bmicat 1 "Underweight (<18.5)" 	///
 					4 "Obese I (30-34.9)"		///
 					5 "Obese II (35-39.9)"		///
 					6 "Obese III (40+)"			///
-					.u "Not known"
+					9 "Not known"
 					
 label values bmicat bmicat
 lab var bmicat "BMI"
 tab bmicat, missing
 
 *Create less granular categorisation
-recode bmicat 1/3 .u = 1 4 = 2 5 = 3 6 = 4, gen(obese4cat)
+recode bmicat 1/3 9 = 1 4 = 2 5 = 3 6 = 4, gen(obese4cat)
 
 label define obese4cat 	1 "No record of obesity" 	///
 						2 "Obese I (30-34.9)"		///
