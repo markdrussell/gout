@@ -18,8 +18,8 @@ USER-INSTALLED ADO:
 
 **Set filepaths
 *global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
-global projectdir `c(pwd)'
+global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/figures"
@@ -299,13 +299,13 @@ label values obese4cat obese4cat
 order obese4cat, after(bmicat)
 
 ***Smoking 
-label define smoke 1 "Never" 2 "Former" 3 "Current" .u "Not known"
+label define smoke 1 "Never" 2 "Former" 3 "Current" 9 "Not known"
 
 gen     smoke = 1  if smoking_status == "N"
 replace smoke = 2  if smoking_status == "E"
 replace smoke = 3  if smoking_status == "S"
-replace smoke = .u if smoking_status == "M"
-replace smoke = .u if smoking_status == "" 
+replace smoke = 9 if smoking_status == "M"
+replace smoke = 9 if smoking_status == "" 
 
 label values smoke smoke
 lab var smoke "Smoking status"
@@ -313,7 +313,7 @@ drop smoking_status
 tab smoke, missing
 
 *Create non-missing 3-category variable for current smoking (assumes missing smoking is never smoking)
-recode smoke .u = 1, gen(smoke_nomiss)
+recode smoke 9 = 1, gen(smoke_nomiss)
 order smoke_nomiss, after(smoke)
 label values smoke_nomiss smoke
 
@@ -358,12 +358,12 @@ gen egfr_cat = .
 recode egfr_cat . = 3 if egfr < 30
 recode egfr_cat . = 2 if egfr < 60
 recode egfr_cat . = 1 if egfr < .
-replace egfr_cat = .u if egfr >= .
+replace egfr_cat = 9 if egfr >= .
 
 label define egfr_cat 	1 ">=60" 		///
 						2 "30-59"		///
 						3 "<30"			///
-						.u "Not known"
+						9 "Not known"
 					
 label values egfr_cat egfr_cat
 lab var egfr_cat "eGFR"
@@ -371,7 +371,7 @@ tab egfr_cat, missing
 
 *If missing eGFR, assume normal
 gen egfr_cat_nomiss = egfr_cat
-replace egfr_cat_nomiss = 1 if egfr_cat == .u
+replace egfr_cat_nomiss = 1 if egfr_cat == 9
 
 label define egfr_cat_nomiss 	1 ">=60/not known" 	///
 								2 "30-59"			///
@@ -447,8 +447,8 @@ replace hba1c_mmol = (hba1c_percentage_val*10.929)-23.5 if hba1c_percentage_val<
 *Group hba1c mmol
 gen 	hba1ccatmm = 0 if hba1c_mmol < 58
 replace hba1ccatmm = 1 if hba1c_mmol >= 58 & hba1c_mmol !=.
-replace hba1ccatmm =.u if hba1ccatmm==. 
-label define hba1ccatmm 0 "HbA1c <58mmol/mol" 1 "HbA1c >=58mmol/mol" .u "Not known"
+replace hba1ccatmm =9 if hba1ccatmm==. 
+label define hba1ccatmm 0 "HbA1c <58mmol/mol" 1 "HbA1c >=58mmol/mol" 9 "Not known"
 label values hba1ccatmm hba1ccatmm
 lab var hba1ccatmm "HbA1c"
 tab hba1ccatmm, missing
@@ -457,7 +457,7 @@ tab hba1ccatmm, missing
 gen     diabcatm = 1 if diabetes==0
 replace diabcatm = 2 if diabetes==1 & hba1ccatmm==0
 replace diabcatm = 3 if diabetes==1 & hba1ccatmm==1
-replace diabcatm = 4 if diabetes==1 & hba1ccatmm==.u
+replace diabcatm = 4 if diabetes==1 & hba1ccatmm==9
 
 label define diabcatm 	1 "No diabetes" 			///
 						2 "Diabetes with HbA1c <58mmol/mol"		///
