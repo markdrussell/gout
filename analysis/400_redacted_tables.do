@@ -2,10 +2,9 @@ version 16
 
 /*==============================================================================
 DO FILE NAME:			redacted output tables
-PROJECT:				EIA OpenSAFELY project
-DATE: 					07/03/2022
-AUTHOR:					J Galloway / M Russell
-						adapted from C Rentsch										
+PROJECT:				Gout OpenSAFELY project
+DATE: 					01/12/2022
+AUTHOR:					M Russell / J Galloway									
 DESCRIPTION OF FILE:	redacted output table
 DATASETS USED:			main data file
 DATASETS CREATED: 		redacted output table
@@ -15,17 +14,15 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
-*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY\Github Practice"
-global projectdir `c(pwd)'
-di "$projectdir"
+global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir `c(pwd)'
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
 capture mkdir "$projectdir/output/figures"
 
 global logdir "$projectdir/logs"
-di "$logdir"
 
 **Open a log file
 cap log close
@@ -37,19 +34,20 @@ adopath + "$projectdir/analysis/extra_ados"
 set scheme plotplainblind
 
 **Set index dates ===========================================================*/
-global year_preceding = "01/04/2018"
-global start_date = "01/04/2019"
-global appt_date = "01/04/2021"
-global end_date = "01/10/2022"
+global year_preceding = "01/03/2014"
+global start_date = "01/03/2015"
+global end_date = "28/02/2023"
 
 *Descriptive statistics======================================================================*/
 
-**Baseline table for all EIA patients
+**Baseline table for all gout patients
 clear *
 save "$projectdir/output/data/table_1_rounded_all.dta", replace emptyok
-use "$projectdir/output/data/file_eia_all.dta", clear
+use "$projectdir/output/data/file_gout_all.dta", clear
 
-foreach var of varlist has_12m_post_appt has_6m_post_appt last_gp_prerheum_to21 last_gp_prerheum_to6m rheum_appt_to21 rheum_appt_to6m rheum_appt ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_cardiac_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
+drop if diagnosis_year==.
+
+foreach var of varlist high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
 	preserve
 	contract `var'
 	local v : variable label `var' 
@@ -92,11 +90,14 @@ foreach var of varlist has_12m_post_appt has_6m_post_appt last_gp_prerheum_to21 
 use "$projectdir/output/data/table_1_rounded_all.dta", clear
 export excel "$projectdir/output/tables/table_1_rounded_bydiag.xls", replace sheet("Overall") keepcellfmt firstrow(variables)
 
-**Baseline table for EIA subdiagnoses - tagged to above excel
-use "$projectdir/output/data/file_eia_all.dta", clear
+**Baseline table for gout diagnoses, by year of diagnosis - tagged to above excel
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+drop if diagnosis_year==.
+decode diagnosis_year, gen(year_str)
 
 local index=0
-levelsof eia_diag, local(levels)
+levelsof year_str, local(levels)
 foreach i of local levels {
 	clear *
 	save "$projectdir/output/data/table_1_rounded_`i'.dta", replace emptyok
@@ -124,11 +125,14 @@ foreach i of local levels {
 	}
 	di `index'
 
-use "$projectdir/output/data/file_eia_all.dta", clear
+use "$projectdir/output/data/file_gout_all.dta", clear
 
-foreach var of varlist has_12m_post_appt has_6m_post_appt last_gp_prerheum_to21 last_gp_prerheum_to6m rheum_appt_to21 rheum_appt_to6m rheum_appt ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_cardiac_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
+drop if diagnosis_year==.
+decode diagnosis_year, gen(year_str)
+
+foreach var of varlist high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
 	preserve
-	keep if eia_diag=="`i'"
+	keep if year_str=="`i'"
 	contract `var'
 	local v : variable label `var' 
 	gen variable = `"`v'"'

@@ -150,8 +150,8 @@ actions:
     outputs:
       moderately_sensitive:
         log1: logs/itsa_models.log   
-        figure1:  output/figures/ITSA*.svg
-      #  doc1: output/tables/gp_to_appt_ITSA_table.csv
+        figure1: output/figures/ITSA*.svg
+        doc1: output/tables/ITSA*.csv
 
   run_box_plots:
     run: stata-mp:latest analysis/300_box_plots.do
