@@ -346,7 +346,7 @@ table1_mc, onecol nospacelowpercent iqrmiddle(",")  ///
 		 ) saving("$projectdir/output/tables/baseline_bydiagnosis.xls", replace)
 		 
 *Rounded baseline table
-table (var) (diagnosis_year), stat(fvfrequency agegroup male ethnicity imd bmicat smoke hypertension diabcatm chronic_card_disease stroke cancer chronic_resp_disease chronic_liver_disease ckd diuretic tophus multiple_flares high_risk) missing
+*table (var) (diagnosis_year), stat(fvfrequency agegroup male ethnicity imd bmicat smoke hypertension diabcatm chronic_card_disease stroke cancer chronic_resp_disease chronic_liver_disease ckd diuretic tophus multiple_flares high_risk) missing
 
 *Baseline table by year of diagnosis
 table1_mc, by(diagnosis_year) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
