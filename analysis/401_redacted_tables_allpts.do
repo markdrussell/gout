@@ -2,10 +2,9 @@ version 16
 
 /*==============================================================================
 DO FILE NAME:			redacted output tables
-PROJECT:				EIA OpenSAFELY project
-DATE: 					07/03/2022
-AUTHOR:					J Galloway / M Russell
-						adapted from C Rentsch										
+PROJECT:				Gout OpenSAFELY project
+DATE: 					01/12/2022
+AUTHOR:					M Russell / J Galloway										
 DESCRIPTION OF FILE:	redacted output table
 DATASETS USED:			main data file
 DATASETS CREATED: 		redacted output table
@@ -15,15 +14,15 @@ USER-INSTALLED ADO:
 ==============================================================================*/
 
 **Set filepaths
+*global projectdir "C:\Users\k1754142\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
+*global projectdir "C:\Users\Mark\OneDrive\PhD Project\OpenSAFELY Gout\OpenSAFELY gout"
 global projectdir `c(pwd)'
-di "$projectdir"
 
 capture mkdir "$projectdir/output/data"
 capture mkdir "$projectdir/output/tables"
 capture mkdir "$projectdir/output/figures"
 
 global logdir "$projectdir/logs"
-di "$logdir"
 
 **Open a log file
 cap log close
@@ -35,21 +34,20 @@ adopath + "$projectdir/analysis/extra_ados"
 set scheme plotplainblind
 
 **Set index dates ===========================================================*/
-global year_preceding = "01/04/2018"
-global start_date = "01/04/2019"
-global appt_date = "01/04/2021"
-global end_date = "01/10/2022"
+global year_preceding = "01/03/2014"
+global start_date = "01/03/2015"
+global end_date = "28/02/2023"
 
 *Descriptive statistics======================================================================*/
 
 **Baseline table for reference population
 clear *
 save "$projectdir/output/data/table_1_rounded_allpts.dta", replace emptyok
-use "$projectdir/output/data/file_eia_allpts.dta", clear
+use "$projectdir/output/data/file_gout_allpts.dta", clear
 
 set type double
 
-foreach var of varlist ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_cardiac_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
+foreach var of varlist diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
 	preserve
 	contract `var'
 	local v : variable label `var' 

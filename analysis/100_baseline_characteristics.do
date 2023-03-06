@@ -444,8 +444,32 @@ table1_mc if nuts_region!=. & has_`x'_post_diag==1, by(nuts_region) total(before
 		 ) saving("$projectdir/output/tables/ult`x'_byregion.xls", replace)
 }		 
 
-//could do heat map
+*ULT standards, by region and year (for those with at least 6m follow-up after diagnosis) - boxplot
+table1_mc if nuts_region!=. & has_6m_post_diag==1 & (diagnosis_year>=5 & diagnosis_year!=.), by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(ult_time cat %3.1f \ ///
+		 ult_time_19 cat %3.1f \ ///
+		 ult_time_20 cat %3.1f \ ///
+		 ult_time_21 cat %3.1f \ ///
+		 ult_time_22 cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/ult_byyearandregion.xls", replace)
+		 
+*Urate attainment within 6m of ULT, by region and year (for those with at least 6m follow-up after ULT) - boxplot
+table1_mc if nuts_region!=. & has_6m_post_ult==1 & ult_6m==1 & (ult_year>=5 & ult_year!=.), by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(urate_6m_ult_time cat %3.1f \ ///
+		 urate_6m_ult_time_19 cat %3.1f \ ///
+		 urate_6m_ult_time_20 cat %3.1f \ ///
+		 urate_6m_ult_time_21 cat %3.1f \ ///
+		 urate_6m_ult_time_22 cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate_6m_ult_byyearandregion.xls", replace)	
 
+*Urate attainment within 12m of ULT, by region and year (for those with at least 12m follow-up after ULT) - boxplot
+table1_mc if nuts_region!=. & has_12m_post_ult==1 & ult_6m==1 & (ult_year>=5 & ult_year<=7 & ult_year!=.), by(nuts_region) total(before) onecol nospacelowpercent iqrmiddle(",")  ///
+	vars(urate_12m_ult_time cat %3.1f \ ///
+		 urate_12m_ult_time_19 cat %3.1f \ ///
+		 urate_12m_ult_time_20 cat %3.1f \ ///
+		 urate_12m_ult_time_21 cat %3.1f \ ///
+		 ) saving("$projectdir/output/tables/urate_12m_ult_byyearandregion.xls", replace)
+		 
 *First ULT drug===================================================================================================*/
 
 *If ULT within 6m of diagnosis
@@ -624,5 +648,14 @@ outsheet * using "$projectdir/output/tables/urate`x'_byyear_ult_test.csv" , comm
 import excel "$projectdir/output/tables/urate`x'_byregion_ult_test.xls", clear
 outsheet * using "$projectdir/output/tables/urate`x'_byregion_ult_test.csv" , comma nonames replace	
 }
+
+import excel "$projectdir/output/tables/ult_byyearandregion.xls", clear
+outsheet * using "$projectdir/output/tables/ult_byyearandregion.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate_6m_ult_byyearandregion.xls", clear
+outsheet * using "$projectdir/output/tables/urate_6m_ult_byyearandregion.csv" , comma nonames replace	
+
+import excel "$projectdir/output/tables/urate_12m_ult_byyearandregion.xls", clear
+outsheet * using "$projectdir/output/tables/urate_12m_ult_byyearandregion.csv" , comma nonames replace
 
 log close

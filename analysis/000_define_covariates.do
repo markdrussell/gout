@@ -1059,6 +1059,85 @@ lab define ult_time 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within
 lab val ult_time ult_time
 lab var ult_time "ULT initiation, overall" 
 
+**Generate ULT variables used for box plots
+gen ult_time_19=ult_time if diagnosis_year==5
+recode ult_time_19 .=4
+gen ult_time_20=ult_time if diagnosis_year==6
+recode ult_time_20 .=4
+gen ult_time_21=ult_time if diagnosis_year==7
+recode ult_time_21 .=4
+gen ult_time_22=ult_time if diagnosis_year==8
+recode ult_time_22 .=4
+lab define ult_time_19 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2019", modify
+lab val ult_time_19 ult_time_19
+lab var ult_time_19 "ULT initiation, 2019/20" 
+lab define ult_time_20 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2020", modify
+lab val ult_time_20 ult_time_20
+lab var ult_time_20 "ULT initiation, 2020/21" 
+lab define ult_time_21 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
+lab val ult_time_21 ult_time_21
+lab var ult_time_21 "ULT initiation, 2021/22" 
+lab define ult_time_22 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
+lab val ult_time_22 ult_time_22
+lab var ult_time_22 "ULT initiation, 2022/23" 
+
+**Urate time categories
+gen urate_6m_ult_time=1 if urate_below360_ult_6m==1
+replace urate_6m_ult_time=2 if urate_below360_ult_6m!=1
+lab define urate_6m_ult_time 1 "Within 6 months" 2 "Not attained within 6 months", modify
+lab val urate_6m_ult_time urate_6m_ult_time
+lab var urate_6m_ult_time "Urate attainment, overall" 
+
+gen urate_12m_ult_time=1 if urate_below360_ult_6m==1
+replace urate_12m_ult_time=2 if urate_below360_ult_6m!=1 & urate_below360_ult_12m==1
+replace urate_12m_ult_time=3 if urate_below360_ult_6m!=1 & urate_below360_ult_12m!=1
+lab define urate_12m_ult_time 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months", modify
+lab val urate_12m_ult_time urate_12m_ult_time
+lab var urate_12m_ult_time "Urate attainment, overall" 
+
+**Generate urate variables used for box plots
+gen urate_6m_ult_time_19=urate_6m_ult_time if ult_year==5
+recode urate_6m_ult_time_19 .=3
+gen urate_6m_ult_time_20=urate_6m_ult_time if ult_year==6
+recode urate_6m_ult_time_20 .=3
+gen urate_6m_ult_time_21=urate_6m_ult_time if ult_year==7
+recode urate_6m_ult_time_21 .=3
+gen urate_6m_ult_time_22=urate_6m_ult_time if ult_year==8
+recode urate_6m_ult_time_22 .=3
+lab define urate_6m_ult_time_19 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2019", modify
+lab val urate_6m_ult_time_19 urate_6m_ult_time_19
+lab var urate_6m_ult_time_19 "Urate attainment, 2019/20" 
+lab define urate_6m_ult_time_20 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2020", modify
+lab val urate_6m_ult_time_20 urate_6m_ult_time_20
+lab var urate_6m_ult_time_20 "Urate attainment, 2020/21" 
+lab define urate_6m_ult_time_21 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2021", modify
+lab val urate_6m_ult_time_21 urate_6m_ult_time_21
+lab var urate_6m_ult_time_21 "Urate attainment, 2021/22" 
+lab define urate_6m_ult_time_22 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2022", modify
+lab val urate_6m_ult_time_22 urate_6m_ult_time_22
+lab var urate_6m_ult_time_22 "Urate attainment, 2022/23" 
+
+gen urate_12m_ult_time_19=urate_12m_ult_time if ult_year==5
+recode urate_12m_ult_time_19 .=4
+gen urate_12m_ult_time_20=urate_12m_ult_time if ult_year==6
+recode urate_12m_ult_time_20 .=4
+gen urate_12m_ult_time_21=urate_12m_ult_time if ult_year==7
+recode urate_12m_ult_time_21 .=4
+gen urate_12m_ult_time_22=urate_12m_ult_time if ult_year==8
+recode urate_12m_ult_time_22 .=4
+lab define urate_12m_ult_time_19 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2019", modify
+lab val urate_12m_ult_time_19 urate_12m_ult_time_19
+lab var urate_12m_ult_time_19 "Urate attainment, 2019/20" 
+lab define urate_12m_ult_time_20 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2020", modify
+lab val urate_12m_ult_time_20 urate_12m_ult_time_20
+lab var urate_12m_ult_time_20 "Urate attainment, 2020/21" 
+lab define urate_12m_ult_time_21 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2021", modify
+lab val urate_12m_ult_time_21 urate_12m_ult_time_21
+lab var urate_12m_ult_time_21 "Urate attainment, 2021/22" 
+lab define urate_12m_ult_time_22 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2022", modify
+lab val urate_12m_ult_time_22 urate_12m_ult_time_22
+lab var urate_12m_ult_time_22 "Urate attainment, 2022/23" 
+
 *What was first ULT drug in GP record==============================================================================*
 
 **Within 6 months of diagnosis

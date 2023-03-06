@@ -137,7 +137,10 @@ actions:
         doc10: output/tables/ult12m_byyear.csv
         doc11: output/tables/ult12m_byregion.csv
         doc12: output/tables/urate6m*.csv
-        doc13: output/tables/urate12m*.csv        
+        doc13: output/tables/urate12m*.csv
+        doc14: output/tables/ult_byyear*.csv
+        doc15: output/tables/urate_6m*.csv  
+        doc16: output/tables/urate_12m*.csv        
         figure1: output/figures/incidence_year_rounded.svg
         figure2: output/figures/incidence_month_rounded.svg
         figure3: output/figures/prevalance_year_rounded.svg
@@ -180,33 +183,24 @@ actions:
         figure 19: output/figures/reg_urate_overall_12m_ult_test.svg
         figure 20: output/figures/reg_urate_merged_12m_ult_test.svg
 
-  # run_redacted_tables:
-  #   run: stata-mp:latest analysis/400_redacted_tables.do
-  #   needs: [create_cohorts]
-  #   outputs:
-  #     moderately_sensitive:
-  #       log1: logs/redacted_tables.log   
-  #       doc1: output/tables/table_1_rounded_bydiag.csv   
-  #       doc2: output/tables/table_mean_bydiag_rounded.csv 
-  #       doc3: output/tables/table_median_bydiag_rounded.csv   
-  #       doc4: output/tables/table_median_bydiag_rounded_to21.csv   
-  #       doc5: output/tables/ITSA_tables_appt_delay_rounded.csv   
-  #       doc6: output/tables/ITSA_tables_csdmard_delay_rounded.csv 
-  #       doc7: output/tables/drug_byyearanddisease_rounded.csv 
-  #       doc8: output/tables/first_csdmard_rounded.csv   
-  #       doc9: output/tables/drug_byyearandregion_rounded.csv
-  #       doc10: output/tables/referral_byregion_rounded.csv
-  #       doc11: output/tables/consultation_medium_rounded.csv
-  #       doc12: output/tables/table_median_bydiag_rounded_to21_report.csv 
-  #       doc13: output/tables/first_csdmard_rounded_report.csv  
+  run_redacted_tables:
+    run: stata-mp:latest analysis/400_redacted_tables.do
+    needs: [create_cohorts]
+    outputs:
+      moderately_sensitive:
+        log1: logs/redacted_tables.log   
+        doc1: output/tables/table_1_rounded_bydiag.csv   
+        doc2: output/tables/ult_byyearandregion_rounded.csv 
+        doc3: output/tables/urate_6m_ult_byyearandregion_rounded.csv   
+        doc4: output/tables/urate_12m_ult_byyearandregion_rounded.csv   
 
-  # run_redacted_tables_allpts:
-  #   run: stata-mp:latest analysis/401_redacted_tables_allpts.do
-  #   needs: [create_cohorts_allpts]
-  #   outputs:
-  #     moderately_sensitive:
-  #       log1: logs/redacted_tables_allpts.log   
-  #       doc1: output/tables/table_1_rounded_allpts.csv  
+  run_redacted_tables_allpts:
+    run: stata-mp:latest analysis/401_redacted_tables_allpts.do
+    needs: [create_cohorts_allpts]
+    outputs:
+      moderately_sensitive:
+        log1: logs/redacted_tables_allpts.log   
+        doc1: output/tables/table_1_rounded_allpts.csv  
 
   # convert_image_formats:
   #   run: python:latest python analysis/convert_images.py --input_dir output/figures --output_dir output/figures
