@@ -1190,6 +1190,8 @@ save "$projectdir/output/data/gout_prevalence_sex_long.dta", replace
 
 **Import denominator for incidence=========================*/
 
+set type double
+
 import delimited "$projectdir/output/measures/measure_pre_registration.csv", clear
 
 summ value //check - what proportion of individuals have 12 months of preceding registration

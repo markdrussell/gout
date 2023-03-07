@@ -53,34 +53,21 @@ foreach var of varlist diuretic ckd chronic_liver_disease chronic_resp_disease c
 	local v : variable label `var' 
 	gen variable = `"`v'"'
     decode `var', gen(categories)
-	gen count = round(_freq, 5)
-	egen total = total(count)
-	egen non_missing=sum(count) if categories!="Not known"
+	egen total_un = total(_freq)
+	egen non_missing_un=sum(_freq) if categories!="Not known"
+	gen missing_un=(total_un-non_missing_un)
 	drop if categories=="Not known"
+	gen count = round(_freq, 5)
+	gen total = round(total_un, 5)
+	gen missing = round(missing_un, 5)
+	gen non_missing = round(non_missing_un, 5)
 	gen percent = round((count/non_missing)*100, 0.1)
-	gen missing=(total-non_missing)
+	order variable, first
+	order categories, after(variable)
+	order count, after(categories)
+	order percent, after(count)
 	order total, after(percent)
 	order missing, after(total)
-	gen countstr = string(count)
-	replace countstr = "<8" if count<=7
-	order countstr, after(count)
-	drop count
-	rename countstr count_all
-	tostring percent, gen(percentstr) force format(%9.1f)
-	replace percentstr = "-" if count =="<8"
-	order percentstr, after(percent)
-	drop percent
-	rename percentstr percent_all
-	gen totalstr = string(total)
-	replace totalstr = "-" if count =="<8"
-	order totalstr, after(total)
-	drop total
-	rename totalstr total_all
-	gen missingstr = string(missing)
-	replace missingstr = "-" if count =="<8"
-	order missingstr, after(missing)
-	drop missing
-	rename missingstr missing
 	list variable categories count percent total missing
 	keep variable categories count percent total missing
 	append using "$projectdir/output/data/table_1_rounded_allpts.dta"

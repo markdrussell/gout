@@ -43,6 +43,8 @@ global end_date = "28/02/2023"
 **Use cleaned data from previous step
 use "$projectdir/output/data/file_gout_all.dta", clear
 
+set type double
+
 **Total number of gout patients within study dates
 tab gout_code
 
@@ -132,6 +134,8 @@ restore
 preserve 
 use "$projectdir/output/data/gout_prevalence_sex_long", clear
 
+set type double
+
 **Calculate counts/population for combined male and female
 expand=2, gen(copy)
 replace sex = "All" if copy==1
@@ -160,6 +164,8 @@ restore
 *Graph of gout admissions incidence by year (all/male/female) - denominator = mid-period TPP population (as per prevalence); admission numbers are from April to April
 preserve 
 use "$projectdir/output/data/gout_admissions_sex_long", clear
+
+set type double
 
 **Calculate counts/population for combined male and female
 expand=2, gen(copy)
@@ -191,6 +197,9 @@ restore
 *Graph of gout admissions incidence by month (all/male/female) - denominator = mid-period TPP population (as per prevalence)
 preserve
 use "$projectdir/output/measures/gout_admissions.dta", clear
+
+set type double
+
 collapse (count) total_adm=adm_count, by(gout_adm_ym sex) 
 
 gen year = year(dofm(gout_adm_ym))

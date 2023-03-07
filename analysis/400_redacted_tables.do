@@ -198,6 +198,8 @@ foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time 
 	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
+	drop total
+	rename non_missing total
 	order total, after(percent)
 	order missing, after(total)
 	gen countstr = string(count)
@@ -297,6 +299,8 @@ foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time 
 	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
+	drop total
+	rename non_missing total
 	order total, after(percent)
 	order missing, after(total)
 	gen countstr = string(count)
@@ -353,6 +357,8 @@ foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_ti
 	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
+	drop total
+	rename non_missing total
 	order total, after(percent)
 	order missing, after(total)
 	gen countstr = string(count)
@@ -454,6 +460,8 @@ foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_ti
 	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
+	drop total
+	rename non_missing total
 	order total, after(percent)
 	order missing, after(total)
 	gen countstr = string(count)
