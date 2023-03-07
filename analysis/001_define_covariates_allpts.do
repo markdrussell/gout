@@ -127,7 +127,7 @@ tab male, missing
 drop sex
 
 ***Ethnicity
-replace ethnicity = .u if ethnicity == .
+replace ethnicity = 9 if ethnicity == .
 ****rearrange in order of prevalence
 recode ethnicity 2=6 /* mixed to 6 */
 recode ethnicity 3=2 /* south asian to 2 */
@@ -139,17 +139,17 @@ label define ethnicity 	1 "White"  					///
 						2 "Asian/Asian British"		///
 						3 "Black"  					///
 						4 "Mixed/Other"				///
-						.u "Not known"
+						9 "Not known"
 label values ethnicity ethnicity
 lab var ethnicity "Ethnicity"
 tab ethnicity, missing
 
 gen ethnicity_bme=0 if ethnicity==1
 replace ethnicity_bme=1 if ethnicity>1 & ethnicity<5
-replace ethnicity_bme=.u if ethnicity==.u
+replace ethnicity_bme=9 if ethnicity==9
 label define ethnicity_bme 	0 "White"  		///
 						1 "Non-white"		///
-						.u "Not known"
+						9 "Not known"
 label values ethnicity_bme ethnicity_bme
 lab var ethnicity_bme "Ethnicity"
 tab ethnicity_bme, missing
@@ -177,8 +177,8 @@ replace region_nospace="YorkshireandTheHumber" if region=="Yorkshire and The Hum
 drop region
 
 ***IMD
-recode imd 0 = .u
-label define imd 1 "1 most deprived" 2 "2" 3 "3" 4 "4" 5 "5 least deprived" .u "Not known"
+recode imd 0 = 9
+label define imd 1 "1 most deprived" 2 "2" 3 "3" 4 "4" 5 "5 least deprived" 9 "Not known"
 label values imd imd 
 lab var imd "Index of multiple deprivation"
 tab imd, missing
@@ -234,7 +234,7 @@ recode  bmicat . = 3 if bmi_val < 30
 recode  bmicat . = 4 if bmi_val < 35
 recode  bmicat . = 5 if bmi_val < 40
 recode  bmicat . = 6 if bmi_val < .
-replace bmicat = .u if bmi_val >= .
+replace bmicat = 9 if bmi_val >= .
 
 label define bmicat 1 "Underweight (<18.5)" 	///
 					2 "Normal (18.5-24.9)"		///
@@ -242,14 +242,14 @@ label define bmicat 1 "Underweight (<18.5)" 	///
 					4 "Obese I (30-34.9)"		///
 					5 "Obese II (35-39.9)"		///
 					6 "Obese III (40+)"			///
-					.u "Not known"
+					9 "Not known"
 					
 label values bmicat bmicat
 lab var bmicat "BMI"
 tab bmicat, missing
 
 *Create less granular categorisation
-recode bmicat 1/3 .u = 1 4 = 2 5 = 3 6 = 4, gen(obese4cat)
+recode bmicat 1/3 9 = 1 4 = 2 5 = 3 6 = 4, gen(obese4cat)
 
 label define obese4cat 	1 "No record of obesity" 	///
 						2 "Obese I (30-34.9)"		///
@@ -260,13 +260,13 @@ label values obese4cat obese4cat
 order obese4cat, after(bmicat)
 
 ***Smoking 
-label define smoke 1 "Never" 2 "Former" 3 "Current" .u "Not known"
+label define smoke 1 "Never" 2 "Former" 3 "Current" 9 "Not known"
 
 gen     smoke = 1  if smoking_status == "N"
 replace smoke = 2  if smoking_status == "E"
 replace smoke = 3  if smoking_status == "S"
-replace smoke = .u if smoking_status == "M"
-replace smoke = .u if smoking_status == "" 
+replace smoke = 9 if smoking_status == "M"
+replace smoke = 9 if smoking_status == "" 
 
 label values smoke smoke
 lab var smoke "Smoking status"
@@ -274,7 +274,7 @@ drop smoking_status
 tab smoke, missing
 
 *Create non-missing 3-category variable for current smoking (assumes missing smoking is never smoking)
-recode smoke .u = 1, gen(smoke_nomiss)
+recode smoke 9 = 1, gen(smoke_nomiss)
 order smoke_nomiss, after(smoke)
 label values smoke_nomiss smoke
 
@@ -319,12 +319,12 @@ gen egfr_cat = .
 recode egfr_cat . = 3 if egfr < 30
 recode egfr_cat . = 2 if egfr < 60
 recode egfr_cat . = 1 if egfr < .
-replace egfr_cat = .u if egfr >= .
+replace egfr_cat = 9 if egfr >= .
 
 label define egfr_cat 	1 ">=60" 		///
 						2 "30-59"		///
 						3 "<30"			///
-						.u "Not known"
+						9 "Not known"
 					
 label values egfr_cat egfr_cat
 lab var egfr_cat "eGFR"
@@ -332,7 +332,7 @@ tab egfr_cat, missing
 
 *If missing eGFR, assume normal
 gen egfr_cat_nomiss = egfr_cat
-replace egfr_cat_nomiss = 1 if egfr_cat == .u
+replace egfr_cat_nomiss = 1 if egfr_cat == 9
 
 label define egfr_cat_nomiss 	1 ">=60/not known" 	///
 								2 "30-59"			///
@@ -408,8 +408,8 @@ replace hba1c_mmol = (hba1c_percentage_val*10.929)-23.5 if hba1c_percentage_val<
 *Group hba1c mmol
 gen 	hba1ccatmm = 0 if hba1c_mmol < 58
 replace hba1ccatmm = 1 if hba1c_mmol >= 58 & hba1c_mmol !=.
-replace hba1ccatmm =.u if hba1ccatmm==. 
-label define hba1ccatmm 0 "HbA1c <58mmol/mol" 1 "HbA1c >=58mmol/mol" .u "Not known"
+replace hba1ccatmm = 9 if hba1ccatmm==. 
+label define hba1ccatmm 0 "HbA1c <58mmol/mol" 1 "HbA1c >=58mmol/mol" 9 "Not known"
 label values hba1ccatmm hba1ccatmm
 lab var hba1ccatmm "HbA1c"
 tab hba1ccatmm, missing
@@ -418,7 +418,7 @@ tab hba1ccatmm, missing
 gen     diabcatm = 1 if diabetes==0
 replace diabcatm = 2 if diabetes==1 & hba1ccatmm==0
 replace diabcatm = 3 if diabetes==1 & hba1ccatmm==1
-replace diabcatm = 4 if diabetes==1 & hba1ccatmm==.u
+replace diabcatm = 4 if diabetes==1 & hba1ccatmm==9
 
 label define diabcatm 	1 "No diabetes" 			///
 						2 "Diabetes with HbA1c <58mmol/mol"		///

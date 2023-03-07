@@ -194,8 +194,8 @@ foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time 
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
@@ -293,8 +293,8 @@ foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time 
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
@@ -349,8 +349,8 @@ foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_ti
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
@@ -450,8 +450,8 @@ foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_ti
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
@@ -506,8 +506,8 @@ foreach var of varlist urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
@@ -607,8 +607,8 @@ foreach var of varlist urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult
     decode `var', gen(categories)
 	gen count = round(_freq, 5)
 	egen total = total(count)
-	egen non_missing=sum(count) if categories!=""
-	drop if categories==""
+	egen non_missing=sum(count) if !strmatch(categories, "Outside*")
+	drop if strmatch(categories, "Outside*")
 	gen percent = round((count/non_missing)*100, 0.1)
 	gen missing=(total-non_missing)
 	order total, after(percent)
