@@ -36,7 +36,7 @@ set scheme plotplainblind
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "28/02/2023"
+global end_date = "01/03/2023"
 
 *Descriptive statistics======================================================================*/
 
@@ -47,7 +47,7 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 
 drop if diagnosis_year==.
 
-foreach var of varlist high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
+foreach var of varlist urate_below360_ult_12m_fup urate_below360_ult_6m_fup urate_below360_ult_12m urate_below360_ult_6m has_12m_post_ult has_6m_post_ult ult_12m_diag ult_6m_diag ult_12m ult_6m has_12m_post_diag has_6m_post_diag high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
 	preserve
 	contract `var'
 	local v : variable label `var' 
@@ -130,7 +130,7 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 drop if diagnosis_year==.
 decode diagnosis_year, gen(year_str)
 
-foreach var of varlist high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
+foreach var of varlist urate_below360_ult_12m_fup urate_below360_ult_6m_fup urate_below360_ult_12m urate_below360_ult_6m has_12m_post_ult has_6m_post_ult ult_12m_diag ult_6m_diag ult_12m ult_6m has_12m_post_diag has_6m_post_diag high_risk multiple_flares tophus diuretic ckd chronic_liver_disease chronic_resp_disease cancer stroke chronic_card_disease diabcatm hypertension smoke bmicat imd ethnicity male agegroup {
 	preserve
 	keep if year_str=="`i'"
 	contract `var'
@@ -653,6 +653,48 @@ use "$projectdir/output/data/urate_12m_ult_byyearandregion_rounded_`i'.dta", cle
 export excel "$projectdir/output/tables/urate_12m_ult_byyearandregion_rounded.xls", sheet("Overall", modify) cell("`col'1") keepcellfmt firstrow(variables)
 }
 
+**Table of mean outputs - full study period
+clear *
+save "$projectdir/output/data/table_mean_rounded.dta", replace emptyok
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+foreach var of varlist age {
+	preserve
+	collapse (count) "`var'_count"=`var' (mean) mean=`var' (sd) stdev=`var'
+	gen varn = "`var'_count"
+	gen variable = substr(varn, 1, strpos(varn, "_count") - 1)
+	drop varn
+	rename *count freq
+	gen count = round(freq, 5)
+	gen countstr = string(count)
+	replace countstr = "<8" if count<=7
+	order countstr, after(count)
+	drop count
+	rename countstr count
+	tostring mean, gen(meanstr) force format(%9.1f)
+	replace meanstr = "-" if count =="<8"
+	order meanstr, after(mean)
+	drop mean
+	rename meanstr mean
+	tostring stdev, gen(stdevstr) force format(%9.1f)
+	replace stdevstr = "-" if count =="<8"
+	order stdevstr, after(stdev)
+	drop stdev
+	rename stdevstr stdev
+	gen diagnosis = "Total"
+	order count, first
+	order diagnosis, first
+	order variable, first
+	list variable diagnosis count mean stdev
+	keep variable diagnosis count mean stdev
+	append using "$projectdir/output/data/table_mean_rounded.dta"
+	save "$projectdir/output/data/table_mean_rounded.dta", replace
+	restore
+} 
+
+use "$projectdir/output/data/table_mean_rounded.dta", clear
+export excel "$projectdir/output/tables/table_mean_rounded.xls", replace keepcellfmt firstrow(variables)
+
 *Output tables as CSVs		 
 import excel "$projectdir/output/tables/table_1_rounded_bydiag.xls", clear
 export delimited using "$projectdir/output/tables/table_1_rounded_bydiag.csv" , novarnames  replace		
@@ -665,5 +707,9 @@ export delimited using "$projectdir/output/tables/urate_6m_ult_byyearandregion_r
 
 import excel "$projectdir/output/tables/urate_12m_ult_byyearandregion_rounded.xls", clear
 export delimited using "$projectdir/output/tables/urate_12m_ult_byyearandregion_rounded.csv" , novarnames  replace	
+
+import excel "$projectdir/output/tables/table_mean_rounded.xls", clear
+export delimited using "$projectdir/output/tables/table_mean_rounded.csv" , novarnames  replace	
+
 
 log close

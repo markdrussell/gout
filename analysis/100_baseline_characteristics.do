@@ -36,7 +36,7 @@ set scheme plotplainblind
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "28/02/2023"
+global end_date = "01/03/2023"
 
 *Diagnostic incidence======================================================================*/
 
@@ -504,23 +504,27 @@ tab baseline_urate_below360 if baseline_urate!=., missing //of those who had a b
 **Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
 tab has_6m_post_ult, missing
 tab has_6m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
+tab has_6m_post_ult if ult_6m==1 & has_6m_post_diag==1, missing //of those who had ULT within 6m
 tab has_12m_post_ult, missing 
-tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m 
-
+tab has_12m_post_ult if ult_6m==1, missing //of those who had ULT within 6m
+tab has_12m_post_ult if ult_6m==1 & has_12m_post_diag==1, missing //of those who had ULT within 6m 
+ 
 **6 months (must have 6m of follow-up post-ULT)
 tab ult_6m, missing //those who received ULT within 6m of diagnosis
-tab has_6m_post_ult if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 6m of registration and follow-up after first ULT prescription
+tab has_6m_post_ult if ult_6m==1 & has_6m_post_diag==1, missing //proportion receiving ULT within 6m who had at least 6m of registration and follow-up after first ULT prescription
 tab had_test_ult_6m if has_6m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 6m
 tabstat lowest_urate_ult_6m if has_6m_post_ult==1, stats(n mean p50 p25 p75) //lowest urate value within 6m of ULT
 tab urate_below360_ult_6m if has_6m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >6m of follow-up
+tab urate_below360_ult_6m_fup, missing //should be same as above
 tab urate_below360_ult_6m if has_6m_post_ult==1 & had_test_ult_6m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >6m of follow-up, and had a test performed within 6m of ULT
 
 **12 months (must have 12m of follow-up post-ULT)
 tab ult_6m, missing //those who received ULT within 6m of diagnosis
-tab has_12m_post_ult if ult_6m==1, missing //proportion receiving ULT within 6m who had at least 12m of registration and follow-up after first ULT prescription
+tab has_12m_post_ult if ult_6m==1 & has_12m_post_diag==1, missing //proportion receiving ULT within 6m who had at least 12m of registration and follow-up after first ULT prescription
 tab had_test_ult_12m if has_12m_post_ult==1, missing //proportion receiving ULT with >6m follow-up, who had a least one test performed within 12m
 tabstat lowest_urate_ult_12m if has_12m_post_ult==1, stats(n mean p50 p25 p75) //lowest urate value within 12m of ULT
 tab urate_below360_ult_12m if has_12m_post_ult==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m and had >12m of follow-up
+tab urate_below360_ult_12m_fup, missing //should be same as above
 tab urate_below360_ult_12m if has_12m_post_ult==1 & had_test_ult_12m==1, missing //proportion who attained <360 micromol/L from those who received ULT within 6m, had >12m of follow-up, and had a test performed within 12m of ULT
 
 *Urate target attainment within 6m/12m of diagnosis; i.e. irrespective of ULT===================================================================*/

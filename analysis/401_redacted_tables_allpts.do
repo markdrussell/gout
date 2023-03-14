@@ -36,7 +36,7 @@ set scheme plotplainblind
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "28/02/2023"
+global end_date = "01/03/2023"
 
 *Descriptive statistics======================================================================*/
 
@@ -77,8 +77,53 @@ foreach var of varlist diuretic ckd chronic_liver_disease chronic_resp_disease c
 use "$projectdir/output/data/table_1_rounded_allpts.dta", clear
 export excel "$projectdir/output/tables/table_1_rounded_allpts.xls", replace keepcellfmt firstrow(variables)
 
+**Table of mean outputs
+clear *
+save "$projectdir/output/data/table_mean_rounded_allpts.dta", replace emptyok
+use "$projectdir/output/data/file_gout_allpts.dta", clear
+
+foreach var of varlist age {
+	preserve
+	collapse (count) "`var'_count"=`var' (mean) mean=`var' (sd) stdev=`var'
+	gen varn = "`var'_count"
+	gen variable = substr(varn, 1, strpos(varn, "_count") - 1)
+	drop varn
+	rename *count freq
+	gen count = round(freq, 5)
+	gen countstr = string(count)
+	replace countstr = "<8" if count<=7
+	order countstr, after(count)
+	drop count
+	rename countstr count
+	tostring mean, gen(meanstr) force format(%9.1f)
+	replace meanstr = "-" if count =="<8"
+	order meanstr, after(mean)
+	drop mean
+	rename meanstr mean
+	tostring stdev, gen(stdevstr) force format(%9.1f)
+	replace stdevstr = "-" if count =="<8"
+	order stdevstr, after(stdev)
+	drop stdev
+	rename stdevstr stdev
+	gen diagnosis = "Total"
+	order count, first
+	order diagnosis, first
+	order variable, first
+	list variable diagnosis count mean stdev
+	keep variable diagnosis count mean stdev
+	append using "$projectdir/output/data/table_mean_rounded_allpts.dta"
+	save "$projectdir/output/data/table_mean_rounded_allpts.dta", replace
+	restore
+} 
+
+use "$projectdir/output/data/table_mean_rounded_allpts.dta", clear
+export excel "$projectdir/output/tables/table_mean_rounded_allpts.xls", replace keepcellfmt firstrow(variables)
+
 *Output tables as CSVs		 
 import excel "$projectdir/output/tables/table_1_rounded_allpts.xls", clear
 export delimited using "$projectdir/output/tables/table_1_rounded_allpts.csv" , novarnames  replace		
+
+import excel "$projectdir/output/tables/table_mean_rounded_allpts.xls", clear
+export delimited using "$projectdir/output/tables/table_mean_rounded_allpts.csv" , novarnames  replace		
 
 log close

@@ -192,7 +192,8 @@ actions:
         doc1: output/tables/table_1_rounded_bydiag.csv   
         doc2: output/tables/ult_byyearandregion_rounded.csv 
         doc3: output/tables/urate_6m_ult_byyearandregion_rounded.csv   
-        doc4: output/tables/urate_12m_ult_byyearandregion_rounded.csv   
+        doc4: output/tables/urate_12m_ult_byyearandregion_rounded.csv  
+        doc5: output/tables/table_mean_rounded.csv 
 
   run_redacted_tables_allpts:
     run: stata-mp:latest analysis/401_redacted_tables_allpts.do
@@ -200,7 +201,8 @@ actions:
     outputs:
       moderately_sensitive:
         log1: logs/redacted_tables_allpts.log   
-        doc1: output/tables/table_1_rounded_allpts.csv  
+        doc1: output/tables/table_1_rounded_allpts.csv
+        doc2: output/tables/table_mean_rounded_allpts.csv           
 
   # convert_image_formats:
   #   run: python:latest python analysis/convert_images.py --input_dir output/figures --output_dir output/figures

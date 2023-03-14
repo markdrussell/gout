@@ -6,7 +6,7 @@ from codelists import *
 
 year_preceding = "2018-03-01"
 start_date = "2019-03-01"
-end_date = "2020-02-28"
+end_date = "2020-03-01"
 
 # This study definition is used to determine distribution of key variables used for iterations (e.g. multiple urate levels)
 

@@ -40,7 +40,7 @@ adopath + "$projectdir/analysis/extra_ados"
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2018"
 global start_date = "01/03/2019"
-global end_date = "28/02/2023"
+global end_date = "01/03/2023"
 
 **Rename variables (some are too long for Stata to handle) =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease

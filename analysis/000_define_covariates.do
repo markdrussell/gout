@@ -40,7 +40,7 @@ adopath + "$projectdir/analysis/extra_ados"
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "28/02/2023"
+global end_date = "01/03/2023"
 
 **Rename variables =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease
@@ -585,14 +585,14 @@ lab var mo_year_diagn "Month/Year of Diagnosis"
 lab var mo_year_diagn_s "Month/Year of Diagnosis"
 
 **Separate into 12-month time windows (for diagnosis date)
-gen diagnosis_year=1 if diagnosis_date>=td(01mar2015) & diagnosis_date<=td(28feb2016)
-replace diagnosis_year=2 if diagnosis_date>=td(01mar2016) & diagnosis_date<=td(28feb2017)
-replace diagnosis_year=3 if diagnosis_date>=td(01mar2017) & diagnosis_date<=td(28feb2018)
-replace diagnosis_year=4 if diagnosis_date>=td(01mar2018) & diagnosis_date<=td(28feb2019)
-replace diagnosis_year=5 if diagnosis_date>=td(01mar2019) & diagnosis_date<=td(28feb2020)
-replace diagnosis_year=6 if diagnosis_date>=td(01mar2020) & diagnosis_date<=td(28feb2021)
-replace diagnosis_year=7 if diagnosis_date>=td(01mar2021) & diagnosis_date<=td(28feb2022)
-replace diagnosis_year=8 if diagnosis_date>=td(01mar2022) & diagnosis_date<=td(28feb2023)
+gen diagnosis_year=1 if diagnosis_date>=td(01mar2015) & diagnosis_date<td(01mar2016)
+replace diagnosis_year=2 if diagnosis_date>=td(01mar2016) & diagnosis_date<td(01mar2017)
+replace diagnosis_year=3 if diagnosis_date>=td(01mar2017) & diagnosis_date<td(01mar2018)
+replace diagnosis_year=4 if diagnosis_date>=td(01mar2018) & diagnosis_date<td(01mar2019)
+replace diagnosis_year=5 if diagnosis_date>=td(01mar2019) & diagnosis_date<td(01mar2020)
+replace diagnosis_year=6 if diagnosis_date>=td(01mar2020) & diagnosis_date<td(01mar2021)
+replace diagnosis_year=7 if diagnosis_date>=td(01mar2021) & diagnosis_date<td(01mar2022)
+replace diagnosis_year=8 if diagnosis_date>=td(01mar2022) & diagnosis_date<td(01mar2023)
 lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
 lab val diagnosis_year diagnosis_year
 lab var diagnosis_year "Year of diagnosis"
@@ -611,14 +611,14 @@ lab var mo_year_ult "Month/Year of first ULT prescription"
 lab var mo_year_ult_s "Month/Year of first ULT prescription"
 
 **Separate into 12-month time windows (for first ult date)
-gen ult_year=1 if first_ult_date>=td(01mar2015) & first_ult_date<=td(28feb2016)
-replace ult_year=2 if first_ult_date>=td(01mar2016) & first_ult_date<=td(28feb2017)
-replace ult_year=3 if first_ult_date>=td(01mar2017) & first_ult_date<=td(28feb2018)
-replace ult_year=4 if first_ult_date>=td(01mar2018) & first_ult_date<=td(28feb2019)
-replace ult_year=5 if first_ult_date>=td(01mar2019) & first_ult_date<=td(28feb2020)
-replace ult_year=6 if first_ult_date>=td(01mar2020) & first_ult_date<=td(28feb2021)
-replace ult_year=7 if first_ult_date>=td(01mar2021) & first_ult_date<=td(28feb2022)
-replace ult_year=8 if first_ult_date>=td(01mar2022) & first_ult_date<=td(28feb2023)
+gen ult_year=1 if first_ult_date>=td(01mar2015) & first_ult_date<td(01mar2016)
+replace ult_year=2 if first_ult_date>=td(01mar2016) & first_ult_date<td(01mar2017)
+replace ult_year=3 if first_ult_date>=td(01mar2017) & first_ult_date<td(01mar2018)
+replace ult_year=4 if first_ult_date>=td(01mar2018) & first_ult_date<td(01mar2019)
+replace ult_year=5 if first_ult_date>=td(01mar2019) & first_ult_date<td(01mar2020)
+replace ult_year=6 if first_ult_date>=td(01mar2020) & first_ult_date<td(01mar2021)
+replace ult_year=7 if first_ult_date>=td(01mar2021) & first_ult_date<td(01mar2022)
+replace ult_year=8 if first_ult_date>=td(01mar2022) & first_ult_date<td(01mar2023)
 lab define ult_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
 lab val ult_year ult_year
 lab var ult_year "Year of first ULT prescription"
@@ -656,6 +656,12 @@ lab define ult_6m 0 "No" 1 "Yes", modify
 lab val ult_6m ult_6m
 tab ult_6m, missing
 tab ult_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
+gen ult_6m_diag = 1 if ult_6m==1 & has_6m_post_diag==1 //should be same as above
+recode ult_6m_diag .=0
+lab var ult_6m_diag "ULT within 6 months of diagnosis"
+lab define ult_6m_diag 0 "No" 1 "Yes", modify
+lab val ult_6m_diag ult_6m_diag
+tab ult_6m_diag, missing
 tab ult_6m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 
 **Generate variable for those who had ULT prescription within 12m of diagnosis 
@@ -666,6 +672,12 @@ lab define ult_12m 0 "No" 1 "Yes", modify
 lab val ult_12m ult_12m
 tab ult_12m, missing
 tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
+gen ult_12m_diag = 1 if ult_12m==1 & has_12m_post_diag==1 //should be same as above
+recode ult_12m_diag .=0
+lab var ult_12m_diag "ULT within 12 months of diagnosis"
+lab define ult_12m_diag 0 "No" 1 "Yes", modify
+lab val ult_12m_diag ult_12m_diag
+tab ult_12m_diag, missing
 
 **Generate variable for time to first allopurinol prescription
 gen time_to_allo = first_allo_date-gout_code_date if first_allo_date!=. & gout_code_date!=.
@@ -714,21 +726,23 @@ tab febux_12m if has_12m_post_diag==1, missing //for those with at least 12m of 
 //Nb. can't tell dose - e.g. if allopurinol 100mg tablets issued, don't know dose prescribed
 
 *Proportion of patients with >6m/12m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
-gen has_6m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-180) & has_6m_follow_up_ult==1 & ult_6m==1
+gen has_6m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-180) & has_6m_follow_up_ult==1 & ult_6m==1 & has_6m_post_diag==1
 recode has_6m_post_ult .=0
 lab var has_6m_post_ult ">6m follow-up after ULT commenced"
 lab define has_6m_post_ult 0 "No" 1 "Yes", modify
 lab val has_6m_post_ult has_6m_post_ult
 tab has_6m_post_ult, missing 
 tab has_6m_post_ult if ult_6m==1, missing 
+tab has_6m_post_ult if ult_6m==1 & has_6m_post_diag==1, missing 
 
-gen has_12m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-365) & has_12m_follow_up_ult==1 & ult_6m==1
+gen has_12m_post_ult=1 if first_ult_date!=. & first_ult_date<(date("$end_date", "DMY")-365) & has_12m_follow_up_ult==1 & ult_6m==1 & has_12m_post_diag==1
 recode has_12m_post_ult .=0
 lab var has_12m_post_ult ">12m follow-up after ULT commenced"
 lab define has_12m_post_ult 0 "No" 1 "Yes", modify
 lab val has_12m_post_ult has_12m_post_ult
 tab has_12m_post_ult, missing 
-tab has_12m_post_ult if ult_12m==1, missing 
+tab has_12m_post_ult if ult_12m==1, missing
+tab has_12m_post_ult if ult_12m==1 & has_12m_post_diag==1, missing
 
 **Number of ULT prescriptions issued in 6m after first script issued (Nb. doses may be double counted if both 300mg and 100mg issued)
 tabstat ult_count_6m, stats (n mean sd p50 p25 p75)
@@ -867,6 +881,11 @@ lab def urate_below360_ult_6m 0 "No" 1 "Yes", modify
 lab val urate_below360_ult_6m urate_below360_ult_6m
 recode urate_below360_ult_6m .=0 //includes those who didn't receive ULT or didn't have a test within 6m
 drop time_to_test_ult_6m
+gen urate_below360_ult_6m_fup=1 if urate_below360_ult_6m==1 & has_6m_post_ult==1
+recode urate_below360_ult_6m_fup .=0
+lab var urate_below360_ult_6m_fup  "Urate <360 micromol/L within 6m of ULT initiation"
+lab def urate_below360_ult_6m_fup 0 "No" 1 "Yes", modify
+lab val urate_below360_ult_6m_fup urate_below360_ult_6m_fup
 
 *Define proportion of patients commenced on ULT within 6 months (important) of diagnosis who attained serum urate <360 within 12 months of ULT commencement
 gen time_to_test_ult_12m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1
@@ -895,6 +914,11 @@ lab var urate_below360_ult_12m  "Urate <360 micromol/L within 12m of ULT initiat
 lab def urate_below360_ult_12m 0 "No" 1 "Yes", modify
 lab val urate_below360_ult_12m urate_below360_ult_12m
 drop time_to_test_ult_12m
+gen urate_below360_ult_12m_fup=1 if urate_below360_ult_12m==1 & has_12m_post_ult==1
+recode urate_below360_ult_12m_fup .=0
+lab var urate_below360_ult_12m_fup  "Urate <360 micromol/L within 12m of ULT initiation"
+lab def urate_below360_ult_12m_fup 0 "No" 1 "Yes", modify
+lab val urate_below360_ult_12m_fup urate_below360_ult_12m_fup
 
 drop test_after_ult		
 reshape wide urate_val_ urate_date_ urate_test_, i(patient_id) j(urate_order)
