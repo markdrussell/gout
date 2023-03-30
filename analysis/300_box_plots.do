@@ -144,7 +144,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment") name(regional_urate_overall_6m, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_overall_6m, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_6m.svg", replace
 restore
 
@@ -164,7 +164,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment") name(regional_urate_merged_6m, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_merged_6m, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_6m.svg", width(12in) replace
 restore
 
@@ -187,7 +187,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment") name(regional_urate_overall_6m_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_overall_6m_test, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_6m_test.svg", replace
 restore
 
@@ -207,7 +207,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment") name(regional_urate_merged_6m_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_merged_6m_test, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_6m_test.svg", width(12in) replace
 restore
 
@@ -230,7 +230,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(regional_urate_overall_6m_ult, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_overall_6m_ult, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_6m_ult.svg", replace
 restore
 
@@ -250,7 +250,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(regional_urate_merged_6m_ult, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(regional_urate_merged_6m_ult, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_6m_ult.svg", width(12in) replace
 restore
 
@@ -273,7 +273,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(reg_urate_overall_6m_ult_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(reg_urate_overall_6m_ult_test, replace)
 graph export "$projectdir/output/figures/reg_urate_overall_6m_ult_test.svg", replace
 restore
 
@@ -293,7 +293,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate attainment after ULT") name(reg_urate_merged_6m_ult_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") bar(1, color(black)) bar(2, color(sky)) legend(order(1 "Within 6 months" 2 "Not within 6 months")) title("Time to urate target attainment") name(reg_urate_merged_6m_ult_test, replace)
 graph export "$projectdir/output/figures/reg_urate_merged_6m_ult_test.svg", width(12in) replace
 restore
 
@@ -318,7 +318,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment") name(regional_urate_overall_12m, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_overall_12m, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_12m.svg", replace
 restore
 
@@ -340,7 +340,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment") name(regional_urate_merged_12m, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_merged_12m, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_12m.svg", width(12in) replace
 restore
 
@@ -365,7 +365,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment") name(regional_urate_overall_12m_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_overall_12m_test, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_12m_test.svg", replace
 restore
 
@@ -387,7 +387,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment") name(regional_urate_merged_12m_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(diagnosis_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_merged_12m_test, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_12m_test.svg", width(12in) replace
 restore
 
@@ -412,7 +412,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(regional_urate_overall_12m_ult, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_overall_12m_ult, replace)
 graph export "$projectdir/output/figures/regional_urate_overall_12m_ult.svg", replace
 restore
 
@@ -434,7 +434,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(regional_urate_merged_12m_ult, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(regional_urate_merged_12m_ult, replace)
 graph export "$projectdir/output/figures/regional_urate_merged_12m_ult.svg", width(12in) replace
 restore
 
@@ -459,7 +459,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(reg_urate_overall_12m_ult_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(nuts_region, relabel(1 "National")) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(reg_urate_overall_12m_ult_test, replace)
 graph export "$projectdir/output/figures/reg_urate_overall_12m_ult_test.svg", replace
 restore
 
@@ -481,7 +481,7 @@ replace nuts_region = 0 if copy==1
 lab define nuts_region 0 "National" 9 "Yorkshire/Humber", modify
 lab val nuts_region nuts_region
 
-graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate attainment after ULT") name(reg_urate_merged_12m_ult_test, replace)
+graph hbar (mean) urate_0 (mean) urate_1 (mean) urate_2, over(ult_year, gap(20) label(labsize(*0.65))) over(nuts_region, gap(60) label(labsize(*0.8))) stack ytitle(Proportion of patients) ytitle(, size(small)) ylabel(0.0 "0" 0.2 "0.2" 0.4 "0.4" 0.6 "0.6" 0.8 "0.8" 1.0 "1.0") legend(order(1 "Within 6 months" 2 "Within 12 months" 3 "Not within 12 months")) title("Time to urate target attainment") name(reg_urate_merged_12m_ult_test, replace)
 graph export "$projectdir/output/figures/reg_urate_merged_12m_ult_test.svg", width(12in) replace
 restore
 

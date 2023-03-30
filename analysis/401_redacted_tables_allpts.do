@@ -90,21 +90,6 @@ foreach var of varlist age {
 	drop varn
 	rename *count freq
 	gen count = round(freq, 5)
-	gen countstr = string(count)
-	replace countstr = "<8" if count<=7
-	order countstr, after(count)
-	drop count
-	rename countstr count
-	tostring mean, gen(meanstr) force format(%9.1f)
-	replace meanstr = "-" if count =="<8"
-	order meanstr, after(mean)
-	drop mean
-	rename meanstr mean
-	tostring stdev, gen(stdevstr) force format(%9.1f)
-	replace stdevstr = "-" if count =="<8"
-	order stdevstr, after(stdev)
-	drop stdev
-	rename stdevstr stdev
 	gen diagnosis = "Total"
 	order count, first
 	order diagnosis, first
