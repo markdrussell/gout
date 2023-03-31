@@ -103,13 +103,23 @@ foreach i of local levels {
 	save "$projectdir/output/data/table_1_rounded_`i'.dta", replace emptyok
 	di `index'
 	if `index'==0 {
-		local col = word("`c(ALPHA)'", `index'+6)
+		local col = word("`c(ALPHA)'", `index'+7)
 	}
 	else if `index'>0 & `index'<=22 {
 	    local col = word("`c(ALPHA)'", `index'+4)
 	}
+	else if `index'==23 {
+	    local col = "AA"
+	}
+	else if `index'==27 {
+	    local col = "AE"
+	}	
+	else if `index'==31 {
+	    local col = "AI"	
+	}	
 	di "`col'"
 	if `index'==0 {
+		local `index++'
 		local `index++'
 		local `index++'
 		local `index++'

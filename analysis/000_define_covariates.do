@@ -658,7 +658,7 @@ tab ult_6m, missing
 tab ult_6m if has_6m_post_diag==1, missing //for those with at least 6m of available follow-up
 gen ult_6m_diag = 1 if ult_6m==1 & has_6m_post_diag==1 //should be same as above
 recode ult_6m_diag .=0
-lab var ult_6m_diag "ULT within 6 months of diagnosis"
+lab var ult_6m_diag "ULT within 6 months of diagnosis (6m+ follow-up)"
 lab define ult_6m_diag 0 "No" 1 "Yes", modify
 lab val ult_6m_diag ult_6m_diag
 tab ult_6m_diag, missing
@@ -674,7 +674,7 @@ tab ult_12m, missing
 tab ult_12m if has_12m_post_diag==1, missing //for those with at least 12m of available follow-up
 gen ult_12m_diag = 1 if ult_12m==1 & has_12m_post_diag==1 //should be same as above
 recode ult_12m_diag .=0
-lab var ult_12m_diag "ULT within 12 months of diagnosis"
+lab var ult_12m_diag "ULT within 12 months of diagnosis (12m+ follow-up)"
 lab define ult_12m_diag 0 "No" 1 "Yes", modify
 lab val ult_12m_diag ult_12m_diag
 tab ult_12m_diag, missing
@@ -883,7 +883,7 @@ recode urate_below360_ult_6m .=0 //includes those who didn't receive ULT or didn
 drop time_to_test_ult_6m
 gen urate_below360_ult_6m_fup=1 if urate_below360_ult_6m==1 & has_6m_post_ult==1
 recode urate_below360_ult_6m_fup .=0
-lab var urate_below360_ult_6m_fup  "Urate <360 micromol/L within 6m of ULT initiation"
+lab var urate_below360_ult_6m_fup  "Urate <360 micromol/L within 6m of ULT initiation (6m+ follow-up)"
 lab def urate_below360_ult_6m_fup 0 "No" 1 "Yes", modify
 lab val urate_below360_ult_6m_fup urate_below360_ult_6m_fup
 
@@ -916,7 +916,7 @@ lab val urate_below360_ult_12m urate_below360_ult_12m
 drop time_to_test_ult_12m
 gen urate_below360_ult_12m_fup=1 if urate_below360_ult_12m==1 & has_12m_post_ult==1
 recode urate_below360_ult_12m_fup .=0
-lab var urate_below360_ult_12m_fup  "Urate <360 micromol/L within 12m of ULT initiation"
+lab var urate_below360_ult_12m_fup  "Urate <360 micromol/L within 12m of ULT initiation (12m+ follow-up)"
 lab def urate_below360_ult_12m_fup 0 "No" 1 "Yes", modify
 lab val urate_below360_ult_12m_fup urate_below360_ult_12m_fup
 
