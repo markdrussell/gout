@@ -668,7 +668,7 @@ clear *
 save "$projectdir/output/data/table_mean_rounded.dta", replace emptyok
 use "$projectdir/output/data/file_gout_all.dta", clear
 
-foreach var of varlist age {
+foreach var of varlist age baseline_urate {
 	preserve
 	collapse (count) "`var'_count"=`var' (mean) mean=`var' (sd) stdev=`var'
 	gen varn = "`var'_count"
