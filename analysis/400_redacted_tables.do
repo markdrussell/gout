@@ -705,6 +705,82 @@ foreach var of varlist age baseline_urate {
 use "$projectdir/output/data/table_mean_rounded.dta", clear
 export excel "$projectdir/output/tables/table_mean_rounded.xls", replace keepcellfmt firstrow(variables)
 
+**Mean baseline urate for gout diagnoses, by year of diagnosis - tagged to the above
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+drop if diagnosis_year==.
+decode diagnosis_year, gen(year_str)
+
+local index=0
+levelsof year_str, local(levels)
+foreach i of local levels {
+	clear *
+	save "$projectdir/output/data/urate_rounded_`i'.dta", replace emptyok
+	di `index'
+	if `index'==0 {
+		local col = word("`c(ALPHA)'", `index'+6)
+	}
+	else if `index'>0 & `index'<=22 {
+	    local col = word("`c(ALPHA)'", `index'+3)
+	}
+	else if `index'==24 {
+	    local col = "AA"
+	}
+	di "`col'"
+	if `index'==0 {
+		local `index++'
+		local `index++'
+		local `index++'
+		local `index++'
+		local `index++'
+		local `index++'
+	}
+	else {
+	    local `index++'
+		local `index++'
+		local `index++'
+	}
+	di `index'
+
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+drop if diagnosis_year==.
+decode diagnosis_year, gen(year_str)
+
+foreach var of varlist baseline_urate {
+	preserve
+	keep if year_str=="`i'"
+	collapse (count) "`var'_count"=`var' (mean) mean=`var' (sd) stdev=`var'
+	rename *count freq
+	gen count = round(freq, 5)
+	gen countstr = string(count)
+	replace countstr = "<8" if count<=7
+	order countstr, after(count)
+	drop count
+	rename countstr count_`i'
+	tostring mean, gen(meanstr) force format(%9.1f)
+	replace meanstr = "-" if count =="<8"
+	order meanstr, after(mean)
+	drop mean
+	rename meanstr mean_`i'
+	tostring stdev, gen(stdevstr) force format(%9.1f)
+	replace stdevstr = "-" if count =="<8"
+	order stdevstr, after(stdev)
+	drop stdev
+	rename stdevstr stdev_`i'
+	order count, first
+	list  count mean stdev
+	keep count mean stdev
+	append using "$projectdir/output/data/urate_rounded_`i'.dta"
+	save "$projectdir/output/data/urate_rounded_`i'.dta", replace
+	restore
+}
+display `index'
+display "`col'"
+use "$projectdir/output/data/urate_rounded_`i'.dta", clear
+export excel "$projectdir/output/tables/table_mean_rounded.xls", sheet("Sheet1", modify) cell("`col'1") keepcellfmt firstrow(variables)
+}	
+
 *Output tables as CSVs		 
 import excel "$projectdir/output/tables/table_1_rounded_bydiag.xls", clear
 export delimited using "$projectdir/output/tables/table_1_rounded_bydiag.csv" , novarnames  replace		
