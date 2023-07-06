@@ -781,6 +781,56 @@ use "$projectdir/output/data/urate_rounded_`i'.dta", clear
 export excel "$projectdir/output/tables/table_mean_rounded.xls", sheet("Sheet1", modify) cell("`col'1") keepcellfmt firstrow(variables)
 }	
 
+**Table of urate monitoring for all gout patients
+clear *
+save "$projectdir/output/data/urate_monitoring_rounded_all.dta", replace emptyok
+use "$projectdir/output/data/file_gout_all.dta", clear
+
+drop if diagnosis_year==.
+
+foreach var of varlist two_urate_ult_6m_fup had_test_ult_6m_fup has_6m_post_ult {
+	preserve
+	contract `var'
+	local v : variable label `var' 
+	gen variable = `"`v'"'
+    decode `var', gen(categories)
+	gen count = round(_freq, 5)
+	egen total = total(count)
+	egen non_missing=sum(count) if categories!="Not known"
+	drop if categories=="Not known"
+	gen percent = round((count/non_missing)*100, 0.1)
+	gen missing=(total-non_missing)
+	order total, after(percent)
+	order missing, after(total)
+	gen countstr = string(count)
+	replace countstr = "<8" if count<=7
+	order countstr, after(count)
+	drop count
+	rename countstr count_all
+	tostring percent, gen(percentstr) force format(%9.1f)
+	replace percentstr = "-" if count =="<8"
+	order percentstr, after(percent)
+	drop percent
+	rename percentstr percent_all
+	gen totalstr = string(total)
+	replace totalstr = "-" if count =="<8"
+	order totalstr, after(total)
+	drop total
+	rename totalstr total_all
+	gen missingstr = string(missing)
+	replace missingstr = "-" if count =="<8"
+	order missingstr, after(missing)
+	drop missing
+	rename missingstr missing
+	list variable categories count percent total missing
+	keep variable categories count percent total missing
+	append using "$projectdir/output/data/urate_monitoring_rounded_all.dta"
+	save "$projectdir/output/data/urate_monitoring_rounded_all.dta", replace
+	restore
+}
+use "$projectdir/output/data/urate_monitoring_rounded_all.dta", clear
+export excel "$projectdir/output/tables/urate_monitoring_rounded_all.xls", replace sheet("Overall") keepcellfmt firstrow(variables)
+
 *Output tables as CSVs		 
 import excel "$projectdir/output/tables/table_1_rounded_bydiag.xls", clear
 export delimited using "$projectdir/output/tables/table_1_rounded_bydiag.csv" , novarnames  replace		
@@ -797,5 +847,7 @@ export delimited using "$projectdir/output/tables/urate_12m_ult_byyearandregion_
 import excel "$projectdir/output/tables/table_mean_rounded.xls", clear
 export delimited using "$projectdir/output/tables/table_mean_rounded.csv" , novarnames  replace	
 
+import excel "$projectdir/output/tables/urate_monitoring_rounded_all.xls", clear
+export delimited using "$projectdir/output/tables/urate_monitoring_rounded_all.csv" , novarnames  replace	
 
 log close

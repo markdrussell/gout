@@ -194,6 +194,7 @@ actions:
         doc3: output/tables/urate_6m_ult_byyearandregion_rounded.csv   
         doc4: output/tables/urate_12m_ult_byyearandregion_rounded.csv  
         doc5: output/tables/table_mean_rounded.csv 
+        doc6: output/tables/urate_monitoring_rounded_all.csv
 
   run_redacted_tables_allpts:
     run: stata-mp:latest analysis/401_redacted_tables_allpts.do

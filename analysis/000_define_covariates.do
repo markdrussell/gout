@@ -868,6 +868,14 @@ recode had_test_ult_6m .=0 //includes those who didn't receive ULT
 lab var had_test_ult_6m "Urate test performed within 6 months of ULT"
 lab def had_test_ult_6m 0 "No" 1 "Yes", modify
 lab val had_test_ult_6m had_test_ult_6m
+tab had_test_ult_6m if has_6m_post_ult==1
+gen had_test_ult_6m_fup = 1 if had_test_ult_6m==1 & has_6m_post_ult==1
+recode had_test_ult_6m_fup .=0
+lab var had_test_ult_6m_fup "Urate test performed within 6 months of ULT if >6m of follow-up"
+lab def had_test_ult_6m_fup 0 "No" 1 "Yes", modify
+lab val had_test_ult_6m_fup had_test_ult_6m_fup
+tab had_test_ult_6m_fup, missing
+
 gen value_test_ult_6m = urate_val_ if time_to_test_ult_6m<=180 & time_to_test_ult_6m!=. & urate_val_!=. //test values within 6 months of ULT
 bys patient_id (value_test_ult_6m): gen n=_n if value_test_ult_6m!=.
 gen lowest_urate_ult_6m = value_test_ult_6m if n==1 //lowest urate value within 6m of ULT
@@ -936,6 +944,12 @@ lab var two_urate_ult_6m "At least 2 urate tests performed within 6 months of UL
 lab def two_urate_ult_6m 0 "No" 1 "Yes", modify
 lab val two_urate_ult_6m two_urate_ult_6m
 tab two_urate_ult_6m if has_6m_post_ult==1, missing 
+gen two_urate_ult_6m_fup=1 if two_urate_ult_6m==1 & has_6m_post_ult==1
+recode two_urate_ult_6m_fup .=0 
+lab var two_urate_ult_6m_fup "At least 2 urate tests performed within 6 months of ULT initiation if >6m of follow-up"
+lab def two_urate_ult_6m_fup 0 "No" 1 "Yes", modify
+lab val two_urate_ult_6m_fup two_urate_ult_6m_fup
+tab two_urate_ult_6m_fup, missing 
 
 tabstat lowest_urate_ult_12m, stats(n mean p50 p25 p75)
 tab urate_below360_ult_12m if has_12m_post_ult==1, missing //for those who received ULT within 6m and had >12m of follow-up
