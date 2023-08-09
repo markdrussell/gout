@@ -747,7 +747,7 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 drop if diagnosis_year==.
 decode diagnosis_year, gen(year_str)
 
-foreach var of varlist baseline_urate {
+foreach var of varlist age baseline_urate {
 	preserve
 	keep if year_str=="`i'"
 	collapse (count) "`var'_count"=`var' (mean) mean=`var' (sd) stdev=`var'
