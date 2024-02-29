@@ -11,6 +11,12 @@ actions:
       highly_sensitive:
         cohort: output/input.csv.gz
 
+  generate_study_population_consults:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/input_consults.csv.gz     
+
   generate_study_population_count:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_count --output-format=csv.gz
     outputs:
@@ -104,6 +110,14 @@ actions:
         data3: output/data/gout_incidence_sex_long.dta
         data4: output/data/gout_admissions_sex_long.dta
 
+  create_cohorts_consults:
+    run: stata-mp:latest analysis/004_define_covariates_consults.do
+    needs: [generate_study_population_consults]
+    outputs:
+      highly_sensitive:
+        log1: logs/cleaning_dataset_consults.log 
+        data1: output/data/file_gout_all_consults.dta
+        
   create_admission_counts:
     run: stata-mp:latest analysis/003_define_admissions.do
     needs: [generate_study_population_2015, generate_study_population_2016, generate_study_population_2017, generate_study_population_2018, generate_study_population_2019, generate_study_population_2020, generate_study_population_2021, generate_study_population_2022]
