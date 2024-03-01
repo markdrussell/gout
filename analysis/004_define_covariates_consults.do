@@ -61,6 +61,7 @@ foreach var of varlist   died_date_ons						///
 foreach var of varlist 	 gout_code_date						///
 						 gout_prevalent_date				///
 						 first_ult_date						///
+						 recent_ult_date					///
 						 died_date_ons						///
 						 urate_test_?_date					///
 						 {		
@@ -160,6 +161,9 @@ keep if gout_code==1
 **Check date range of gout consultations is within study window
 codebook gout_code_date
 
+**Check most common codes
+tab gout_snomed
+
 *Prevalent gout_admission if first gout code was before study start date
 gen prevalent_gout=1 if gout_prevalent_date<date("$start_date", "DMY") & gout_prevalent_date!=.
 recode prevalent_gout .=0
@@ -179,42 +183,54 @@ tab has_6m_post_diag, missing
 
 *ULT prescriptions=================================================================*/
 
-*Patients on ULT at time of consultation
-gen ult_pre_consult=1 if first_ult_date!=. & first_ult_date<gout_code_date
-recode ult_pre_consult .=0
+*Patients who had ever received ULT prior to consultation (not necessary on it at the time of consultation) - less relevant
+gen ult_ever_pre_consult=1 if first_ult_date!=. & first_ult_date<gout_code_date
+recode ult_ever_pre_consult .=0
+tab ult_ever_pre_consult
 
-*Patients who were first prescribed ULT after consultation, irrespective of follow-up duration
-gen ult_post_consult=1 if first_ult_date!=. & first_ult_date>=gout_code_date
+*Patients who had received ULT prescription in 6m prior to consultation
+gen ult_6m_pre_consult=1 if recent_ult_date!=. & recent_ult_date<gout_code_date & recent_ult_date>(gout_code_date-186)
+recode ult_6m_pre_consult .=0
+tab ult_6m_pre_consult
+
+*Patients who had not been prescribed ULT in 6m before consultation who were prescribed ULT in 6m after consultation
+gen ult_post_consult=1 if recent_ult_date!=. & recent_ult_date>=gout_code_date
 recode ult_post_consult .=0
+tab ult_post_consult
 
-*Patients on ULT before or after consultation, irrespective of follow-up duration
-gen ult_any=1 if ult_pre_consult==1 | ult_post_consult==1
+*Patients on ULT before or after consultation
+gen ult_any=1 if ult_6m_pre_consult==1 | ult_post_consult==1
 recode ult_any .=0
+tab ult_any
 
-*Patients on no ULT before or after consultation, irrespective of follow-up duration
-gen no_ult=1 if ult_pre_consult!=1 & ult_post_consult!=1
+*Patients on no ULT before or after consultation
+gen no_ult=1 if ult_6m_pre_consult!=1 & ult_post_consult!=1
 recode no_ult .=0
+tab no_ult
 
-**Generate variable for time to first ULT prescription (if started after consultation), irrespective of follow-up duration
-gen time_to_ult = (first_ult_date-gout_code_date) if first_ult_date!=. & gout_code_date!=. & (first_ult_date>=gout_code_date)
+**Generate demoninator for individuals who were not prescribed ULT in 6m before consultation and who had 6m+ follow-up after their consult
+gen no_pre_ULT_has_6m=1 if has_6m_post_diag==1 & ult_6m_pre_consult!=1
+recode no_pre_ULT_has_6m .=0
+tab no_pre_ULT_has_6m
 
-**Generate variable for time to first ULT prescription, limited to 6m post-consultation
-gen time_to_ult_6m=(first_ult_date-gout_code_date) if first_ult_date!=. & gout_code_date!=. & (first_ult_date>=gout_code_date) & (first_ult_date<gout_code_date+186)
+**Generate variable for time to first ULT prescription (if started after consultation)
+gen time_to_ult = (recent_ult_date-gout_code_date) if recent_ult_date!=. & gout_code_date!=. & (recent_ult_date>=gout_code_date)
+tabstat time_to_ult, stats(n mean sd median p25 p75)
+
+**Generate variable for time to first ULT prescription, limited to 6m post-consultation - should be the same as above
+gen time_to_ult_6m=(recent_ult_date-gout_code_date) if recent_ult_date!=. & gout_code_date!=. & (recent_ult_date>=gout_code_date) & (recent_ult_date<gout_code_date+186)
+tabstat time_to_ult_6m, stats(n mean sd median p25 p75)
 
 **Generate variable for those who had ULT prescription within 6m of diagnosis, who were not already on ULT and who have 6m+ follow-up post consultation
 gen ult_6m_diag = 1 if time_to_ult_6m<=186 & time_to_ult_6m!=. & has_6m_post_diag==1 
-recode ult_6m_diag .=0 if ult_pre_consult!=1 //leaves missing for those who were on ULT pre-consultation
+recode ult_6m_diag .=0 if ult_6m_pre_consult!=1 //leaves missing for those who were on ULT pre-consultation
 lab var ult_6m_diag "ULT initiated within 6 months of diagnosis"
 lab define ult_6m_diag 0 "No" 1 "Yes", modify
 lab val ult_6m_diag ult_6m_diag
 tab ult_6m_diag, missing
 
-**Generate demoninator for individuals who were not already on ULT and who had 6m+ follow-up
-gen no_pre_ULT_has_6m=1 if has_6m_post_diag==1 & ult_pre_consult!=1
-recode no_pre_ULT_has_6m .=0
-
 *Proportion of patients with >6m of registration and follow-up after first ULT prescription, assuming first prescription was within 6m of diagnosis
-gen has_6m_post_ult=1 if ult_6m_diag==1 & has_6m_follow_up_ult==1 & first_ult_date!=. & first_ult_date<(date("$follow_up", "DMY")-186) 
+gen has_6m_post_ult=1 if ult_6m_diag==1 & has_6m_follow_up_ult==1 & recent_ult_date!=. & recent_ult_date<(date("$follow_up", "DMY")-186) 
 recode has_6m_post_ult .=0
 lab var has_6m_post_ult ">6m follow-up after ULT commenced"
 lab define has_6m_post_ult 0 "No" 1 "Yes", modify
@@ -251,8 +267,8 @@ drop n
 
 gen time_to_test = urate_date_-gout_code_date if urate_date_!=. & gout_code_date!=. //time to urate test from consultation date
 
-gen test_after_ult=1 if urate_date_>first_ult_date & urate_date_!=. & first_ult_date!=.
-replace test_after_ult=0 if urate_date_<=first_ult_date & urate_date_!=.
+gen test_after_ult=1 if urate_date_>recent_ult_date & urate_date_!=. & recent_ult_date!=.
+replace test_after_ult=0 if urate_date_<=recent_ult_date & urate_date_!=.
 
 gen abs_time_to_test = abs(time_to_test) if time_to_test!=. & time_to_test<=186 & time_to_test>=-186 & urate_val_!=. //within 6 months before/after consultation
 bys patient_id (abs_time_to_test): gen n=_n 
@@ -273,8 +289,8 @@ lab val baseline_urate_below360 baseline_urate_below360
 replace baseline_urate_below360=0 if baseline_urate>360 & baseline_urate!=.
 drop abs_time_to_test
 
-*Define proportion of patients who attained serum urate <360 within 6 months of consultation, irrespective of ULT
-gen had_test_6m = 1 if (time_to_test>0 & time_to_test<=186) & urate_val_!=. //any test done within 6 months of diagnosis
+*Define proportion of patients who attained serum urate <360 within 6 months of consultation (had to be >7 days after consult, to ensure this was a follow-up test), irrespective of ULT
+gen had_test_6m = 1 if (time_to_test>7 & time_to_test<=186) & urate_val_!=. //any test done within 6 months of diagnosis
 bys patient_id (had_test_6m): gen n=_n if had_test_6m!=.
 by patient_id: egen count_urate_6m = max(n) //number of tests within 6m
 recode count_urate_6m .=0 //includes those who didn't receive ULT
@@ -291,7 +307,7 @@ recode had_test_6m_fup .=0
 lab var had_test_6m_fup "Urate test performed within 6 months of diagnosis (6m+ follow-up)"
 lab def had_test_6m_fup 0 "No" 1 "Yes", modify
 lab val had_test_6m_fup had_test_6m_fup
-gen value_test_6m = urate_val_ if (time_to_test>0 & time_to_test<=186) & urate_val_!=. //test values within 6 months of diagnosis
+gen value_test_6m = urate_val_ if (time_to_test>7 & time_to_test<=186) & urate_val_!=. //test values within 6 months of diagnosis
 bys patient_id (value_test_6m): gen n=_n if value_test_6m!=.
 gen lowest_urate_6m = value_test_6m if n==1 //lowest urate value within 6m of diagnosis
 lab var lowest_urate_6m "Lowest urate value within 6m of diagnosis"
@@ -311,9 +327,9 @@ recode urate_below360_6m_fup .=0 //includes those who didn't have a test within 
 
 drop time_to_test
 
-*Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement, assuming ULT was initiated after consultation date 
-gen time_to_test_ult_6m = urate_date_- first_ult_date if urate_date_!=. & first_ult_date!=. & test_after_ult==1 & ((first_ult_date>=gout_code_date) & (first_ult_date<(gout_code_date+186)))
-gen had_test_ult_6m = 1 if (time_to_test_ult_6m>0 & time_to_test_ult_6m<=186) & time_to_test_ult_6m!=. & urate_val_!=. //any test done within 6 months of ULT
+*Define proportion of patients commenced on ULT within 6 months of diagnosis who attained serum urate <360 within 6 months of ULT commencement (had to be >7 days after ULT initiation), assuming ULT was initiated after consultation date 
+gen time_to_test_ult_6m = urate_date_- recent_ult_date if urate_date_!=. & recent_ult_date!=. & test_after_ult==1 & ((recent_ult_date>=gout_code_date) & (recent_ult_date<(gout_code_date+186)))
+gen had_test_ult_6m = 1 if (time_to_test_ult_6m>7 & time_to_test_ult_6m<=186) & time_to_test_ult_6m!=. & urate_val_!=. //any test done within 6 months of ULT
 bys patient_id (had_test_ult_6m): gen n=_n if had_test_ult_6m!=.
 by patient_id: egen count_urate_ult_6m = max(n) //number of tests within 6m of ULT
 recode count_urate_ult_6m .=0 //includes those who didn't receive ULT
@@ -333,7 +349,7 @@ lab def had_test_ult_6m_fup 0 "No" 1 "Yes", modify
 lab val had_test_ult_6m_fup had_test_ult_6m_fup
 tab had_test_ult_6m_fup, missing
 
-gen value_test_ult_6m = urate_val_ if (time_to_test_ult_6m>0 & time_to_test_ult_6m<=186) & time_to_test_ult_6m!=. & urate_val_!=. //test values within 6 months of ULT
+gen value_test_ult_6m = urate_val_ if (time_to_test_ult_6m>7 & time_to_test_ult_6m<=186) & time_to_test_ult_6m!=. & urate_val_!=. //test values within 6 months of ULT
 bys patient_id (value_test_ult_6m): gen n=_n if value_test_ult_6m!=.
 gen lowest_urate_ult_6m = value_test_ult_6m if n==1 //lowest urate value within 6m of ULT
 lab var lowest_urate_ult_6m "Lowest urate value within 6m of ULT initiation"
@@ -377,17 +393,26 @@ tab two_urate_ult_6m_fup, missing
 
 *Number of practices who had a least one gout consultations within study window==============================*/
 preserve
-collapse (count) count_consults=gout_code (sum) prevalent_consults=prevalent_gout follow_up=has_6m_post_diag ult_pre_consult=ult_pre_consult ult_post_consult=ult_post_consult ult_any=ult_any no_ult=no_ult no_pre_ULT_has_6m=no_pre_ULT_has_6m ult_6m_diag=ult_6m_diag has_6m_post_ult=has_6m_post_ult had_baseline_urate=had_baseline_urate baseline_urate_below360=baseline_urate_below360 had_test_6m=had_test_6m had_test_6m_fup=had_test_6m_fup urate_below360_6m=urate_below360_6m urate_below360_6m_fup=urate_below360_6m_fup had_test_ult_6m=had_test_ult_6m had_test_ult_6m_fup=had_test_ult_6m_fup urate_below360_ult_6m=urate_below360_ult_6m urate_below360_ult_6m_fup=urate_below360_ult_6m_fup two_urate_ult_6m=two_urate_ult_6m two_urate_ult_6m_fup=two_urate_ult_6m_fup (mean) mean_ult_time=time_to_ult (sd) sd_ult_time=time_to_ult (mean) mean_ult_time_6m=time_to_ult_6m (sd) sd_ult_time_6m=time_to_ult_6m, by(practice)
+collapse (count) count_consults=gout_code (sum) prevalent_consults=prevalent_gout follow_up=has_6m_post_diag ult_ever_pre_consult=ult_ever_pre_consult ult_6m_pre_consult=ult_6m_pre_consult ult_post_consult=ult_post_consult ult_any=ult_any no_ult=no_ult no_pre_ULT_has_6m=no_pre_ULT_has_6m ult_6m_diag=ult_6m_diag has_6m_post_ult=has_6m_post_ult had_baseline_urate=had_baseline_urate baseline_urate_below360=baseline_urate_below360 had_test_6m=had_test_6m had_test_6m_fup=had_test_6m_fup urate_below360_6m=urate_below360_6m urate_below360_6m_fup=urate_below360_6m_fup had_test_ult_6m=had_test_ult_6m had_test_ult_6m_fup=had_test_ult_6m_fup urate_below360_ult_6m=urate_below360_ult_6m urate_below360_ult_6m_fup=urate_below360_ult_6m_fup two_urate_ult_6m=two_urate_ult_6m two_urate_ult_6m_fup=two_urate_ult_6m_fup (mean) mean_ult_time=time_to_ult (sd) sd_ult_time=time_to_ult (mean) mean_ult_time_6m=time_to_ult_6m (sd) sd_ult_time_6m=time_to_ult_6m, by(practice)
 
 tabstat count_consults, stats(n mean sd median p25 p75)
 
-foreach var of varlist prevalent_consults follow_up ult_pre_consult ult_post_consult ult_any no_ult no_pre_ULT_has_6m had_baseline_urate {
+foreach var of varlist prevalent_consults follow_up ult_ever_pre_consult ult_6m_pre_consult ult_any no_ult no_pre_ULT_has_6m had_baseline_urate {
 gen prop_`var'=`var'/count_consults
 tabstat prop_`var', stats(n mean sd median p25 p75)
 }
 
+gen prop_no_pre_ult_prev=1 if no_pre_ULT_has_6m/prevalent_consults //denominator is those with prevalent gout only - more relevant; looking at proportion who were not on ULT pre-consult
+tabstat prop_no_pre_ult_prev, stats(n mean sd median p25 p75)
+
+gen prop_ult_6m_pre_prev=1 if ult_6m_pre_consult/prevalent_consults //denominator is those with prevalent gout only; looking at proportion who were on ULT pre-consult
+tabstat prop_ult_6m_pre_prev, stats(n mean sd median p25 p75) 
+
+gen prop_ult_ever_pre_prev=1 if ult_ever_pre_consult/prevalent_consults //denominator is those with prevalent gout only; looking at proportion who had ever had a ULT prescription pre-consult
+tabstat prop_ult_ever_pre_prev, stats(n mean sd median p25 p75) 
+
 **Primary outcome
-gen prop_ult_6m_diag = ult_6m_diag/no_pre_ULT_has_6m //denominator are those who have 6m+ follow-up and who were not already on ULT pre-consultation
+gen prop_ult_6m_diag = ult_6m_diag/no_pre_ULT_has_6m //denominator are those who have 6m+ follow-up and who were not prescribed ULT in the 6m pre-consultation (includes both prevalent and incident gout)
 tabstat prop_ult_6m_diag, stats(n mean sd median p25 p75)
 
 ***ICC for primary outcome

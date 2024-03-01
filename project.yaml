@@ -15,7 +15,7 @@ actions:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_consults --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/input_consults.csv.gz     
+        cohort: output/input_consults.csv.gz    
 
   generate_study_population_count:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_count --output-format=csv.gz

@@ -9,7 +9,7 @@ start_date = "2019-03-01"
 end_date = "2020-03-01"
 follow_up = "2020-09-01"
 
-# Date of first consultation for gout in primary care record within a 1-year period
+# Date of first consultation for gout in primary care record within a 1-year period - code
 def first_consultation_in_period(dx_codelist):
     return patients.with_these_clinical_events(
         dx_codelist,
@@ -18,10 +18,31 @@ def first_consultation_in_period(dx_codelist):
         between=[start_date, end_date],
         date_format="YYYY-MM-DD",
         return_expectations={
-            "incidence": 0.99,
             "date": {"earliest": start_date, "latest": end_date},
+            "incidence": 0.99,
         },
     )
+
+# Date of first consultation for gout in primary care record within a 1-year period - code
+def first_consultation_code_in_period(dx_codelist):
+    return patients.with_these_clinical_events(
+        dx_codelist,
+        returning="code",
+        find_first_match_in_period=True,
+        between=[start_date, end_date],
+        return_expectations={
+            "incidence": 0.99,
+            "category": {
+                "ratios": {
+                    "10000000": 0.2,
+                    "11000000": 0.2,
+                    "12000000": 0.2,
+                    "13000000": 0.2,
+                    "14000000": 0.2,
+                }
+            },
+        },
+    )    
 
 # Date of first gout code prior to start date (i.e. date of prevalent gout diagnosis)
 def first_code_in_period(dx_codelist):
@@ -90,6 +111,9 @@ study = StudyDefinition(
         end_date="gout_code_date + 6 months",
         return_expectations={"incidence": 1},
     ),
+
+    # Snomed code for consultation
+    gout_snomed=first_consultation_code_in_period(prevalent_gout_codes),
 
     # First gout code prior to start date (i.e. prevalent diagnoses)
     gout_prevalent_date=first_code_in_period(
@@ -176,10 +200,23 @@ study = StudyDefinition(
         },
     ),
 
-    ## Has at least 6m of registration after index ULT prescription
+    ## First ULT prescription within 6m before or after consultation 
+    recent_ult_date=patients.with_these_medications(
+        ult_codes,
+        between=["gout_code_date - 6 months", "gout_code_date + 6 months"],
+        returning="date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "incidence": 0.90,
+            "date": {"earliest": start_date, "latest": follow_up},
+        },
+    ),
+
+    ## Has at least 6m of registration after ULT prescription
     has_6m_follow_up_ult=patients.registered_with_one_practice_between(
-        start_date="first_ult_date",
-        end_date="first_ult_date + 6 months",
+        start_date="recent_ult_date",
+        end_date="recent_ult_date + 6 months",
         return_expectations={"incidence": 0.80},
     ),
 
