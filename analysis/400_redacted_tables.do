@@ -36,7 +36,7 @@ set scheme plotplainblind
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "01/03/2023"
+global end_date = "01/03/2024"
 
 *Descriptive statistics======================================================================*/
 
@@ -116,7 +116,10 @@ foreach i of local levels {
 	}	
 	else if `index'==31 {
 	    local col = "AI"	
-	}	
+	}
+	else if `index'==35 {
+	    local col = "AM"	
+	}		
 	di "`col'"
 	if `index'==0 {
 		local `index++'
@@ -196,7 +199,7 @@ keep if has_6m_post_diag==1
 keep if diagnosis_year>=5 & diagnosis_year!=. //restrict to 2019 onwards
 drop if region_nospace=="Not known"
 
-foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time {
+foreach var of varlist ult_time_23 ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time {
 	preserve
 	contract `var'
 	local v : variable label `var' 
@@ -296,7 +299,7 @@ keep if diagnosis_year>=5 & diagnosis_year!=. //restrict to 2019 onwards
 drop if region_nospace=="Not known"
 
 
-foreach var of varlist ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time {
+foreach var of varlist ult_time_23 ult_time_22 ult_time_21 ult_time_20 ult_time_19 ult_time {
 	preserve
 	keep if region_nospace=="`i'"
 	contract `var'
@@ -355,7 +358,7 @@ keep if ult_6m==1
 keep if ult_year>=5 & ult_year!=. //restrict to 2019 onwards. Note, this is year of first ULT, not year of diagnosis
 drop if region_nospace=="Not known"
 
-foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_time_20 urate_6m_ult_time_19 urate_6m_ult_time {
+foreach var of varlist urate_6m_ult_time_23 urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_time_20 urate_6m_ult_time_19 urate_6m_ult_time {
 	preserve
 	contract `var'
 	local v : variable label `var' 
@@ -457,7 +460,7 @@ keep if ult_year>=5 & ult_year!=. //restrict to 2019 onwards. Note, this is year
 drop if region_nospace=="Not known"
 
 
-foreach var of varlist urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_time_20 urate_6m_ult_time_19 urate_6m_ult_time {
+foreach var of varlist urate_6m_ult_time_23 urate_6m_ult_time_22 urate_6m_ult_time_21 urate_6m_ult_time_20 urate_6m_ult_time_19 urate_6m_ult_time {
 	preserve
 	keep if region_nospace=="`i'"
 	contract `var'
@@ -513,10 +516,10 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 
 keep if has_12m_post_ult==1
 keep if ult_6m==1
-keep if ult_year>=5 & ult_year<=7 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
+keep if ult_year>=5 & ult_year<=8 & ult_year!=. //restrict to 2019-2022. Note, this is year of first ULT, not year of diagnosis
 drop if region_nospace=="Not known"
 
-foreach var of varlist urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult_time_19 urate_12m_ult_time {
+foreach var of varlist urate_12m_ult_time_22 urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult_time_19 urate_12m_ult_time {
 	preserve
 	contract `var'
 	local v : variable label `var' 
@@ -564,7 +567,7 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 
 keep if has_12m_post_ult==1
 keep if ult_6m==1
-keep if ult_year>=5 & ult_year<=7 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
+keep if ult_year>=5 & ult_year<=8 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
 drop if region_nospace=="Not known"
 
 local index=0
@@ -612,11 +615,11 @@ use "$projectdir/output/data/file_gout_all.dta", clear
 
 keep if has_12m_post_ult==1
 keep if ult_6m==1
-keep if ult_year>=5 & ult_year<=7 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
+keep if ult_year>=5 & ult_year<=8 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
 drop if region_nospace=="Not known"
 
 
-foreach var of varlist urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult_time_19 urate_12m_ult_time {
+foreach var of varlist urate_12m_ult_time_22 urate_12m_ult_time_21 urate_12m_ult_time_20 urate_12m_ult_time_19 urate_12m_ult_time {
 	preserve
 	keep if region_nospace=="`i'"
 	contract `var'
@@ -726,6 +729,9 @@ foreach i of local levels {
 	else if `index'==24 {
 	    local col = "AA"
 	}
+	else if `index'==27 {
+	    local col = "AD"
+	}	
 	di "`col'"
 	if `index'==0 {
 		local `index++'

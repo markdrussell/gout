@@ -40,7 +40,7 @@ adopath + "$projectdir/analysis/extra_ados"
 **Set index dates ===========================================================*/
 global year_preceding = "01/03/2014"
 global start_date = "01/03/2015"
-global end_date = "01/03/2023"
+global end_date = "01/03/2024"
 
 **Rename variables =======================================*/
 rename chronic_respiratory_disease chronic_resp_disease
@@ -593,7 +593,8 @@ replace diagnosis_year=5 if diagnosis_date>=td(01mar2019) & diagnosis_date<td(01
 replace diagnosis_year=6 if diagnosis_date>=td(01mar2020) & diagnosis_date<td(01mar2021)
 replace diagnosis_year=7 if diagnosis_date>=td(01mar2021) & diagnosis_date<td(01mar2022)
 replace diagnosis_year=8 if diagnosis_date>=td(01mar2022) & diagnosis_date<td(01mar2023)
-lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
+replace diagnosis_year=9 if diagnosis_date>=td(01mar2023) & diagnosis_date<td(01mar2024)
+lab define diagnosis_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022" 9 "2023", modify
 lab val diagnosis_year diagnosis_year
 lab var diagnosis_year "Year of diagnosis"
 tab diagnosis_year, missing
@@ -619,7 +620,8 @@ replace ult_year=5 if first_ult_date>=td(01mar2019) & first_ult_date<td(01mar202
 replace ult_year=6 if first_ult_date>=td(01mar2020) & first_ult_date<td(01mar2021)
 replace ult_year=7 if first_ult_date>=td(01mar2021) & first_ult_date<td(01mar2022)
 replace ult_year=8 if first_ult_date>=td(01mar2022) & first_ult_date<td(01mar2023)
-lab define ult_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022", modify
+replace ult_year=9 if first_ult_date>=td(01mar2023) & first_ult_date<td(01mar2024)
+lab define ult_year 1 "2015" 2 "2016" 3 "2017" 4 "2018" 5 "2019" 6 "2020" 7 "2021" 8 "2022" 9 "2023", modify
 lab val ult_year ult_year
 lab var ult_year "Year of first ULT prescription"
 tab ult_year, missing
@@ -1106,6 +1108,8 @@ gen ult_time_21=ult_time if diagnosis_year==7
 recode ult_time_21 .=4
 gen ult_time_22=ult_time if diagnosis_year==8
 recode ult_time_22 .=4
+gen ult_time_23=ult_time if diagnosis_year==9
+recode ult_time_23 .=4
 lab define ult_time_19 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2019", modify
 lab val ult_time_19 ult_time_19
 lab var ult_time_19 "ULT initiation, 2019/20" 
@@ -1115,9 +1119,12 @@ lab var ult_time_20 "ULT initiation, 2020/21"
 lab define ult_time_21 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
 lab val ult_time_21 ult_time_21
 lab var ult_time_21 "ULT initiation, 2021/22" 
-lab define ult_time_22 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2021", modify
+lab define ult_time_22 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2022", modify
 lab val ult_time_22 ult_time_22
 lab var ult_time_22 "ULT initiation, 2022/23" 
+lab define ult_time_23 1 "Within 3 months" 2 "3-6 months" 3 "No prescription within 6 months" 4 "Outside 2023", modify
+lab val ult_time_23 ult_time_23
+lab var ult_time_23 "ULT initiation, 2023/24" 
 
 **Urate time categories
 gen urate_6m_ult_time=1 if urate_below360_ult_6m==1
@@ -1142,6 +1149,8 @@ gen urate_6m_ult_time_21=urate_6m_ult_time if ult_year==7
 recode urate_6m_ult_time_21 .=3
 gen urate_6m_ult_time_22=urate_6m_ult_time if ult_year==8
 recode urate_6m_ult_time_22 .=3
+gen urate_6m_ult_time_23=urate_6m_ult_time if ult_year==9
+recode urate_6m_ult_time_23 .=3
 lab define urate_6m_ult_time_19 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2019", modify
 lab val urate_6m_ult_time_19 urate_6m_ult_time_19
 lab var urate_6m_ult_time_19 "Urate attainment, 2019/20" 
@@ -1153,7 +1162,10 @@ lab val urate_6m_ult_time_21 urate_6m_ult_time_21
 lab var urate_6m_ult_time_21 "Urate attainment, 2021/22" 
 lab define urate_6m_ult_time_22 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2022", modify
 lab val urate_6m_ult_time_22 urate_6m_ult_time_22
-lab var urate_6m_ult_time_22 "Urate attainment, 2022/23" 
+lab var urate_6m_ult_time_22 "Urate attainment, 2022/23"
+lab define urate_6m_ult_time_23 1 "Within 6 months" 2 "Not attained within 6 months" 3 "Outside 2023", modify
+lab val urate_6m_ult_time_23 urate_6m_ult_time_23
+lab var urate_6m_ult_time_23 "Urate attainment, 2023/24" 
 
 gen urate_12m_ult_time_19=urate_12m_ult_time if ult_year==5
 recode urate_12m_ult_time_19 .=4
@@ -1163,6 +1175,8 @@ gen urate_12m_ult_time_21=urate_12m_ult_time if ult_year==7
 recode urate_12m_ult_time_21 .=4
 gen urate_12m_ult_time_22=urate_12m_ult_time if ult_year==8
 recode urate_12m_ult_time_22 .=4
+gen urate_12m_ult_time_23=urate_12m_ult_time if ult_year==9
+recode urate_12m_ult_time_23 .=4
 lab define urate_12m_ult_time_19 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2019", modify
 lab val urate_12m_ult_time_19 urate_12m_ult_time_19
 lab var urate_12m_ult_time_19 "Urate attainment, 2019/20" 
@@ -1175,6 +1189,9 @@ lab var urate_12m_ult_time_21 "Urate attainment, 2021/22"
 lab define urate_12m_ult_time_22 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2022", modify
 lab val urate_12m_ult_time_22 urate_12m_ult_time_22
 lab var urate_12m_ult_time_22 "Urate attainment, 2022/23" 
+lab define urate_12m_ult_time_23 1 "Within 6 months" 2 "Within 12 months" 3 "Not attained within 12 months" 4 "Outside 2023", modify
+lab val urate_12m_ult_time_23 urate_12m_ult_time_23
+lab var urate_12m_ult_time_23 "Urate attainment, 2023/24" 
 
 *What was first ULT drug in GP record==============================================================================*
 

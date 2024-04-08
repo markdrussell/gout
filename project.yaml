@@ -1,7 +1,7 @@
 version: '3.0'
 
 expectations:
-  population_size: 500000
+  population_size: 200000
 
 actions:
 
@@ -11,11 +11,35 @@ actions:
       highly_sensitive:
         cohort: output/input.csv.gz
 
-  generate_study_population_consults:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults --output-format=csv.gz
+  generate_study_population_consults_2019:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2019-03-01" --output-dir=output/measures --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/input_consults.csv.gz    
+        cohort: output/measures/input_consults_year_2019-03-01.csv.gz
+
+  generate_study_population_consults_2020:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2020-03-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_consults_year_2020-03-01.csv.gz
+
+  generate_study_population_consults_2021:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2021-03-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_consults_year_2021-03-01.csv.gz
+
+  generate_study_population_consults_2022:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2022-03-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_consults_year_2022-03-01.csv.gz  
+
+  generate_study_population_consults_2023:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2023-03-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_consults_year_2023-03-01.csv.gz               
 
   generate_study_population_count:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_count --output-format=csv.gz
@@ -82,11 +106,17 @@ actions:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_year --index-date-range "2022-09-01" --output-dir=output/measures --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/measures/input_year_2022-09-01.csv.gz            
+        cohort: output/measures/input_year_2022-09-01.csv.gz 
+
+  generate_study_population_2023:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_year --index-date-range "2023-09-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_year_2023-09-01.csv.gz                 
     
   generate_measures:
     run: cohortextractor:latest generate_measures --study-definition study_definition_year --output-dir=output/measures
-    needs: [generate_study_population_2015, generate_study_population_2016, generate_study_population_2017, generate_study_population_2018, generate_study_population_2019, generate_study_population_2020, generate_study_population_2021, generate_study_population_2022]
+    needs: [generate_study_population_2015, generate_study_population_2016, generate_study_population_2017, generate_study_population_2018, generate_study_population_2019, generate_study_population_2020, generate_study_population_2021, generate_study_population_2022, generate_study_population_2023]
     outputs:
       moderately_sensitive:
         measure_csv: output/measures/measure_*.csv           
@@ -110,17 +140,21 @@ actions:
         data3: output/data/gout_incidence_sex_long.dta
         data4: output/data/gout_admissions_sex_long.dta
 
-  create_cohorts_consults:
-    run: stata-mp:latest analysis/004_define_covariates_consults.do
-    needs: [generate_study_population_consults]
+  create_cohorts_consults_year:
+    run: stata-mp:latest analysis/004_define_covariates_consults_year.do
+    needs: [generate_study_population_consults_2019, generate_study_population_consults_2020, generate_study_population_consults_2021, generate_study_population_consults_2022, generate_study_population_consults_2023]
     outputs:
       highly_sensitive:
-        log1: logs/cleaning_dataset_consults.log 
-        data1: output/data/file_gout_all_consults.dta
+        log1: logs/cleaning_dataset_consults_year.log 
+        data1: output/data/input_consults_year_2019-03-01.dta
+        data2: output/data/input_consults_year_2020-03-01.dta
+        data3: output/data/input_consults_year_2021-03-01.dta
+        data4: output/data/input_consults_year_2022-03-01.dta
+        data5: output/data/input_consults_year_2023-03-01.dta
         
   create_admission_counts:
     run: stata-mp:latest analysis/003_define_admissions.do
-    needs: [generate_study_population_2015, generate_study_population_2016, generate_study_population_2017, generate_study_population_2018, generate_study_population_2019, generate_study_population_2020, generate_study_population_2021, generate_study_population_2022]
+    needs: [generate_study_population_2015, generate_study_population_2016, generate_study_population_2017, generate_study_population_2018, generate_study_population_2019, generate_study_population_2020, generate_study_population_2021, generate_study_population_2022, generate_study_population_2023]
     outputs:
       highly_sensitive:
         data1: output/measures/gout_admissions.dta                  

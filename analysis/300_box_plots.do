@@ -106,7 +106,7 @@ restore
 /*Initiation of ULT within 12m by region, merged===========================================================================*/
 
 preserve
-keep if diagnosis_year>=5 & diagnosis_year<=7 & diagnosis_year!=. //restrict to 2019-2021
+keep if diagnosis_year>=5 & diagnosis_year<=8 & diagnosis_year!=. //restrict to 2019-2022
 
 gen ult_0 =1 if ult_6m==1
 recode ult_0 .=0
@@ -325,7 +325,7 @@ restore
 *Urate attainment within 12m of diagnosis by region, merged; irrespective of whether a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if diagnosis_year>=5 & diagnosis_year<=7 & diagnosis_year!=. //restrict to 2019-2021
+keep if diagnosis_year>=5 & diagnosis_year<=8 & diagnosis_year!=. //restrict to 2019-2021
 
 gen urate_0 =1 if urate_below360_6m==1
 recode urate_0 .=0
@@ -372,7 +372,7 @@ restore
 *Urate attainment within 12m of diagnosis by region, merged; restricted to those that had a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if diagnosis_year>=5 & diagnosis_year<=7 & diagnosis_year!=. //restrict to 2019-2021
+keep if diagnosis_year>=5 & diagnosis_year<=8 & diagnosis_year!=. //restrict to 2019-2021
 
 gen urate_0 =1 if urate_below360_6m==1
 recode urate_0 .=0
@@ -419,7 +419,7 @@ restore
 *Urate attainment within 12m of ULT by region, merged; assuming ULT was within 6m of diagnosis, irrespective of whether a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if ult_year>=5 & ult_year<=7 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
+keep if ult_year>=5 & ult_year<=8 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
 
 gen urate_0 =1 if urate_below360_ult_6m==1
 recode urate_0 .=0
@@ -466,7 +466,7 @@ restore
 *Urate attainment within 12m of ULT by region, merged; assuming ULT was within 6m of diagnosis, restricted to those that had a test was performed within that timeframe=========================================================================*
 
 preserve
-keep if ult_year>=5 & ult_year<=7 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
+keep if ult_year>=5 & ult_year<=8 & ult_year!=. //restrict to 2019-2021. Note, this is year of first ULT, not year of diagnosis
 
 gen urate_0 =1 if urate_below360_ult_6m==1
 recode urate_0 .=0

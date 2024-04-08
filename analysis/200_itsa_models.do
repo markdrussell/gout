@@ -41,11 +41,11 @@ set scheme plotplainblind
 foreach x in "6m" "12m" {
 	
 if "`x'"=="6m" {
-	local upper_bound "2022m6"
+	local upper_bound "2023m6"
 	di "`upper_bound'"
 	}	
 else if "`x'"=="12m" {
-	local upper_bound "2021m12"
+	local upper_bound "2022m12"
 	di "`upper_bound'"
 	}	
 	
@@ -75,7 +75,7 @@ export delimited using "$projectdir/output/tables/ITSA_ult_`x'.csv", replace
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa prop_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_ult_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -113,7 +113,7 @@ export delimited using "$projectdir/output/tables/ITSA_ult_hrisk_`x'.csv", repla
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa prop_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) yscale(range(0(0.1)0.7)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_ult_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion prescribed ULT", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) yscale(range(0(0.1)0.7)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_ult_hrisk_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -149,7 +149,7 @@ export delimited using "$projectdir/output/tables/ITSA_360_diag_`x'.csv", replac
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa prop_360_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_360_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_360_diag_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -183,7 +183,7 @@ export delimited using "$projectdir/output/tables/ITSA_360_diag_test_`x'.csv", r
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa prop_360_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_360_delay if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_360_diag_test_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -217,7 +217,7 @@ export delimited using "$projectdir/output/tables/ITSA_360_ult_`x'.csv", replace
 tsset mo_year_ult
 
 **Newey Standard Errors with 5 lags
-itsa prop_360_delay if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_360_delay if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_360_ult_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -251,7 +251,7 @@ export delimited using "$projectdir/output/tables/ITSA_360_ult_test_`x'.csv", re
 tsset mo_year_ult
 
 **Newey Standard Errors with 5 lags
-itsa prop_360_delay if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_360_delay if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion attaining urate <360 micromol/L", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_360_ult_test_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -286,7 +286,7 @@ export delimited using "$projectdir/output/tables/ITSA_two_urate_`x'.csv", repla
 tsset mo_year_ult
 
 **Newey Standard Errors with 5 lags
-itsa prop_two_urate if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with two or more urate checks after ULT", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_two_urate if inrange(mo_year_ult, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with two or more urate checks after ULT", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid)  yscale(range(0(0.1)0.5)) ylabel(0 "0" 0.1 "0.1" 0.2 "0.2" 0.3 "0.3" 0.4 "0.4" 0.5 "0.5", format(%03.1f) nogrid) xtitle("Date of first ULT prescription", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_two_urate_`x'.svg", as(svg) replace
 	
 actest, lag(18)	
@@ -321,7 +321,7 @@ export delimited using "$projectdir/output/tables/ITSA_baseline_urate.csv", repl
 tsset mo_year_diagn
 
 **Newey Standard Errors with 5 lags
-itsa prop_baseline_urate if inrange(mo_year_diagn, tm(2015m3), tm(2022m6)), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with a serum urate level at diagnosis", size(medsmall) margin(small)) xscale(range(660(12)756)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023", nogrid) yscale(range(0.3(0.1)0.8)) ylabel(0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7" 0.8 "0.8", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
+itsa prop_baseline_urate if inrange(mo_year_diagn, tm(2015m3), tm(`upper_bound')), single trperiod(2020m3) lag(5) replace figure(title("", size(small)) subtitle("", size(medsmall)) ytitle("Proportion with a serum urate level at diagnosis", size(medsmall) margin(small)) xscale(range(660(12)768)) xlabel(660 "2015" 672 "2016" 684 "2017" 696 "2018" 708 "2019" 720 "2020" 732 "2021" 744 "2022" 756 "2023" 768 "2024", nogrid) yscale(range(0.3(0.1)0.8)) ylabel(0.3 "0.3" 0.4 "0.4" 0.5 "0.5" 0.6 "0.6" 0.7 "0.7" 0.8 "0.8", format(%03.1f) nogrid) xtitle("Date of diagnosis", size(medsmall) margin(medsmall)) note("", size(v.small)) legend(off)) posttrend 
 	graph export "$projectdir/output/figures/ITSA_baseline_urate.svg", as(svg) replace
 	
 actest, lag(18)	
