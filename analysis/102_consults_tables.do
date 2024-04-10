@@ -292,15 +292,8 @@ putexcel D12=matrix(sd), nformat(0.000)
 putexcel E12=matrix(p50), nformat(0.000)
 putexcel F12=matrix(p25), nformat(0.000)
 putexcel G12=matrix(p75), nformat(0.000)
-
-***ICC
-melogit prop_ult_any || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H12=matrix(icc), nformat(0.000)
-putexcel I12=matrix(se), nformat(0.000)
+putexcel H12="Not required"
+putexcel I12="Not required"
 
 gen prop_no_ult = no_ult/count_consults //denominator is all cases of gout, irrespective of follow-up; proportion who had no ULT prescription in 6 months before or after consultation
 tabstat prop_no_ult, stats(n mean sd median p25 p75) save
@@ -320,15 +313,8 @@ putexcel D13=matrix(sd), nformat(0.000)
 putexcel E13=matrix(p50), nformat(0.000)
 putexcel F13=matrix(p25), nformat(0.000)
 putexcel G13=matrix(p75), nformat(0.000)
-
-***ICC
-melogit prop_no_ult || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H13=matrix(icc), nformat(0.000)
-putexcel I13=matrix(se), nformat(0.000)
+putexcel H13="Not required"
+putexcel I13="Not required"
 
 gen prop_baseline_urate = had_baseline_urate/count_consults //denominator is all cases of gout; proportion who had a urate level checked within 6 months before or after consultation, irrespective of ULT - could change this to e.g. 2 weeks after
 tabstat prop_baseline_urate, stats(n mean sd median p25 p75) save
@@ -348,15 +334,8 @@ putexcel D14=matrix(sd), nformat(0.000)
 putexcel E14=matrix(p50), nformat(0.000)
 putexcel F14=matrix(p25), nformat(0.000)
 putexcel G14=matrix(p75), nformat(0.000)
-
-***ICC
-melogit prop_baseline_urate || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H14=matrix(icc), nformat(0.000)
-putexcel I14=matrix(se), nformat(0.000)
+putexcel H14="Not required"
+putexcel I14="Not required"
 
 gen prop_baseline_urate_360 = baseline_urate_below360/count_consults //denominator is all cases of gout, irrespective of test; proportion who had baseline serum urate <360 
 tabstat prop_baseline_urate_360, stats(n mean sd median p25 p75) save
@@ -376,15 +355,8 @@ putexcel D15=matrix(sd), nformat(0.000)
 putexcel E15=matrix(p50), nformat(0.000)
 putexcel F15=matrix(p25), nformat(0.000)
 putexcel G15=matrix(p75), nformat(0.000)
-
-***ICC
-melogit prop_baseline_urate_360 || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H15=matrix(icc), nformat(0.000)
-putexcel I15=matrix(se), nformat(0.000)
+putexcel H15="Not required"
+putexcel I15="Not required"
 
 gen prop_baseline_urate_360_test = baseline_urate_below360/had_baseline_urate //denominator is all cases of gout who had baseline test; proportion who had baseline serum urate <360 
 tabstat prop_baseline_urate_360_test, stats(n mean sd median p25 p75) save
@@ -404,14 +376,8 @@ putexcel D16=matrix(sd), nformat(0.000)
 putexcel E16=matrix(p50), nformat(0.000)
 putexcel F16=matrix(p25), nformat(0.000)
 putexcel G16=matrix(p75), nformat(0.000)
-
-melogit prop_baseline_urate_360_test || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H16=matrix(icc), nformat(0.000)
-putexcel I16=matrix(se), nformat(0.000)
+putexcel H16="Not required"
+putexcel I16="Not required"
 
 gen prop_had_test_6m_fup = had_test_6m_fup/follow_up //denominator are those who had 6m+ follow-up after consultation; proportion with a test performed within 6m after consultation
 tabstat prop_had_test_6m_fup, stats(n mean sd median p25 p75) save
@@ -431,14 +397,8 @@ putexcel D17=matrix(sd), nformat(0.000)
 putexcel E17=matrix(p50), nformat(0.000)
 putexcel F17=matrix(p25), nformat(0.000)
 putexcel G17=matrix(p75), nformat(0.000)
-
-melogit prop_had_test_6m_fup || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H17=matrix(icc), nformat(0.000)
-putexcel I17=matrix(se), nformat(0.000)
+putexcel H17="Not required"
+putexcel I17="Not required"
 
 gen prop_urate_360_6m_fup = urate_below360_6m_fup/follow_up //denominator are those who had 6m+ follow-up after consultation, irrespective of whether a test was performed; proportion who achieved urate<360 within 6m of consult
 tabstat prop_urate_360_6m_fup, stats(n mean sd median p25 p75) save
@@ -512,14 +472,8 @@ putexcel D20=matrix(sd), nformat(0.000)
 putexcel E20=matrix(p50), nformat(0.000)
 putexcel F20=matrix(p25), nformat(0.000)
 putexcel G20=matrix(p75), nformat(0.000)
-
-melogit prop_had_test_ult_6m_fup || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H20=matrix(icc), nformat(0.000)
-putexcel I20=matrix(se), nformat(0.000)
+putexcel H20="Not required"
+putexcel I20="Not required"
 
 gen prop_urate_360_ult_6m_fup = urate_below360_ult_6m_fup/has_6m_post_ult //denominator are those who had 6m+ follow-up post ULT, irrespective of whether test performed; proportion who achieved urate<360 within 6m of new ULT
 tabstat prop_urate_360_ult_6m_fup, stats(n mean sd median p25 p75) save
@@ -593,14 +547,8 @@ putexcel D23=matrix(sd), nformat(0.000)
 putexcel E23=matrix(p50), nformat(0.000)
 putexcel F23=matrix(p25), nformat(0.000)
 putexcel G23=matrix(p75), nformat(0.000)
-
-melogit prop_two_urate_ult_6m_fup || practice:
-estat icc
-matrix icc = r(icc2)
-matrix se = r(se2)
-putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel H23=matrix(icc), nformat(0.000)
-putexcel I23=matrix(se), nformat(0.000)
+putexcel H23="Not required"
+putexcel I23="Not required"
 
 restore
 
