@@ -11,6 +11,12 @@ actions:
       highly_sensitive:
         cohort: output/input.csv.gz
 
+  generate_study_population_consults_2018:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2018-03-01" --output-dir=output/measures --output-format=csv.gz
+    outputs:
+      highly_sensitive:
+        cohort: output/measures/input_consults_year_2018-03-01.csv.gz
+
   generate_study_population_consults_2019:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2019-03-01" --output-dir=output/measures --output-format=csv.gz
     outputs:
@@ -39,7 +45,7 @@ actions:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_consults_year --index-date-range "2023-03-01" --output-dir=output/measures --output-format=csv.gz
     outputs:
       highly_sensitive:
-        cohort: output/measures/input_consults_year_2023-03-01.csv.gz               
+        cohort: output/measures/input_consults_year_2023-03-01.csv.gz              
 
   generate_study_population_count:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_count --output-format=csv.gz
@@ -142,15 +148,16 @@ actions:
 
   create_cohorts_consults_year:
     run: stata-mp:latest analysis/004_define_covariates_consults_year.do
-    needs: [generate_study_population_consults_2019, generate_study_population_consults_2020, generate_study_population_consults_2021, generate_study_population_consults_2022, generate_study_population_consults_2023]
+    needs: [generate_study_population_consults_2018, generate_study_population_consults_2019, generate_study_population_consults_2020, generate_study_population_consults_2021, generate_study_population_consults_2022, generate_study_population_consults_2023]
     outputs:
       highly_sensitive:
         log1: logs/cleaning_dataset_consults_year.log 
-        data1: output/data/input_consults_year_2019-03-01.dta
-        data2: output/data/input_consults_year_2020-03-01.dta
-        data3: output/data/input_consults_year_2021-03-01.dta
-        data4: output/data/input_consults_year_2022-03-01.dta
-        data5: output/data/input_consults_year_2023-03-01.dta
+        data1: output/data/input_consults_year_2018-03-01.dta
+        data2: output/data/input_consults_year_2019-03-01.dta
+        data3: output/data/input_consults_year_2020-03-01.dta
+        data4: output/data/input_consults_year_2021-03-01.dta
+        data5: output/data/input_consults_year_2022-03-01.dta
+        data6: output/data/input_consults_year_2023-03-01.dta
         
   create_admission_counts:
     run: stata-mp:latest analysis/003_define_admissions.do
@@ -194,7 +201,15 @@ actions:
         figure3: output/figures/prevalance_year_rounded.svg
         figure4: output/figures/incidence_admission_year_rounded.svg
         figure5: output/figures/admission_month_rounded.svg
-  
+
+  run_consults_tables:
+    run: stata-mp:latest analysis/102_consults_tables.do
+    needs: [create_cohorts_consults_year]
+    outputs:
+      moderately_sensitive:
+        log1: logs/consults_tables.log   
+        doc1: output/tables/consults_averaged_*.csv   
+
   run_itsa_models:
     run: stata-mp:latest analysis/200_itsa_models.do
     needs: [create_cohorts]

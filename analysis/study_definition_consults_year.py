@@ -89,7 +89,7 @@ study = StudyDefinition(
     },
 
     # Dates for study period
-    index_date = "2019-03-01",
+    index_date = "2018-03-01",
 
     # Disease codes - any gout code during 1-year period
     gout_code_date=first_consultation_in_period(prevalent_gout_codes),
