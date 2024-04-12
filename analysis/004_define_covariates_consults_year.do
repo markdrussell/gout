@@ -179,6 +179,10 @@ keep if gout_code==1
 **Check date range of gout consultations is within study window
 codebook gout_code_date
 
+**Check number of episodes for gout consultations per person during study window
+codebook gout_episodes
+tabstat gout_episodes, stat(n mean sd p50 p25 p75)
+
 **Check most common codes
 tab gout_snomed
 

@@ -18,6 +18,18 @@ def first_consultation_in_period(dx_codelist):
         },
     )
 
+# Count of consultations for gout in primary care record within a 1-year period
+def count_consultation_in_period(dx_codelist):
+    return patients.with_these_clinical_events(
+        dx_codelist,
+        returning="number_of_episodes",
+        between=["index_date", "index_date + 1 year"],
+        return_expectations={
+            "int": {"distribution": "normal", "mean": 2, "stddev": 2},
+            "incidence": 0.99,
+        },
+    )
+
 # Date of first consultation for gout in primary care record within a 1-year period - code
 def first_consultation_code_in_period(dx_codelist):
     return patients.with_these_clinical_events(
@@ -98,7 +110,6 @@ study = StudyDefinition(
     population=patients.satisfying(
         """
             gout_code_date AND
-            has_6m_follow_up AND
             (age >=18 AND age <= 110) AND
             (sex = "M" OR sex = "F")
             """,
@@ -110,6 +121,9 @@ study = StudyDefinition(
         end_date="gout_code_date + 6 months",
         return_expectations={"incidence": 1},
     ),
+
+    # Number of gout consultation episodes in period
+    gout_episodes=count_consultation_in_period(prevalent_gout_codes),
 
     # Snomed code for consultation
     gout_snomed=first_consultation_code_in_period(prevalent_gout_codes),

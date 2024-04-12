@@ -1,7 +1,7 @@
 version: '3.0'
 
 expectations:
-  population_size: 500000
+  population_size: 100000
 
 actions:
 
@@ -267,6 +267,14 @@ actions:
         log1: logs/redacted_tables_allpts.log   
         doc1: output/tables/table_1_rounded_allpts.csv
         doc2: output/tables/table_mean_rounded_allpts.csv           
+
+  run_redacted_tables_consults:
+    run: stata-mp:latest analysis/402_redacted_tables_consults.do
+    needs: [create_cohorts_consults_year]
+    outputs:
+      moderately_sensitive:
+        log1: logs/redacted_tables_consults.log   
+        doc1: output/tables/consults_main_table_redacted.csv
 
   # convert_image_formats:
   #   run: python:latest python analysis/convert_images.py --input_dir output/figures --output_dir output/figures
