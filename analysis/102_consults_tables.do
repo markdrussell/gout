@@ -54,12 +54,12 @@ foreach f in `r(files)' {
 use "$projectdir/output/data/`out_file'.dta", replace
 
 preserve
-collapse (sum) count_consults=gout_code prevalent_consults=prevalent_gout follow_up=has_6m_post_diag ult_ever_pre_consult=ult_ever_pre_consult ult_6m_pre_consult=ult_6m_pre_consult ult_any=ult_any no_ult=no_ult no_pre_ULT_has_6m=no_pre_ULT_has_6m ult_6m_diag=ult_6m_diag has_6m_post_ult=has_6m_post_ult had_baseline_urate=had_baseline_urate baseline_urate_below360=baseline_urate_below360 had_test_6m_fup=had_test_6m_fup urate_below360_6m_fup=urate_below360_6m_fup had_test_ult_6m_fup=had_test_ult_6m_fup urate_below360_ult_6m_fup=urate_below360_ult_6m_fup two_urate_ult_6m_fup=two_urate_ult_6m_fup, by(practice)
+collapse (sum) count_consults=gout_code prevalent_consults=gout_prevalent follow_up=has_6m_post_diag ult_ever_pre_consult=ult_ever_pre_consult ult_6m_pre_consult=ult_6m_pre_consult ult_any=ult_any no_ult=no_ult no_pre_ULT_has_6m=no_pre_ULT_has_6m ult_6m_diag=ult_6m_diag has_6m_post_ult=has_6m_post_ult had_baseline_urate=had_baseline_urate baseline_urate_below360=baseline_urate_below360 had_test_6m_fup=had_test_6m_fup urate_below360_6m_fup=urate_below360_6m_fup had_test_ult_6m_fup=had_test_ult_6m_fup urate_below360_ult_6m_fup=urate_below360_ult_6m_fup two_urate_ult_6m_fup=two_urate_ult_6m_fup, by(practice)
 
 tabstat count_consults, stats(n mean sd median p25 p75) save //number of consults per practice for that year
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -78,7 +78,7 @@ gen p75_ = table[1,6]
 tostring p75_, gen(p75) force format(%9.3f)
 drop p75_
 putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", replace
-putexcel A1="Outcome" B1="Number practices" C1="Mean" D1="Standard Deviation" E1="Median" F1="25th Centile" G1="75th Centile" H1="Intraclass correlation" I1="Standard error of ICC"
+putexcel A1="Variable" B1="Number practices" C1="Mean" D1="Standard Deviation" E1="Median" F1="25th Centile" G1="75th Centile" H1="Intraclass correlation" I1="Standard error of ICC"
 putexcel A2="Number of consults"
 putexcel B2=n
 putexcel C2=mean
@@ -94,7 +94,7 @@ gen prop_prevalent_consults = prevalent_consults/count_consults //proportion of 
 tabstat prop_prevalent_consults, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -128,7 +128,7 @@ gen prop_follow_up = follow_up/count_consults //proportion who had 6m+ follow-up
 tabstat prop_follow_up, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -162,7 +162,7 @@ gen prop_ult_ever_pre_consult = ult_ever_pre_consult/count_consults //denominato
 tabstat prop_ult_ever_pre_consult, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -196,7 +196,7 @@ gen prop_ult_ever_pre_prev = ult_ever_pre_consult/prevalent_consults //denominat
 tabstat prop_ult_ever_pre_prev, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -230,7 +230,7 @@ gen prop_ult_6m_pre_consult = ult_6m_pre_consult/count_consults //denominator is
 tabstat prop_ult_6m_pre_consult, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -264,7 +264,7 @@ gen prop_ult_6m_pre_prev = ult_6m_pre_consult/prevalent_consults //denominator i
 tabstat prop_ult_6m_pre_prev, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -298,7 +298,7 @@ gen prop_no_pre_ULT_has_6m = no_pre_ULT_has_6m/count_consults //denominator is a
 tabstat prop_no_pre_ULT_has_6m, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -328,46 +328,15 @@ putexcel H9="Not required"
 putexcel I9="Not required"
 drop n mean sd p50 p25 p75
 
-gen prop_no_pre_ULT_6m_prev = no_pre_ULT_has_6m/prevalent_consults //denominator is those with prevalent gout only; looking at proportion who had ever had a ULT prescription pre-consult
-tabstat prop_no_pre_ULT_6m_prev, stats(n mean sd median p25 p75) save
-matrix table = r(StatTotal)'
-matrix list table
-gen n_ = table[1,1]
-tostring n_, gen(n) force format(%9.0f)
-drop n_
-gen mean_ = table[1,2]
-tostring mean_, gen(mean) force format(%9.3f)
-drop mean_
-gen sd_ = table[1,3]
-tostring sd_, gen(sd) force format(%9.3f)
-drop sd_
-gen p50_ = table[1,4]
-tostring p50_, gen(p50) force format(%9.3f)
-drop p50_
-gen p25_ = table[1,5]
-tostring p25_, gen(p25) force format(%9.3f)
-drop p25_
-gen p75_ = table[1,6]
-tostring p75_, gen(p75) force format(%9.3f)
-drop p75_
 putexcel set "$projectdir/output/tables/consults_averaged_`year'.xlsx", modify
-putexcel A10="No ULT in last 6m (prevalent cases)"
-putexcel B10=n
-putexcel C10=mean
-putexcel D10=sd
-putexcel E10=p50
-putexcel F10=p25
-putexcel G10=p75
-putexcel H10="Not required"
-putexcel I10="Not required"
-drop n mean sd p50 p25 p75
+putexcel A10="Key outcomes"
 
 **Primary outcome
 gen prop_ult_6m_diag = ult_6m_diag/no_pre_ULT_has_6m //denominator are those who have 6m+ follow-up and who were not prescribed ULT in the 6m pre-consultation (includes both prevalent and incident gout); proportion who newly initiated ULT within 6m of consultation
 tabstat prop_ult_6m_diag, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -413,7 +382,7 @@ gen prop_ult_any = ult_any/count_consults //denominator is all cases of gout, ir
 tabstat prop_ult_any, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -447,7 +416,7 @@ gen prop_no_ult = no_ult/count_consults //denominator is all cases of gout, irre
 tabstat prop_no_ult, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -481,7 +450,7 @@ gen prop_baseline_urate = had_baseline_urate/count_consults //denominator is all
 tabstat prop_baseline_urate, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -515,7 +484,7 @@ gen prop_baseline_urate_360 = baseline_urate_below360/count_consults //denominat
 tabstat prop_baseline_urate_360, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -549,7 +518,7 @@ gen prop_baseline_urate_360_test = baseline_urate_below360/had_baseline_urate //
 tabstat prop_baseline_urate_360_test, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -583,7 +552,7 @@ gen prop_had_test_6m_fup = had_test_6m_fup/follow_up //denominator are those who
 tabstat prop_had_test_6m_fup, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -617,7 +586,7 @@ gen prop_urate_360_6m_fup = urate_below360_6m_fup/follow_up //denominator are th
 tabstat prop_urate_360_6m_fup, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -651,7 +620,7 @@ gen prop_urate_360_6m_fup_test = urate_below360_6m_fup/had_test_6m_fup //denomin
 tabstat prop_urate_360_6m_fup_test, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -685,7 +654,7 @@ gen prop_had_test_ult_6m_fup = had_test_ult_6m_fup/has_6m_post_ult //denominator
 tabstat prop_had_test_ult_6m_fup, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -719,7 +688,7 @@ gen prop_urate_360_ult_6m_fup = urate_below360_ult_6m_fup/has_6m_post_ult //deno
 tabstat prop_urate_360_ult_6m_fup, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -753,7 +722,7 @@ gen prop_urate_360_ult_6m_fup_test = urate_below360_ult_6m_fup/had_test_ult_6m_f
 tabstat prop_urate_360_ult_6m_fup_test, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]
@@ -787,7 +756,7 @@ gen prop_two_urate_ult_6m_fup = two_urate_ult_6m_fup/has_6m_post_ult //denominat
 tabstat prop_two_urate_ult_6m_fup, stats(n mean sd median p25 p75) save
 matrix table = r(StatTotal)'
 matrix list table
-gen n_ = table[1,1]
+gen n_ = round(table[1,1], 5) //round practices to nearest 5
 tostring n_, gen(n) force format(%9.0f)
 drop n_
 gen mean_ = table[1,2]

@@ -58,7 +58,7 @@ foreach f in `r(files)' {
 
 use "$projectdir/output/data/`out_file'.dta", clear
 
-collapse (sum) N_gout_consults=gout_code N_prevalent_gout_consults=prevalent_gout N_male_gout_consults=male (mean) mean_age=age mean_episode_count=gout_episodes (sd) sd_age=age stdev_episode_count=gout_episodes
+collapse (sum) N_gout_consults=gout_code N_prevalent_gout_consults=gout_prevalent N_male_gout_consults=male (mean) mean_age=age mean_episode_count=gout_episodes (sd) sd_age=age stdev_episode_count=gout_episodes
 
 gen year="`year'"
 
