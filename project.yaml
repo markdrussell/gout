@@ -275,17 +275,3 @@ actions:
       moderately_sensitive:
         log1: logs/redacted_tables_consults.log   
         doc1: output/tables/consults_main_table_redacted.csv
-
-  # convert_image_formats:
-  #   run: python:latest python analysis/convert_images.py --input_dir output/figures --output_dir output/figures
-  #   needs: [run_baseline_tables, run_itsa_models, run_box_plots, run_redacted_tables]
-  #   outputs:
-  #     moderately_sensitive:
-  #       figures: output/figures/*.png           
-
-  # generate_notebook:
-  #   run: jupyter:latest jupyter nbconvert /workspace/analysis/report.ipynb --execute --to html --template basic --output-dir=/workspace/output --ExecutePreprocessor.timeout=86400 --no-input
-  #   needs: [convert_image_formats,run_baseline_tables, run_itsa_models, run_box_plots, run_redacted_tables]
-  #   outputs:
-  #     moderately_sensitive:
-  #       notebook: output/report.html            
